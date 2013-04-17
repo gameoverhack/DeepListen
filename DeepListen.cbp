@@ -1,0 +1,1264 @@
+<?xml version="1.0"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="DeepListen" />
+		<Option makefile="makefile" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="addons\;src\;" />
+		<Build>
+			<Target title="release">
+				<Option output="bin\$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj\release" />
+				<Option external_deps="..\..\..\libs\openFrameworksCompiled\lib\win_cb\openFrameworks.lib;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="../../../libs/openFrameworksCompiled/lib/win_cb/openFrameworks.lib" />
+				</Linker>
+			</Target>
+			<Target title="debug">
+				<Option output="bin\$(PROJECT_NAME)_DEBUG" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj\debug\" />
+				<Option external_deps="..\..\..\libs\openFrameworksCompiled\lib\win_cb\openFrameworksDebug.lib;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="../../../libs/openFrameworksCompiled/lib/win_cb/openFrameworksDebug.lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wno-multichar" />
+			<Add directory="..\..\..\libs\glu\include" />
+			<Add directory="..\..\..\libs\freetype\include" />
+			<Add directory="..\..\..\libs\freetype\include\freetype2" />
+			<Add directory="..\..\..\libs\FreeImage\include" />
+			<Add directory="..\..\..\libs\quicktime\include" />
+			<Add directory="..\..\..\libs\rtAudio\include" />
+			<Add directory="..\..\..\libs\fmodex\include" />
+			<Add directory="..\..\..\libs\videoInput\include" />
+			<Add directory="..\..\..\libs\glew\include" />
+			<Add directory="..\..\..\libs\glut\include" />
+			<Add directory="..\..\..\libs\openFrameworks" />
+			<Add directory="..\..\..\libs\openFrameworks\3d" />
+			<Add directory="..\..\..\libs\openFrameworks\app" />
+			<Add directory="..\..\..\libs\openFrameworks\communication" />
+			<Add directory="..\..\..\libs\openFrameworks\events" />
+			<Add directory="..\..\..\libs\openFrameworks\gl" />
+			<Add directory="..\..\..\libs\openFrameworks\graphics" />
+			<Add directory="..\..\..\libs\openFrameworks\math" />
+			<Add directory="..\..\..\libs\openFrameworks\sound" />
+			<Add directory="..\..\..\libs\openFrameworks\types" />
+			<Add directory="..\..\..\libs\openFrameworks\utils" />
+			<Add directory="..\..\..\libs\openFrameworks\video" />
+			<Add directory="..\..\..\libs\poco\include" />
+			<Add directory="..\..\..\libs\tess2\include" />
+			<Add directory="..\..\..\libs\cairo\include\cairo" />
+			<Add directory="src" />
+			<Add directory="../../../addons/ofxBezierWarp/libs" />
+			<Add directory="../../../addons/ofxBezierWarp/src" />
+			<Add directory="../../../addons/ofxCv/libs" />
+			<Add directory="../../../addons/ofxCv/libs/ofxCv" />
+			<Add directory="../../../addons/ofxCv/libs/ofxCv/include" />
+			<Add directory="../../../addons/ofxCv/libs/ofxCv/include/ofxCv" />
+			<Add directory="../../../addons/ofxCv/libs/ofxCv/src" />
+			<Add directory="../../../addons/ofxCv/src" />
+			<Add directory="../../../addons/ofxDmx/libs" />
+			<Add directory="../../../addons/ofxDmx/src" />
+			<Add directory="../../../addons/ofxFenster/libs" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/include" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/include/Cocoa" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/include/WIN32" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/include/X11" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/lib" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/lib/osx32" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/lib/osx64" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/lib/win_cb" />
+			<Add directory="../../../addons/ofxFenster/libs/ghost/lib/win_vs" />
+			<Add directory="../../../addons/ofxFenster/libs/string" />
+			<Add directory="../../../addons/ofxFenster/libs/string/include" />
+			<Add directory="../../../addons/ofxFenster/src" />
+			<Add directory="../../../addons/ofxGui/libs" />
+			<Add directory="../../../addons/ofxGui/src" />
+			<Add directory="../../../addons/ofxhGui/libs" />
+			<Add directory="../../../addons/ofxhGui/src" />
+			<Add directory="../../../addons/ofxhUtils/libs" />
+			<Add directory="../../../addons/ofxhUtils/src" />
+			<Add directory="../../../addons/ofxhUtils/src/hEvents" />
+			<Add directory="../../../addons/ofxhUtils/src/hStringUtils" />
+			<Add directory="../../../addons/ofxhUtils/src/hTable" />
+			<Add directory="../../../addons/ofxJackClient/libs" />
+			<Add directory="../../../addons/ofxJackClient/src" />
+			<Add directory="../../../addons/ofxLogger/libs" />
+			<Add directory="../../../addons/ofxLogger/src" />
+			<Add directory="../../../addons/ofxMidi/libs" />
+			<Add directory="../../../addons/ofxMidi/src" />
+			<Add directory="../../../addons/ofxMVC/libs" />
+			<Add directory="../../../addons/ofxMVC/src" />
+			<Add directory="../../../addons/ofxNetwork/libs" />
+			<Add directory="../../../addons/ofxNetwork/src" />
+			<Add directory="../../../addons/ofxOpenCv/libs" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/calib3d" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/contrib" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/features2d" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/highgui" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/ml" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/objdetect" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/ts" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/lib" />
+			<Add directory="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb" />
+			<Add directory="../../../addons/ofxOpenCv/src" />
+			<Add directory="../../../addons/ofxOsc/libs" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack/src" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack/src/ip" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack/src/ip/posix" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack/src/ip/win32" />
+			<Add directory="../../../addons/ofxOsc/libs/oscpack/src/osc" />
+			<Add directory="../../../addons/ofxOsc/src" />
+			<Add directory="../../../addons/ofxThreadedVideo/libs" />
+			<Add directory="../../../addons/ofxThreadedVideo/src" />
+			<Add directory="../../../addons/ofxXmlSettings/libs" />
+			<Add directory="../../../addons/ofxXmlSettings/src" />
+		</Compiler>
+		<Linker>
+			<Add library="..\..\..\libs\FreeImage\lib\win_cb\FreeImage.lib" />
+			<Add library="..\..\..\libs\rtAudio\lib\win_cb\librtaudio.a" />
+			<Add library="..\..\..\libs\quicktime\lib\win_cb\qtmlClient.lib" />
+			<Add library="..\..\..\libs\cairo\lib\win_cb\libcairo.a" />
+			<Add library="..\..\..\libs\cairo\lib\win_cb\libpixman-1.a" />
+			<Add library="..\..\..\libs\freetype\lib\win_cb\libfreetype.a" />
+			<Add library="..\..\..\libs\glut\lib\win_cb\libglut.a" />
+			<Add library="..\..\..\libs\videoInput\lib\win_cb\videoInputLib.a" />
+			<Add library="..\..\..\libs\fmodex\lib\win_cb\libfmodex.a" />
+			<Add library="..\..\..\libs\glew\lib\win_cb\glew32s.lib" />
+			<Add library="..\..\..\libs\glu\lib\win_cb\glu32.lib" />
+			<Add library="..\..\..\libs\poco\lib\win_cb\libPocoNet.a" />
+			<Add library="..\..\..\libs\poco\lib\win_cb\libPocoUtil.a" />
+			<Add library="..\..\..\libs\poco\lib\win_cb\libPocoXML.a" />
+			<Add library="..\..\..\libs\poco\lib\win_cb\libPocoFoundation.a" />
+			<Add library="..\..\..\libs\tess2\lib\win_cb\libtess2.a" />
+			<Add library="opengl32" />
+			<Add library="gdi32" />
+			<Add library="msimg32" />
+			<Add library="glu32" />
+			<Add library="dsound" />
+			<Add library="winmm" />
+			<Add library="dxguid" />
+			<Add library="strmbase" />
+			<Add library="strmiids" />
+			<Add library="z" />
+			<Add library="uuid" />
+			<Add library="ole32" />
+			<Add library="oleaut32" />
+			<Add library="setupapi" />
+			<Add library="wsock32" />
+			<Add library="ws2_32" />
+			<Add library="Iphlpapi" />
+			<Add library="Comdlg32" />
+			<Add library="../../../addons/ofxFenster/libs/ghost/lib/win_cb/libGhost32.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_legacy231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_haartraining_engine.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_calib3d231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_features2d231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_objdetect231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_imgproc231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_video231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_highgui231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_ml231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_core231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_flann231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_contrib231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_gpu231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libopencv_ts231.a" />
+			<Add library="../../../addons/ofxOpenCv/libs/opencv/lib/win_cb/libzlib.a" />
+		</Linker>
+		<ExtraCommands>
+			<Add after="xcopy /e /i /y &quot;$(PROJECT_DIR)..\..\..\export\win_cb\*.dll&quot;  &quot;$(PROJECT_DIR)bin&quot;" />
+			<Add after="cmd /c if not exist &quot;$(PROJECT_DIR)bin/data&quot; mkdir &quot;$(PROJECT_DIR)bin/data&quot;" />
+			<Mode after="always" />
+		</ExtraCommands>
+		<Unit filename="src\main.cpp">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src\testApp.cpp">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src\testApp.h">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+		<Unit filename="../../../addons/ofxBezierWarp/src/ofxBezierWarp.cpp">
+			<Option virtualFolder="addons/ofxBezierWarp/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxBezierWarp/src/ofxBezierWarp.h">
+			<Option virtualFolder="addons/ofxBezierWarp/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/src/ofxCv.h">
+			<Option virtualFolder="addons/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Calibration.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/ContourFinder.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Distance.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Helpers.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/RunningBackground.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Utilities.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Wrappers.h">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/include/ofxCv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Calibration.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/ContourFinder.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Distance.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Helpers.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/RunningBackground.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Tracker.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Utilities.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxCv/libs/ofxCv/src/Wrappers.cpp">
+			<Option virtualFolder="addons/ofxCv/libs/ofxCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxDmx/src/ofxDmx.cpp">
+			<Option virtualFolder="addons/ofxDmx/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxDmx/src/ofxDmx.h">
+			<Option virtualFolder="addons/ofxDmx/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplay.cpp">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplay.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplayMac.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplayManager.cpp">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplayManager.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxDisplayManagerMac.mm">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFenster.cpp">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFenster.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFensterCanvas.cpp">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFensterCanvas.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFensterManager.cpp">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/src/ofxFensterManager.h">
+			<Option virtualFolder="addons/ofxFenster/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/Cocoa/GHOST_DisplayManagerCocoa.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/Cocoa" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/Cocoa/GHOST_SystemCocoa.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/Cocoa" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/Cocoa/GHOST_SystemPathsCocoa.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/Cocoa" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/Cocoa/GHOST_WindowCocoa.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/Cocoa" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Buttons.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_C-api.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_CallbackEventConsumer.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Debug.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_DisplayManager.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_DisplayManagerNULL.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Event.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventButton.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventCursor.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventDragnDrop.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventKey.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventManager.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventNDOF.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventPrinter.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventString.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventTrackpad.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_EventWheel.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_IEvent.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_IEventConsumer.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_ISystem.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_ISystemPaths.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_ITimerTask.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_IWindow.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_ModifierKeys.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Path-api.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Rect.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_System.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_SystemNULL.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_SystemPaths.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_TimerManager.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_TimerTask.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Types.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_Window.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_WindowManager.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/GHOST_WindowNULL.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_DisplayManagerWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_DropTargetWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_SystemPathsWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_SystemWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_TaskbarWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/GHOST_WindowWin32.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/pktdef.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/WIN32/wintab.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/WIN32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/X11/GHOST_DisplayManagerX11.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/X11" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/X11/GHOST_SystemPathsX11.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/X11" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/X11/GHOST_SystemX11.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/X11" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/ghost/include/X11/GHOST_WindowX11.h">
+			<Option virtualFolder="addons/ofxFenster/libs/ghost/include/X11" />
+		</Unit>
+		<Unit filename="../../../addons/ofxFenster/libs/string/include/STR_String.h">
+			<Option virtualFolder="addons/ofxFenster/libs/string/include" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxBaseGui.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxBaseGui.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxButton.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxButton.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGui.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGuiGroup.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGuiGroup.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxLabel.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxLabel.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxPanel.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxPanel.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSlider.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSlider.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSliderGroup.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSliderGroup.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxToggle.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxToggle.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/h2DSlider.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/h2DSlider.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hAlert.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hAlert.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hAlertLabel.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hAlertLabel.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButton.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButton.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButtonBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButtonBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButtonBoxItem.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hButtonBoxItem.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hCheckBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hCheckBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hCounterLabel.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hCounterLabel.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDialog.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDialog.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDialogButton.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDialogButton.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDrawingPrimitives.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hDrawingPrimitives.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hGui.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hGui.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hGui_all.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hIncButton.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hIncButton.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hLabel.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hLabel.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hListBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hListBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hListItem.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hListItem.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hMessageBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hMessageBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hNumberBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hNumberBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hPanel.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hPanel.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hScrollBar.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hScrollBar.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hScrollButton.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hScrollButton.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hSlider.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hSlider.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hSliderBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hSliderBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hStatusBar.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hStatusBar.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTabBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTabBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTabBoxItem.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTabBoxItem.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextArea.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextArea.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextAreaButton.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextAreaButton.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextBox.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTextBox.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTScrollBar.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hTScrollBar.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hWidget.cpp">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhGui/src/hWidget.h">
+			<Option virtualFolder="addons/ofxhGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hEvents/hEvents.cpp">
+			<Option virtualFolder="addons/ofxhUtils/src/hEvents" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hEvents/hEvents.h">
+			<Option virtualFolder="addons/ofxhUtils/src/hEvents" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hEvents/hObject.h">
+			<Option virtualFolder="addons/ofxhUtils/src/hEvents" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hEvents/hSymbols.cpp">
+			<Option virtualFolder="addons/ofxhUtils/src/hEvents" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hEvents/hSymbols.h">
+			<Option virtualFolder="addons/ofxhUtils/src/hEvents" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hStringUtils/hStringUtils.cpp">
+			<Option virtualFolder="addons/ofxhUtils/src/hStringUtils" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hStringUtils/hStringUtils.h">
+			<Option virtualFolder="addons/ofxhUtils/src/hStringUtils" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hTable/hTable.cpp">
+			<Option virtualFolder="addons/ofxhUtils/src/hTable" />
+		</Unit>
+		<Unit filename="../../../addons/ofxhUtils/src/hTable/hTable.h">
+			<Option virtualFolder="addons/ofxhUtils/src/hTable" />
+		</Unit>
+		<Unit filename="../../../addons/ofxJackClient/src/ofxJackClient.cpp">
+			<Option virtualFolder="addons/ofxJackClient/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxJackClient/src/ofxJackClient.h">
+			<Option virtualFolder="addons/ofxJackClient/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxLogger/src/ofxLogger.cpp">
+			<Option virtualFolder="addons/ofxLogger/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxLogger/src/ofxLogger.h">
+			<Option virtualFolder="addons/ofxLogger/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidi.h">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiConstants.h">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiEvents.h">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiIn.cpp">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiIn.h">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiOut.cpp">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/src/ofxMidiOut.h">
+			<Option virtualFolder="addons/ofxMidi/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/libs/RtError.h">
+			<Option virtualFolder="addons/ofxMidi/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/libs/RtMidi.cpp">
+			<Option virtualFolder="addons/ofxMidi/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMidi/libs/RtMidi.h">
+			<Option virtualFolder="addons/ofxMidi/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseController.cpp">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseController.h">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseModel.cpp">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseModel.h">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseView.cpp">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/BaseView.h">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/SerializationUtils.h">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxMVC/src/States.h">
+			<Option virtualFolder="addons/ofxMVC/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxNetwork.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxNetworkUtils.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPClient.cpp">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPClient.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPManager.cpp">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPManager.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPServer.cpp">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxTCPServer.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxUDPManager.cpp">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxNetwork/src/ofxUDPManager.h">
+			<Option virtualFolder="addons/ofxNetwork/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvBlob.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvColorImage.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvColorImage.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvConstants.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvContourFinder.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvContourFinder.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvFloatImage.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvFloatImage.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvGrayscaleImage.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvGrayscaleImage.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvHaarFinder.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvImage.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvImage.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvMain.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvShortImage.cpp">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvShortImage.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/src/ofxOpenCv.h">
+			<Option virtualFolder="addons/ofxOpenCv/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cv.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cv.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cvaux.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cvaux.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cvwimage.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxeigen.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxmisc.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/highgui.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/ml.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/calib3d/calib3d.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/calib3d" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/contrib/contrib.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/contrib" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/contrib/retina.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/contrib" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/core.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/core_c.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/eigen.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/internal.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/operations.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/types_c.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/version.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/wimage.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/core" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/features2d/features2d.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/features2d" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/all_indices.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/allocator.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/any.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/autotuned_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/composite_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/config.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/defines.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/dist.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/dummy.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/dynamic_bitset.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/flann.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/flann_base.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/general.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/ground_truth.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/hdf5.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/heap.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/hierarchical_clustering_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/index_testing.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/kdtree_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/kdtree_single_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/kmeans_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/linear_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/logger.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/lsh_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/lsh_table.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/matrix.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/miniflann.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/nn_index.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/object_factory.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/params.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/random.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/result_set.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/sampling.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/saving.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/simplex_downhill.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/timer.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/flann" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/devmem2d.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/gpu.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/gpumat.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/matrix_operations.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/stream_accessor.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/gpu" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/highgui/highgui.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/highgui" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/highgui/highgui_c.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/highgui" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc_c.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/types_c.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/blobtrack.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/legacy" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/compat.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/legacy" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/legacy.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/legacy" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/legacy/streams.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/legacy" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/ml/ml.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/ml" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/objdetect/objdetect.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/objdetect" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/opencv.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/ts/ts.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/ts" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/ts/ts_gtest.h">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/ts" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/video" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/tracking.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/video" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/video.hpp">
+			<Option virtualFolder="addons/ofxOpenCv/libs/opencv/include/opencv2/video" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOsc.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscArg.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscBundle.cpp">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscBundle.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscMessage.cpp">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscMessage.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscParameterSync.cpp">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscParameterSync.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscReceiver.cpp">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscReceiver.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscSender.cpp">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscSender.h">
+			<Option virtualFolder="addons/ofxOsc/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/PacketListener.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/posix/NetworkingUtils.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip/posix" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/posix/UdpSocket.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip/posix" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/TimerListener.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/UdpSocket.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/win32/NetworkingUtilsWin.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip/win32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/win32/UdpSocketWin.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/ip/win32" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/MessageMappingOscPacketListener.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscException.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscHostEndianness.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.h">
+			<Option virtualFolder="addons/ofxOsc/libs/oscpack/src/osc" />
+		</Unit>
+		<Unit filename="../../../addons/ofxThreadedVideo/src/ofxThreadedVideo.cpp">
+			<Option virtualFolder="addons/ofxThreadedVideo/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxThreadedVideo/src/ofxThreadedVideo.h">
+			<Option virtualFolder="addons/ofxThreadedVideo/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.h">
+			<Option virtualFolder="addons/ofxXmlSettings/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.h">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,16 @@
+ofxBezierWarp
+ofxCv
+ofxDmx
+ofxFenster
+ofxGui
+ofxhGui
+ofxhUtils
+ofxJackClient
+ofxLogger
+ofxMidi
+ofxMVC
+ofxNetwork
+ofxOpenCv
+ofxOsc
+ofxThreadedVideo
+ofxXmlSettings
