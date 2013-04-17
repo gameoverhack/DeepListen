@@ -1,3 +1,7 @@
+# Applications
+*.app
+*.exe
+
 # Compiled Object files
 *.slo
 *.lo
