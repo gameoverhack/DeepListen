@@ -153,7 +153,8 @@ inline ostream& operator<<(ostream& os, Clip &c){
             c.clipPosition.position.x << ":" << 
             c.clipPosition.position.y << ":" << 
             c.clipPosition.position.width << ":" << 
-            c.clipPosition.position.height << ": frames: " << 
+            c.clipPosition.position.height << ":" <<
+            c.clipPosition.screen << " frames: " << 
             c.clipPosition.videostart << ":" <<
             c.clipPosition.audiostart << ":" <<
             c.clipPosition.audioend << ":" <<
@@ -661,7 +662,7 @@ public:
                 
                 Clip & clip = getClipFromPath(video->getPath());
                 
-                ofxLogVerbose() << "Stop clip ( " << i << " ): " << clip.name << endl;
+                //ofxLogVerbose() << "Stop clip ( " << i << " ): " << clip.name << endl;
                 
                 video->stop();
                 
@@ -853,7 +854,7 @@ public:
         for(int i = 0; i < groups.size(); i++){
             ClipGroup & group = groups[i];
             int grouptotalframes = group[0].frames;
-            for(int j = 0; j < group.size(); j++){
+            for(int j = 1; j < group.size(); j++){
                 grouptotalframes = grouptotalframes - (group[j-1].clipPosition.videoend - group[j].clipPosition.videostart) + group[j].frames;
             }
             tframes = MAX(totalframes, grouptotalframes);

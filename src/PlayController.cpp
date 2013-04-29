@@ -190,6 +190,7 @@ ClipGroup PlayController::makeClipGroup(){
             // to weight statements at start etc
             uniqueNameGroup.shuffle();
             
+            
             // calculate audio overlaps and pack
             for(int j = 0; j < uniqueNameGroup.size(); j++){
                 
@@ -212,27 +213,44 @@ ClipGroup PlayController::makeClipGroup(){
                 
                 vector<string> clipNamesAtStart;
                 rectTestGroup.getClipNamesAt(clipPosition.videostart, clipNamesAtStart);
+                rectTestGroup.getClipNamesAt(clipPosition.audiostart, clipNamesAtStart);
                 
                 vector<string> clipNamesAtEnd;
                 rectTestGroup.getClipNamesAt(clipPosition.videoend, clipNamesAtEnd);
+                rectTestGroup.getClipNamesAt(clipPosition.audioend, clipNamesAtEnd);
                 
+                int attempts = 0;
+                bool reject = false;
                 while(!fitted){
+                    
+                    attempts++;
+                    if(attempts > 2000){
+                        reject = true;
+                        fitted = true;
+                        continue;
+                    }
+                    
                     // prefer screen right hand screen most of the time
                     clipPosition.screen = getRandomDistribution(2, 0.7f, 0.3f);
                     
-                    float xstart = ofRandom(1920.0f - clip.rect.width) - clip.rect.x;
-                    float xend = xstart + clip.rect.width;
+                    fitted = false;
+                    clipPosition.position.x = ofRandom(1920.0f - clip.rect.width) - clip.rect.x;
+                    clipPosition.position.y = (1080.0f - 100.0f) - clip.rect.height - clip.rect.y; // TODO: replace with screen height prop 200 = floor height; make this a prop
                     
-                    fitted = true;
-                    clipPosition.position.x = xstart;
+                    // could scale with these ??
+                    clipPosition.position.width = clip.rect.width;
+                    clipPosition.position.height = clip.rect.height;
+                    
+                    ofRectangle testRectA = ofRectangle(clipPosition.position.x - ofRandom(20, 50), clipPosition.position.y, clipPosition.position.width + ofRandom(20, 50), clipPosition.position.height);
                     
                     for(int k = 0; k < clipNamesAtStart.size(); k++){
                         Clip & clip = rectTestGroup.getClip(clipNamesAtStart[k]);
-                        if(clip.clipPosition.screen != clipPosition.screen) continue;
-                        if((xstart >= clip.clipPosition.position.x && xstart <= clip.clipPosition.position.x + clip.clipPosition.position.width) ||
-                           (xend >= clip.clipPosition.position.x && xend <= clip.clipPosition.position.x + clip.clipPosition.position.width) ||
-                           (clip.clipPosition.position.x >= xstart && clip.clipPosition.position.x + clip.clipPosition.position.width <= xstart) ||
-                           (clip.clipPosition.position.x >= xend && clip.clipPosition.position.x + clip.clipPosition.position.width <= xend)){
+                        ofRectangle testRectB = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
+                        if(clip.clipPosition.screen != clipPosition.screen){
+                            fitted = true;
+                            continue;
+                        }
+                        if(testRectA.intersects(testRectB)){
                             fitted = false;
                             break;
                         }
@@ -240,23 +258,25 @@ ClipGroup PlayController::makeClipGroup(){
                     if(!fitted) continue;
                     for(int k = 0; k < clipNamesAtEnd.size(); k++){
                         Clip & clip = rectTestGroup.getClip(clipNamesAtEnd[k]);
-                        if(clip.clipPosition.screen != clipPosition.screen) continue;
-                        if((xstart >= clip.clipPosition.position.x && xstart <= clip.clipPosition.position.x + clip.clipPosition.position.width) ||
-                           (xend >= clip.clipPosition.position.x && xend <= clip.clipPosition.position.x + clip.clipPosition.position.width) ||
-                           (clip.clipPosition.position.x >= xstart && clip.clipPosition.position.x + clip.clipPosition.position.width <= xstart) ||
-                           (clip.clipPosition.position.x >= xend && clip.clipPosition.position.x + clip.clipPosition.position.width <= xend)){
+                        ofRectangle testRectB = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
+                        if(clip.clipPosition.screen != clipPosition.screen){
+                            fitted = true;
+                            continue;
+                        }
+                        if(testRectA.intersects(testRectB)){
                             fitted = false;
                             break;
                         }
                     }
-                    
                 }
                 
-                clipPosition.position.y = (1080.0f - 100.0f) - clip.rect.height - clip.rect.y; // TODO: replace with screen height prop 200 = floor height; make this a prop
-                
-                // could scale with these ??
-                clipPosition.position.width = clip.rect.width;
-                clipPosition.position.height = clip.rect.height;
+                if(reject){
+                    ostringstream os;
+                    os << clip;
+                    ofxLogWarning() << "Rejected" << os << endl;
+                    uniqueNameGroup.pop(clip);
+                    continue;
+                }
                 
                 clipPosition.isLoading = false;
                 clipPosition.isPlaying = false;
