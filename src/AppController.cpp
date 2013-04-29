@@ -87,7 +87,7 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth", 1920.0f);
     appModel->setProperty("OutputHeight", 1080.0f);
     
-    appModel->setProperty("PixelFormat", (string)"JPEG");
+    appModel->setProperty("PixelFormat", (string)"  ");
     
     // create appView windows
     for(int screen = 0; screen < 2; screen++){

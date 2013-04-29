@@ -32,6 +32,7 @@ void main(){
 // modified from: http://www.fourcc.org/fccyvrgb.php and http://www.fourcc.org/source/YUV420P-OpenGL-GLSLang.c
 uniform sampler2DRect yuvTex;
 uniform int conversionType;
+uniform float fade;
 
 void main(void){
     
@@ -66,7 +67,7 @@ void main(void){
     g = y - c * (1.0 - kb) * (kb / (1.0 - kb - kr)) * u - c * (1.0 - kr) * (kr / (1.0 - kb - kr)) * v;
     b = y + c * (1.0 - kb) * u;
     
-    gl_FragColor = vec4(r, g, b, 1.0);
+    gl_FragColor = vec4(r, g, b, fade);
     
     //    vec4 tl = texture2DRect(yuvTex, uv);
     //    vec4 tr = texture2DRect(textureSampler, uv + vec2(texelSize, 0));

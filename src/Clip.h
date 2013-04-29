@@ -38,6 +38,152 @@ struct ClipPosition {
     bool isPaused;
 };
 
+static string getTypeFromCode(string code){
+    if(code == "F") return "Factual";
+    if(code == "A") return "Anecdotal";
+    if(code == "D") return "Descriptive";
+    if(code == "X") return "Experiential";
+    if(code == "E") return "Educative";
+    if(code == "M") return "Emotive";
+    if(code == "O") return "Other";
+};
+
+static string getFrameFromCode(string code){
+    if(code == "P") return "Political";
+    if(code == "R") return "Personal";
+    if(code == "S") return "Spiritual";
+    if(code == "C") return "Cultural";
+    if(code == "A") return "All";
+    if(code == "O") return "Other";
+};
+
+static string getTimeFromCode(string code){
+    if(code == "N") return "Now";
+    if(code == "P") return "Past";
+    if(code == "H") return "Historical";
+    if(code == "A") return "Ancestral";
+    if(code == "C") return "Comparative";
+    if(code == "O") return "Other";
+};
+
+static string getPersonalFromCode(string code){
+    if(code == "A") return "Abstract";
+    if(code == "S") return "Self";
+    if(code == "F") return "FewOthers";
+    if(code == "M") return "ManyOthers";
+    if(code == "R") return "OurPeople";
+    if(code == "V") return "ManyPeopleVisible";
+    if(code == "O") return "Other";
+};
+
+static string getCategoryFromCode(string code){
+    if(code == "INTR") return "Intro";
+    if(code == "CNTY") return "Country";
+    if(code == "IDEN") return "Identity";
+    if(code == "RITE") return "Rights";
+    if(code == "FAML") return "Family";
+    if(code == "CULT") return "Culture";
+    if(code == "STAT") return "Statement";
+    if(code == "SPEC") return "Special";
+    if(code == "LSTN") return "Listen";
+};
+
+static string getIntroQuestionFromCode(string code){
+    if(code == "NAME") return "What is your name?";
+    if(code == "NMCL") return "What is your name and language/clan affiliation?";
+    if(code == "CLAN") return "What is your language/clan affiliation?";
+    if(code == "ABOT") return "Tell us a bit about yourself…";
+};
+
+static string getCountryQuestionFromCode(string code){
+    if(code == "WHER") return "Where is your country?";
+    if(code == "DESC") return "Can you describe your country to me?";
+    if(code == "LOOK") return "What does it look like?";
+    if(code == "SPCN") return "Something specific about your country?";
+    if(code == "FEEL") return "How does it make you feel being on country?";
+    if(code == "CNCT") return "What is (your) connection to country?";
+    if(code == "CNMN") return "Tell me what connection to country means to you?";
+    if(code == "IMPT") return "Why is where you're from so important?";
+    if(code == "PLDE") return "Can describe a particular place of importance?";
+    if(code == "EXCU") return "Explain clans / tribes / nations";
+};
+
+static string getIdentityQuestionFromCode(string code){
+    if(code == "HOWI") return "How do you identify yourself?";
+    if(code == "MEAN") return "What does 'identity' mean to you?";
+    if(code == "EXNO") return "How would you explain Aboriginal identity to a non-indigenous person?";
+    if(code == "DNTL") return "What would you say to someone if they said 'You don't look Aboriginal'?";
+    if(code == "CMMN") return "What do you think are the most comman misconceptions/stereotypes held about Aboriginal people?";
+    if(code == "PRWD") return "Can you tell us a time when you felt proud of your identity?";
+};
+
+static string getRightsQuestionFromCode(string code){
+    if(code == "FEEL") return "When you think about indigenous rights how do you feel?";
+    if(code == "STRG") return "Can you tell us about a time or event when you felt indigenous rights were strengthened?";
+    if(code == "UNDR") return "Can you tell us about a time or event when you felt indigenous rights were undermined?";
+    if(code == "WTDO") return "What do you think non-aboriginal can do about inidgenous rights?";
+    if(code == "DFNT") return "Definition of treaty, soveriegnty, terra nullus...";
+};
+
+static string getFamilyQuestionFromCode(string code){
+    if(code == "NMPS") return "Can you name as people in your family as possible?";
+    if(code == "ROLE") return "What role do ancestors play in your life?";
+    if(code == "DIFF") return "How are Aboriginal families different to other/mainstream/white families?";
+    if(code == "IMPT") return "Who in your family has been the most important / influential in your life?";
+    if(code == "LOVE") return "Can you tell us about falling in love or feeling the love?";
+    if(code == "FMTU") return "What does family mean to you?";
+    if(code == "DWIF") return "Can you describe your family?";
+    if(code == "STOL") return "What is the stolen generation?";
+    if(code == "HIER") return "Explain hierarachy, ancesters, elders and learning";
+};
+
+static string getCultureQuestionFromCode(string code){
+    if(code == "MEAN") return "What does culture mean to you?";
+    if(code == "CNCT") return "How do you maintain or connect to your traditional or ancestral culture?";
+    if(code == "SPVC") return "What is special or unique about Victorian Aboriginal cultures?";
+    if(code == "LRNE") return "How do you learn about culture?";
+    if(code == "ALIV") return "How do you keep culture alive?";
+    if(code == "WORD") return "Can you say words in your langauge?";
+    if(code == "LARO") return "What role does language play in your life?";
+    if(code == "PRTO") return "What does respect/protocol play in culture?";
+};
+
+static string getStatementQuestionFromCode(string code){
+    if(code == "CNIS") return "Country is...";
+    if(code == "IDIS") return "Identity is...";
+    if(code == "RIIS") return "Resilience is...";
+    if(code == "FAIS") return "Family is...";
+    if(code == "CUIS") return "Culture is...";
+    if(code == "CCIS") return "Connection is...";
+};
+
+static string getSpecialQuestionFromCode(string code){    
+    if(code == "DANC") return "Dance";
+    if(code == "SONG") return "Song";
+    if(code == "SNDN") return "Song and dance";
+    if(code == "ITEM") return "Special item";
+};
+
+static string getListenQuestionFromCode(string code){    
+    if(code == "LFPR") return "Left Profile";
+    if(code == "LFTR") return "Left Three Quarter";
+    if(code == "FRON") return "Front";
+    if(code == "RIPR") return "Right Profile";
+    if(code == "RITR") return "Right Three Quarter";
+};
+
+static string getQuestionFromCode(string categoryCode, string questionCode){
+    if(categoryCode == "INTR") return getIntroQuestionFromCode(questionCode);
+    if(categoryCode == "CNTY") return getCountryQuestionFromCode(questionCode);
+    if(categoryCode == "IDEN") return getIdentityQuestionFromCode(questionCode);
+    if(categoryCode == "RITE") return getRightsQuestionFromCode(questionCode);
+    if(categoryCode == "FAML") return getFamilyQuestionFromCode(questionCode);
+    if(categoryCode == "CULT") return getCultureQuestionFromCode(questionCode);
+    if(categoryCode == "STAT") return getStatementQuestionFromCode(questionCode);
+    if(categoryCode == "SPEC") return getSpecialQuestionFromCode(questionCode);
+    if(categoryCode == "LSTN") return getListenQuestionFromCode(questionCode);
+};
+
 class Clip {
 
 public:
@@ -80,6 +226,13 @@ public:
         number =    ofToInt(nameSplit[3]);
         person =    nameSplit[4];
         
+        readable.category = getCategoryFromCode(category);
+        readable.question = getQuestionFromCode(category, question);
+        readable.type = getTypeFromCode(type);
+        readable.time = getTimeFromCode(time);
+        readable.framed = getFrameFromCode(framed);
+        readable.personal = getPersonalFromCode(personal);
+        
     };
     
     string name;
@@ -91,6 +244,17 @@ public:
     string personal;
     string number;
     string person;
+    
+    struct {
+        string category;
+        string question;
+        string type;
+        string time;
+        string framed;
+        string personal;
+        string number;
+        string person;
+    } readable;
     
     File videoFile;
     File audioFile;
@@ -124,7 +288,7 @@ public:
         }
     }
     
-    friend ostream& operator<< (ostream &os, Clip &c);
+    friend ostream& operator<< (ostream &os, const Clip &c);
     
     friend class boost::serialization::access;
 	template<class Archive>
@@ -148,7 +312,7 @@ private:
     
 };
 
-inline ostream& operator<<(ostream& os, Clip &c){
+inline ostream& operator<<(ostream& os, const Clip &c){
     os <<   c.name << " :position: " << 
             c.clipPosition.position.x << ":" << 
             c.clipPosition.position.y << ":" << 
@@ -227,16 +391,16 @@ public:
         types.clear();
     }
     
-    friend ostream& operator<< (ostream &os, ClipType &ct);
-    
-protected:
+    friend ostream& operator<< (ostream &os, const ClipType &ct);
     
     map<string, int> types;
     
+protected:
+    
 };
 
-inline ostream& operator<<(ostream& os, ClipType &ct){
-    for(map<string, int>::iterator it = ct.getTypes().begin(); it != ct.getTypes().end(); it++){
+inline ostream& operator<<(ostream& os, const ClipType &ct){
+    for(map<string, int>::const_iterator it = ct.types.begin(); it != ct.types.end(); it++){
         os << it->first << " : " << it->second << endl;
     }
     return os;
@@ -565,11 +729,12 @@ public:
         return group[i];
     }
     
-    friend ostream& operator<< (ostream &os, ClipGroup &cg);
+    friend ostream& operator<< (ostream &os, const ClipGroup &cg);
+    
+    vector<Clip> group;
     
 protected:
     
-    vector<Clip> group;
     Clip dummyClip;
     
     ClipType categoryTypes;
@@ -583,9 +748,9 @@ protected:
     
 };
 
-inline ostream& operator<<(ostream& os, ClipGroup &cg){
-    for(int i = 0; i < cg.size(); i++){
-        os << cg[i] << endl;
+inline ostream& operator<<(ostream& os, const ClipGroup &cg){
+    for(int i = 0; i < cg.group.size(); i++){
+        os << cg.group[i] << endl;
     }
     return os;
 };
@@ -749,6 +914,16 @@ public:
                 
                 if(clip.clipPosition.screen == screen){
                     
+                    float fade = 1.0f;
+                    int fadeInSeconds = 3;
+                    int currentFrame = video->getCurrentFrame();
+                    
+                    if(currentFrame > 0 && currentFrame < fadeInSeconds * 25){
+                        fade = (float)currentFrame / (float)(fadeInSeconds * 25);
+                    }else if(currentFrame > clip.frames - fadeInSeconds * 25 && currentFrame < clip.frames){
+                        fade = (((float)clip.frames - currentFrame) / (float)(fadeInSeconds * 25));
+                    }
+                    
                     if(video->getPixelFormat() == OF_PIXELS_2YUV){
                         
                         render.begin();
@@ -757,14 +932,17 @@ public:
                         shader.begin();
                         shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
                         shader.setUniform1i("conversionType", (false ? 709 : 601));
+                        shader.setUniform1f("fade", fade);
                         render.draw(clip.clipPosition.position.x, clip.clipPosition.position.y);
                         shader.end();
                         
                     }else{
                         
+                        ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
                         video->draw(clip.clipPosition.position.x, clip.clipPosition.position.y);
                         
                     }
+                    ofSetColor(255, 255, 255, 255);
                 }
             }
             

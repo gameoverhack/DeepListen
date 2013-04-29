@@ -29,7 +29,6 @@ void AppView::update(){
         ofSetBackgroundColor(0, 0, 0);
         ofEnableBlendMode(OF_BLENDMODE_SCREEN);
         if(playControllerStates.getState(kPLAYCONTROLLER_PLAY)){
-            ofSetColor(255, 255, 255);
             clipTimeline.draw(instanceID);
         }
         ofDisableBlendMode();

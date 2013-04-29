@@ -63,9 +63,9 @@ void PlayController::update(){
             clipTimeline.clear();
             clipTimeline.push(playGroup);
             
-            cout << "\\/---------------------\\/" << endl;
-            cout << playGroup << endl;
-            cout << "/\\---------------------/\\" << endl;
+            ofxLogVerbose() << "\\/---------------------\\/" << endl;
+            ofxLogVerbose() << playGroup << endl;
+            ofxLogVerbose() << "/\\---------------------/\\" << endl;
 
         }
             break;
@@ -273,7 +273,7 @@ ClipGroup PlayController::makeClipGroup(){
                 if(reject){
                     ostringstream os;
                     os << clip;
-                    ofxLogWarning() << "Rejected" << os << endl;
+                    ofxLogWarning() << "Rejected" << clip << endl;
                     uniqueNameGroup.pop(clip);
                     continue;
                 }
