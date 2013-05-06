@@ -55,7 +55,7 @@ void DebugView::update(){
 //    }
 //    
 //    int deltaLength = maxLength - minLength;
-//    int bins = ceil((float) deltaLength/750);
+//    int bins = ceil((float) deltaLength/1500);
 //    if(bins < 0) return;
 //    vector<int> counts;
 //    vector<float> times;
@@ -72,9 +72,9 @@ void DebugView::update(){
 //        }
 //    }
 //    
-//    cout << minLength << "  :  " << maxLength << "  :  " << (float)deltaLength/bins;// << endl;
+//    cout << minLength << "  :  " << maxLength << "  :  " << (float)deltaLength/bins << " ";// << endl;
 //    //cout << times << endl;
-//    cout << counts << endl;
+//    cout << counts << "   " << allClips.size() << endl;
     
     begin();
     {

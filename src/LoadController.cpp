@@ -76,6 +76,14 @@ void LoadController::update(){
             // if the clip doesn't exist check if we have 
             // both an audio and a text file for this video
             
+            if(name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+                Clip clip = Clip(name);
+                clip.videoFile = videoFiles[name];
+                clip.analyzed = false;
+                clip.deleted = false;
+                appModel->setClip(clip);
+            }
+            
             if(audioFiles.getFileExists(name) && textFiles.getFileExists(name)){
                 
                 ofxLogNotice() << "ADDING clip: " << name << endl;
@@ -123,6 +131,8 @@ void LoadController::update(){
             // mark the clip as deleted in case we're just
             // temporarily removing the file
             
+            if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos) continue;
+            
             ofxLogNotice() << "Clip " << clip.name << " marked for DELETION" << endl;
             
             clip.deleted = true;
@@ -152,6 +162,10 @@ void LoadController::update(){
         }
         
     }
+    
+    Clips clips;
+    clips.clips = appModel->getClips();
+    clips.save();
     
     if(appModel->getNumClipsForAnalysis() > 0){
         appControllerStates.setState(kAPPCONTROLLER_ANALYZE);

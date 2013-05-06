@@ -68,9 +68,9 @@ void AppController::setup(){
     appModel->load("config", ARCHIVE_BINARY);
     
     // set properties here (can comment once saved)
-    appModel->setProperty("TextPath", (string)"/Volumes/Artaud/CODECTESTS/TEXT/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Artaud/CODECTESTS/JPEG60/");
-    appModel->setProperty("AudioPath", (string)"/Volumes/Artaud/CODECTESTS/WAVE/");
+    appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
+    appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);

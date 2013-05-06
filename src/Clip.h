@@ -49,6 +49,7 @@ static string getTypeFromCode(string code){
 };
 
 static string getFrameFromCode(string code){
+    if(code == "L") return "Land";
     if(code == "P") return "Political";
     if(code == "R") return "Personal";
     if(code == "S") return "Spiritual";
@@ -96,6 +97,7 @@ static string getIntroQuestionFromCode(string code){
 };
 
 static string getCountryQuestionFromCode(string code){
+    if(code == "TTLE") return "Title clip";
     if(code == "WHER") return "Where is your country?";
     if(code == "DESC") return "Can you describe your country to me?";
     if(code == "LOOK") return "What does it look like?";
@@ -109,6 +111,7 @@ static string getCountryQuestionFromCode(string code){
 };
 
 static string getIdentityQuestionFromCode(string code){
+    if(code == "TTLE") return "Title clip";
     if(code == "HOWI") return "How do you identify yourself?";
     if(code == "MEAN") return "What does 'identity' mean to you?";
     if(code == "EXNO") return "How would you explain Aboriginal identity to a non-indigenous person?";
@@ -118,6 +121,8 @@ static string getIdentityQuestionFromCode(string code){
 };
 
 static string getRightsQuestionFromCode(string code){
+    if(code == "ADIR") return "Can you tell us about advocay for indigenous rights?";
+    if(code == "TTLE") return "Title clip";
     if(code == "FEEL") return "When you think about indigenous rights how do you feel?";
     if(code == "STRG") return "Can you tell us about a time or event when you felt indigenous rights were strengthened?";
     if(code == "UNDR") return "Can you tell us about a time or event when you felt indigenous rights were undermined?";
@@ -126,6 +131,7 @@ static string getRightsQuestionFromCode(string code){
 };
 
 static string getFamilyQuestionFromCode(string code){
+    if(code == "TTLE") return "Title clip";
     if(code == "NMPS") return "Can you name as people in your family as possible?";
     if(code == "ROLE") return "What role do ancestors play in your life?";
     if(code == "DIFF") return "How are Aboriginal families different to other/mainstream/white families?";
@@ -138,6 +144,7 @@ static string getFamilyQuestionFromCode(string code){
 };
 
 static string getCultureQuestionFromCode(string code){
+    if(code == "TTLE") return "Title clip";
     if(code == "MEAN") return "What does culture mean to you?";
     if(code == "CNCT") return "How do you maintain or connect to your traditional or ancestral culture?";
     if(code == "SPVC") return "What is special or unique about Victorian Aboriginal cultures?";
@@ -216,7 +223,11 @@ public:
         
         // make sure we got actually got a name for the person
         assert(nameSplit[4].size() > 0);
-        
+        if(name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+            
+        }else{
+            
+        }
         category =  nameSplit[0];
         question =  nameSplit[1];
         type =      nameSplit[2][0];
@@ -460,7 +471,7 @@ public:
                     break;
                 case PERSON:
                 {
-                    if(group[i].name == value) clipGroup.push(group[i]);
+                    if(group[i].person == value) clipGroup.push(group[i]);
                 }
                     break;
             }
@@ -514,7 +525,7 @@ public:
                     break;
                 case PERSON:
                 {
-                    if(group[i].name != value) clipGroup.push(group[i]);
+                    if(group[i].person != value) clipGroup.push(group[i]);
                 }
                     break;
             }
@@ -583,10 +594,24 @@ public:
                 break;
             case PERSON:
             {
-                return nameTypes;
+                return personTypes;
             }
                 break;
         }
+    }
+
+    void push_front(Clip clip){
+        std::reverse(group.begin(), group.end());
+        group.push_back(clip);
+        std::reverse(group.begin(), group.end());
+        categoryTypes.push(clip.category);
+        questionTypes.push(clip.question);
+        typeTypes.push(clip.type);
+        timeTypes.push(clip.time);
+        framedTypes.push(clip.framed);
+        personalTypes.push(clip.personal);
+        personTypes.push(clip.person);
+        nameTypes.push(clip.name);
     }
     
     void push(Clip & clip){
@@ -597,7 +622,7 @@ public:
         timeTypes.push(clip.time);
         framedTypes.push(clip.framed);
         personalTypes.push(clip.personal);
-        personTypes.push(clip.name);
+        personTypes.push(clip.person);
         nameTypes.push(clip.name);
     }
     
@@ -809,7 +834,8 @@ public:
     
     void update(){
         
-        if(currentframe == -2000) currentframe = groups[0][0].clipPosition.videostart; // bad form?
+        if(totalframes == 0) updateStartFrames();
+        if(currentframe == -2000) currentframe = firstframe; //groups[0][0].clipPosition.videostart; // bad form?
         
         for(map<int, vector<string> >::reverse_iterator it = startFrames.rbegin(); it != startFrames.rend(); ++it){
             if(currentframe >= it->first){
@@ -850,7 +876,7 @@ public:
             Clip & clip = getClip(currentClipNames[i]);
             
             if(currentframe >= clip.clipPosition.videostart &&
-               currentframe <= clip.clipPosition.videostart + 10 &&
+               currentframe <= clip.clipPosition.videoend - (3 * 25) &&
                !clip.clipPosition.isLoading && 
                !clip.clipPosition.isPlaying){
                 
@@ -1026,18 +1052,20 @@ public:
     int getTotalFrames(){
         return totalframes;
     }
-    
-    int updateTotalFrames(){
-        int tframes = 0;
+     
+    void updateTotalFrames(){
+        totalframes = 0;
+        firstframe = INFINITY;
         for(int i = 0; i < groups.size(); i++){
             ClipGroup & group = groups[i];
             int grouptotalframes = group[0].frames;
             for(int j = 1; j < group.size(); j++){
+                firstframe = MIN(firstframe, group[j].clipPosition.videostart);
                 grouptotalframes = grouptotalframes - (group[j-1].clipPosition.videoend - group[j].clipPosition.videostart) + group[j].frames;
             }
-            tframes = MAX(totalframes, grouptotalframes);
+            totalframes = MAX(totalframes, grouptotalframes);
         }
-        return tframes;
+        ofxLogVerbose() << "frames: " << totalframes << " : " << firstframe << endl;
     }
     
     int getNextStartTime(){
@@ -1052,7 +1080,7 @@ public:
     
     void updateStartFrames(){
         startFrames.clear();
-        totalframes = updateTotalFrames();
+        updateTotalFrames();
         for(int i = 0; i < groups.size(); i++){
             ClipGroup & group = groups[i];
             for(int j = 0; j < group.size(); j++){
@@ -1150,7 +1178,7 @@ protected:
     vector<ClipGroup> groups;
     vector<ofxThreadedVideo*> videos;
     
-    int lastFrameTime;
+    
     string syncClipName;
     
     Clip dummyClip;
@@ -1158,6 +1186,7 @@ protected:
     bool bIsPlaying;
     
     int totalframes;
+    int firstframe;
     int currentframe;
     
 };

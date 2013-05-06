@@ -84,7 +84,7 @@ bool AppModel::getClipExists(string name){
 void AppModel::setClipGroup(string clipGroupname, ClipGroup clipGroup){
     map<string, ClipGroup>::iterator it = clipGroups.find(clipGroupname);
     if(it != clipGroups.end()){
-        ofxLogError() << "Clip gorup already exists" << endl;
+        ofxLogError() << "Clip group already exists" << endl;
     }else{
         clipGroups[clipGroupname] = clipGroup;
     }
@@ -96,7 +96,7 @@ ClipGroup& AppModel::getClipGroupReference(string clipGroupname){
     if(it != clipGroups.end()){
         return it->second;
     }else{
-        ofxLogError() << "Clip gorup doesn't exists" << endl;
+        ofxLogError() << "Clip group ref doesn't exists" << endl;
         return dummyClipGroup;
     }
 }
@@ -107,7 +107,7 @@ ClipGroup AppModel::getClipGroup(string clipGroupname){
     if(it != clipGroups.end()){
         return it->second;
     }else{
-        ofxLogError() << "Clip gorup doesn't exists" << endl;
+        ofxLogError() << "Clip group doesn't exists" << endl;
         return dummyClipGroup;
     }
 }

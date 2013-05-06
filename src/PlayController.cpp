@@ -115,6 +115,10 @@ ClipGroup PlayController::makeClipGroup(){
     ClipGroup & allClips = appModel->getClipGroupReference("allClips");
     ClipGroup & allListenClips = appModel->getClipGroupReference("allListenClips");
     ClipGroup & allStatClips = appModel->getClipGroupReference("allStatClips");
+    ClipGroup & allIntroClips = appModel->getClipGroupReference("allIntroClips");
+    cout << allIntroClips << endl;
+    ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
+    
     ClipGroup & statistics = appModel->getClipGroupReference("statistics");
     
     ClipGroup newClipGroup;
@@ -122,6 +126,9 @@ ClipGroup PlayController::makeClipGroup(){
     string category = "";
     int flip;
     int lastAudioFreeFrame = 0;
+    Clip lastClip;
+    lastClip.clipPosition.videostart = 0;
+    lastClip.clipPosition.videoend = 0;
     
     while(true){
         
@@ -147,8 +154,9 @@ ClipGroup PlayController::makeClipGroup(){
             }
             
             // could use a random distribution algorithm here instead
-            int numberOfQuestions = (int)ofRandom(2) + 1; // min 1; max 2
+            int numberOfQuestions = (int)ofRandom(3) + 2; // min 1; max 2
             int numberOfStatements = (int)ofRandom(2) + 1; // min 1; max 2
+            int numberOfIntros = (int)ofRandom(2) + 1;
             
             category = allCategoryTypes.poprandom();
             
@@ -156,13 +164,34 @@ ClipGroup PlayController::makeClipGroup(){
             ClipType questionGroup = categoryGroup.getClipTypes(QUESTION);
             
             string question = questionGroup.poprandom();
-            ClipGroup uniqueNameGroup = categoryGroup.getContains(QUESTION, question).getUnique(NAME, numberOfStatements);
+            ClipGroup uniqueNameGroup = categoryGroup.getContains(QUESTION, question).getUnique(PERSON, numberOfQuestions);
+            
+            
+            
+            
+            // mix up the order
+            // TODO: might want to use a randomDist
+            // to weight statements at start etc
+            uniqueNameGroup.shuffle();
+            
+            ClipGroup introGroup;
+            
+            for(int j = 0; j < uniqueNameGroup.size(); j++){
+                Clip introClip = allIntroClips.getContains(PERSON, uniqueNameGroup[j].person).poprandom();
+                cout << uniqueNameGroup[j].person << " " << introClip << endl;
+                introGroup.push(introClip);
+            }
+            cout << introGroup << endl;
+            for(int j = 0; j < numberOfIntros; j++){
+                Clip introClip = introGroup.poprandom();
+                uniqueNameGroup.push_front(introClip);
+            }
             
             ClipGroup statementGroup = allStatClips;
             
             // make sure no statement is by someone answering a question
             for(int j = 0; j < uniqueNameGroup.size(); j++){
-                statementGroup = statementGroup.getExcludes(NAME, statementGroup[j].name);
+                statementGroup = statementGroup.getExcludes(PERSON, statementGroup[j].person);
             }
             
             for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
@@ -182,14 +211,12 @@ ClipGroup PlayController::makeClipGroup(){
                 if(category == "RITE"){
                     statementClip = statementGroup.getContains(QUESTION, "RIIS").poprandom();
                 }
-                uniqueNameGroup.push(statementClip);
+                uniqueNameGroup.push_front(statementClip);
             }
             
-            // mix up the order
-            // TODO: might want to use a randomDist
-            // to weight statements at start etc
-            uniqueNameGroup.shuffle();
+            Clip titleClip = allTitleClips.getContains(CATEGORY, category)[0];
             
+            uniqueNameGroup.push_front(titleClip);
             
             // calculate audio overlaps and pack
             for(int j = 0; j < uniqueNameGroup.size(); j++){
@@ -197,11 +224,19 @@ ClipGroup PlayController::makeClipGroup(){
                 ClipPosition clipPosition;
                 Clip & clip = uniqueNameGroup[j];
                 
-                // calculate frame starts and ends
-                clipPosition.videostart = lastAudioFreeFrame - (clip.frames * clip.audioinpct);
-                clipPosition.videoend = clipPosition.videostart + clip.frames;
-                clipPosition.audiostart = clipPosition.videostart + (clip.frames * clip.audioinpct);
-                clipPosition.audioend = clipPosition.videostart + (clip.frames * clip.audioutpct);
+                if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+                    // calculate frame starts and ends
+                    clipPosition.videostart = lastAudioFreeFrame;
+                    clipPosition.videoend = clipPosition.videostart + clip.frames;
+                    clipPosition.audiostart = clipPosition.videostart;
+                    clipPosition.audioend = clipPosition.videoend;
+                }else{
+                    // calculate frame starts and ends
+                    clipPosition.videostart = lastAudioFreeFrame - (clip.frames * clip.audioinpct);
+                    clipPosition.videoend = clipPosition.videostart + clip.frames;
+                    clipPosition.audiostart = clipPosition.videostart + (clip.frames * clip.audioinpct);
+                    clipPosition.audioend = clipPosition.videostart + (clip.frames * clip.audioutpct);
+                }
                 
                 lastAudioFreeFrame = clipPosition.audioend;
 
@@ -241,16 +276,19 @@ ClipGroup PlayController::makeClipGroup(){
                     clipPosition.position.width = clip.rect.width;
                     clipPosition.position.height = clip.rect.height;
                     
-                    ofRectangle testRectA = ofRectangle(clipPosition.position.x - ofRandom(20, 50), clipPosition.position.y, clipPosition.position.width + ofRandom(20, 50), clipPosition.position.height);
+//                    if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+//                        fitted = true;
+//                        continue;
+//                    }
                     
                     for(int k = 0; k < clipNamesAtStart.size(); k++){
                         Clip & clip = rectTestGroup.getClip(clipNamesAtStart[k]);
-                        ofRectangle testRectB = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
+                        ofRectangle r = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
                         if(clip.clipPosition.screen != clipPosition.screen){
                             fitted = true;
                             continue;
                         }
-                        if(testRectA.intersects(testRectB)){
+                        if(clipPosition.position.intersects(r)){
                             fitted = false;
                             break;
                         }
@@ -258,12 +296,12 @@ ClipGroup PlayController::makeClipGroup(){
                     if(!fitted) continue;
                     for(int k = 0; k < clipNamesAtEnd.size(); k++){
                         Clip & clip = rectTestGroup.getClip(clipNamesAtEnd[k]);
-                        ofRectangle testRectB = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
+                        ofRectangle r = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
                         if(clip.clipPosition.screen != clipPosition.screen){
                             fitted = true;
                             continue;
                         }
-                        if(testRectA.intersects(testRectB)){
+                        if(clipPosition.position.intersects(r)){
                             fitted = false;
                             break;
                         }
@@ -283,6 +321,7 @@ ClipGroup PlayController::makeClipGroup(){
                 clipPosition.isPaused = false;
                 
                 clip.clipPosition = clipPosition;
+                lastClip = clip;
                 
             }
 
@@ -312,6 +351,7 @@ void PlayController::resetClipGroups(){
         ClipGroup allIntroClips, originalIntroClips;
         ClipGroup allStatClips, originalStatClips;
         ClipGroup allSpecClips, originalSpecClips;
+        ClipGroup allTitleClips;
         
         ClipGroup statistics, playGroup;
         
@@ -321,7 +361,11 @@ void PlayController::resetClipGroups(){
             originalClips.push(clip);
         }
         
-        // make a copy
+        // get all the title clips and delete them from the original list
+        allTitleClips = originalClips.getContains(QUESTION, "TTLE");
+        originalClips.pop(allTitleClips);
+        
+        // now make a copy
         allClips = originalClips;
         
         // filter into Listen, Intro, Statement and Special clip groups
@@ -348,6 +392,7 @@ void PlayController::resetClipGroups(){
         appModel->setClipGroup("allIntroClips", allIntroClips);
         appModel->setClipGroup("allStatClips", allStatClips);
         appModel->setClipGroup("allSpecClips", allSpecClips);
+        appModel->setClipGroup("allTitleClips", allTitleClips);
         
         appModel->setClipGroup("statistics", statistics);
         appModel->setClipGroup("playGroup", playGroup);
