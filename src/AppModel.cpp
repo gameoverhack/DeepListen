@@ -34,11 +34,11 @@ bool AppModel::load(string filename, ArchiveType archiveType){
 
 //--------------------------------------------------------------
 void AppModel::setClip(Clip clip){
-    map<string, Clip>::iterator it = clips.find(clip.name);
+    map<string, Clip>::iterator it = clips.find(clip.getName());
     if(it != clips.end()){
-        ofxLogError() << "Clip already exists: " << clip.name << endl;
+        ofxLogError() << "Clip already exists: " << clip.getName() << endl;
     }else{
-        clips[clip.name] = clip;
+        clips[clip.getName()] = clip;
     }
 }
 
@@ -132,7 +132,7 @@ int AppModel::getNumClipsForAnalysis(){
     int count = 0;
     for(int i = 0; i < clips.size(); i++){
         Clip & clip = getClip(i);
-        if(clip.analyzed == false && clip.deleted == false) count++;
+        if(clip.getAnalyzed() == false && clip.getDeleted() == false) count++;
     }
     setProperty("AnalyzeClipNum", count);
     return count;
@@ -142,8 +142,8 @@ int AppModel::getNumClipsForAnalysis(){
 Clip& AppModel::getClipForAnalysis(){
     for(int i = 0; i < clips.size(); i++){
         Clip & clip = getClip(i);
-        if(clip.analyzed == false && clip.deleted == false){
-            setProperty("AnalyzeClip", clip.name);
+        if(clip.getAnalyzed() == false && clip.getDeleted() == false){
+            setProperty("AnalyzeClip", clip.getName());
             return clip;
             break;
         }

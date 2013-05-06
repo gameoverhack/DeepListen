@@ -223,6 +223,8 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     BezierWarp & warp0 = appViews[0]->getWarp<BezierWarp>();
     BezierWarp & warp1 = appViews[1]->getWarp<BezierWarp>();
     
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    
     int key = e.key;
     
     switch (key) {
@@ -271,6 +273,15 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 'l':
             appModel->setProperty("ContourThreshold", appModel->getProperty<int>("ContourThreshold") - 1);
+            break;
+        case ',':
+            timeline.previousClip();
+            break;
+        case '.':
+            timeline.nextClip();
+            break;
+        case '/':
+            timeline.togglePaused();
             break;
     }
 

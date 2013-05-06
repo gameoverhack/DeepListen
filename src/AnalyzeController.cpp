@@ -49,26 +49,26 @@ void AnalyzeController::update(){
         ofxCv::ContourFinder& contourFinder = appModel->getAnalysisContourFinder();
         
         // check if we're analysing this video by seeing if we've loaded the video
-        if(video.getMoviePath() != clip.videoFile.path){
+        if(video.getMoviePath() != clip.getVideoFile().path){
             
-            ofxLogNotice() << "Start Analysing: " << clip.name << endl;
+            ofxLogNotice() << "Start Analysing: " << clip.getName() << endl;
             
             // load the text
-            ofFile file(clip.textFile.path);
+            ofFile file(clip.getTextFile().path);
             ofBuffer buffer(file);
-            clip.text = buffer.getText();
+            clip.setText(buffer.getText());
             
-            appModel->setProperty("AnalyzeText", clip.text);
+            appModel->setProperty("AnalyzeText", clip.getText());
             
             // load the audio and analyze the waveform
-            audio.load(clip.audioFile.path);
+            audio.load(clip.getAudioFile().path);
             audio.generateWaveForm();
             
             // find the start of audio
             for(int i = 0; i < audio.getWaveForm().size(); i++){
                 if(ABS((float)(audio.getWaveForm()[i].maxL)) > 0 ||
                    ABS((float)(audio.getWaveForm()[i].maxR)) > 0){
-                    clip.audioinpct = (float)i/audio.getWaveForm().size();
+                    clip.setAudioInPct((float)i/audio.getWaveForm().size());
                     break;
                 }
             }
@@ -77,19 +77,19 @@ void AnalyzeController::update(){
             for(int i = audio.getWaveForm().size() - 1; i >= 0; i--){
                 if(ABS((float)(audio.getWaveForm()[i].maxL)) > 0 ||
                    ABS((float)(audio.getWaveForm()[i].maxR)) > 0){
-                    clip.audioutpct = (float)i/audio.getWaveForm().size();
+                    clip.setAudioOutPct((float)i/audio.getWaveForm().size());
                     break;
                 }
             }
             
             // load the video
-            video.loadMovie(clip.videoFile.path);
-            clip.frames = video.getTotalNumFrames();
+            video.loadMovie(clip.getVideoFile().path);
+            clip.setTotalFrames(video.getTotalNumFrames());
             
             // set rect to opposite minimum and maximums
-            clip.rect = ofRectangle(appModel->getProperty<float>("OutputWidth"), appModel->getProperty<float>("OutputHeight"), 0, 0);
+            clip.setRect(ofRectangle(appModel->getProperty<float>("OutputWidth"), appModel->getProperty<float>("OutputHeight"), 0, 0));
             
-            ofxLogNotice() << "Frames: " << clip.frames << " audio in: " << clip.frames * clip.audioinpct << " out: " << clip.frames * clip.audioutpct << endl;
+            ofxLogNotice() << "Frames: " << clip.getTotalFrames() << " audio in: " << clip.getTotalFrames() * clip.getAudioInPct() << " out: " << clip.getTotalFrames() * clip.getAudioOutPct() << endl;
             
         }else{
             
@@ -114,20 +114,20 @@ void AnalyzeController::update(){
                 for(int i = 0; i < contourFinder.getContours().size(); i++){
                     vector<cv::Point> pts = contourFinder.getContours()[i];
                     for(int j = 0; j < pts.size(); j++){
-                        clip.rect.x = MIN(pts[j].x, clip.rect.x);
-                        clip.rect.y = MIN(pts[j].y, clip.rect.y);
-                        clip.rect.width = MAX(pts[j].x, clip.rect.width + clip.rect.x) - clip.rect.x;
-                        clip.rect.height = MAX(pts[j].y, clip.rect.height + clip.rect.y) - clip.rect.y;
-                        
+                        ofRectangle & r = clip.getPosition();
+                        r.x = MIN(pts[j].x, r.x);
+                        r.y = MIN(pts[j].y, r.y);
+                        r.width = MAX(pts[j].x, r.width + r.x) - r.x;
+                        r.height = MAX(pts[j].y, r.height + r.y) - r.y;
                     }
                 }
 
             }else{ // the video is at or near last frame
                 
-                ofxLogNotice() << "Finsished Analysing: " << clip.name << endl;
+                ofxLogNotice() << "Finsished Analysing: " << clip.getName() << endl;
                 
                 // mark clip as analysed and close the video
-                clip.analyzed = true;
+                clip.setAnalyzed(true);
                 video.close();
                 
                 // save the app model so we don't lose data (is this a good idea?)

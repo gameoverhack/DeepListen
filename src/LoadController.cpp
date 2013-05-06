@@ -25,13 +25,10 @@ void LoadController::setup(){
 
     ClipTimeline & clipTimeline = appModel->getClipTimeline();
     
-    ofVideoPlayer vid;
-    vid.loadMovie("/Volumes/Artaud/CODECTESTS/JPEG60/FAML_ROLE_XNSS_00_MARBEEW.mov");
-    
     if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
-        clipTimeline.setup(4, OF_PIXELS_2YUV);
+        clipTimeline.setup("/Volumes/Ersatz/CODECTESTS/black.mov", OF_PIXELS_2YUV);
     }else{
-        clipTimeline.setup(4, OF_PIXELS_BGRA);
+        clipTimeline.setup("/Volumes/Ersatz/CODECTESTS/black.mov", OF_PIXELS_BGRA);
     }
     
 }
@@ -65,8 +62,10 @@ void LoadController::update(){
             // if the clip exists check if anything has changed
             Clip & clip = appModel->getClip(name);
             
-            ofxLogNotice() << "CHECK clip: " << clip.name << endl;
-            
+            ofxLogNotice() << "CHECK clip: " << clip.getName() << endl;
+//            if(name.rfind("OOOO_00_TITLE") != string::npos){
+//                clip.setAnalyzed(false);
+//            }
             // TODO: check if clip has been temporarily removed (ie., deleted == true)
             // TODO: check dates and sizes or overide dates and sizes
             // actually maybe this just happens in the next check ??
@@ -76,11 +75,11 @@ void LoadController::update(){
             // if the clip doesn't exist check if we have 
             // both an audio and a text file for this video
             
-            if(name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+            if(name.rfind("OOOO_00_TITLE") != string::npos){
                 Clip clip = Clip(name);
-                clip.videoFile = videoFiles[name];
-                clip.analyzed = false;
-                clip.deleted = false;
+                clip.setVideoFile(videoFiles[name]);
+                clip.setAnalyzed(false);
+                clip.setDeleted(false);
                 appModel->setClip(clip);
             }
             
@@ -91,11 +90,11 @@ void LoadController::update(){
                 // create a new clip
                 
                 Clip clip = Clip(name);
-                clip.videoFile = videoFiles[name];
-                clip.audioFile = audioFiles[name];
-                clip.textFile = textFiles[name];
-                clip.analyzed = false;
-                clip.deleted = false;
+                clip.setVideoFile(videoFiles[name]);
+                clip.setAudioFile(audioFiles[name]);
+                clip.setTextFile(textFiles[name]);
+                clip.setAnalyzed(false);
+                clip.setDeleted(false);
                 
                 appModel->setClip(clip);
                 
@@ -115,57 +114,57 @@ void LoadController::update(){
         clip.init();
         
         // no need to check if this clip needs analysis and is not deleted
-        if(clip.analyzed == false && clip.deleted == false){
+        if(clip.getAnalyzed() == false && clip.getDeleted() == false){
             
-            ofxLogNotice() << "Clip " << clip.name << " is just being ADDED" << endl;
+            ofxLogNotice() << "Clip " << clip.getName() << " is just being ADDED" << endl;
             
             continue;
         }
         
         // check if Files exist
-        if(!videoFiles.getFileExists(clip.name) || 
-           !audioFiles.getFileExists(clip.name) || 
-           !textFiles.getFileExists(clip.name)){
+        if(!videoFiles.getFileExists(clip.getName()) || 
+           !audioFiles.getFileExists(clip.getName()) || 
+           !textFiles.getFileExists(clip.getName())){
             
             // if any one of these files does not exist then
             // mark the clip as deleted in case we're just
             // temporarily removing the file
             
-            if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos) continue;
+            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos) continue;
             
-            ofxLogNotice() << "Clip " << clip.name << " marked for DELETION" << endl;
+            ofxLogNotice() << "Clip " << clip.getName() << " marked for DELETION" << endl;
             
-            clip.deleted = true;
+            clip.setDeleted(true);
             continue;
         }
         
         // check if date and size are the same (by using overload == operator
         
         // ... don't worry about text files - just accept the new one
-        if(textFiles.getFile(clip.name) != clip.textFile){
-            clip.textFile = textFiles[clip.name];
+        if(textFiles.getFile(clip.getName()) != clip.getTextFile()){
+            clip.setTextFile(textFiles[clip.getName()]);
         }
         
         // ...but re-analyze if the audio or video are different
-        if(videoFiles.getFile(clip.name) != clip.videoFile ||
-           audioFiles.getFile(clip.name) != clip.audioFile){
+        if(videoFiles.getFile(clip.getName()) != clip.getVideoFile() ||
+           audioFiles.getFile(clip.getName()) != clip.getAudioFile()){
             
             // if any of these have changed we need to re-analyze this clip
             // TODO: make checks so we only analyse if necessary...hmmm?
             
-            clip.videoFile = videoFiles[clip.name];
-            clip.audioFile = audioFiles[clip.name];
+            clip.setVideoFile(videoFiles[clip.getName()]);
+            clip.setAudioFile(audioFiles[clip.getName()]);
             
-            ofxLogNotice() << "Clip " << clip.name << " marked for ANALYSIS" << endl;
+            ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
             
-            clip.analyzed = false;
+            clip.setAnalyzed(false);
         }
         
     }
     
-    Clips clips;
-    clips.clips = appModel->getClips();
-    clips.save();
+//    Clips clips;
+//    clips.clips = appModel->getClips();
+//    clips.save();
     
     if(appModel->getNumClipsForAnalysis() > 0){
         appControllerStates.setState(kAPPCONTROLLER_ANALYZE);

@@ -35,7 +35,7 @@ void AnalyzeView::update(){
             ofSetBackgroundColor(0, 0, 0);
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
             if(playControllerStates.getState(kPLAYCONTROLLER_PLAY)){
-                clipTimeline.drawTimeline();
+                clipTimeline.drawTimeline(0, 0, getWidth(), getHeight());
             }
             ofDisableBlendMode();
         }
@@ -54,7 +54,7 @@ void AnalyzeView::update(){
         ofxSamplePlayer & audio = appModel->getAnalysisAudio();
         ofxCv::ContourFinder& contourFinder = appModel->getAnalysisContourFinder();
         
-        if(lastclip != clip.name){
+        if(lastclip != clip.getName()){
             waveformFBO.begin();
             {
                 glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -62,7 +62,7 @@ void AnalyzeView::update(){
                 audio.drawWaveForm(0, 50, waveformFBO.getWidth(), 100);
             }
             waveformFBO.end();
-            lastclip = clip.name;
+            lastclip = clip.getName();
         }
         
         if(!video.isLoaded()) return;
@@ -75,7 +75,7 @@ void AnalyzeView::update(){
             contourFinder.draw();
             ofSetColor(255, 0, 0);
             ofNoFill();
-            ofRect(clip.rect);
+            ofRect(clip.getPosition());
             ofSetColor(255, 255, 255, 255);
             waveformFBO.draw(0, 0);
             ofDisableBlendMode();

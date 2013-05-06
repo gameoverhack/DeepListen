@@ -55,17 +55,15 @@ void PlayController::update(){
         case kPLAYCONTROLLER_MAKE:
         {
             // generate clip group
-            playGroup = makeClipGroup();
-            
-            // add to the model...
             ClipTimeline & clipTimeline = appModel->getClipTimeline();
-            //clipTimeline.stop();
             clipTimeline.clear();
-            clipTimeline.push(playGroup);
-            
+            playGroup = makeClipGroup();
+
             ofxLogVerbose() << "\\/---------------------\\/" << endl;
             ofxLogVerbose() << playGroup << endl;
             ofxLogVerbose() << "/\\---------------------/\\" << endl;
+            
+            clipTimeline.play();
 
         }
             break;
@@ -82,10 +80,10 @@ void PlayController::update(){
             }
             
             ostringstream os;
-            vector<string> & clipNames = clipTimeline.getCurrentClipNames();
-            for(int i = 0; i < clipNames.size(); i++){
-                Clip & clip = clipTimeline.getClip(clipNames[i]);
-                os << clip.name << " " << clip.clipPosition.isPlaying << " " << clip.clipPosition.isLoading << (i == clipNames.size() - 1 ? "" : ", ");
+            vector<string> & currentClipNames = clipTimeline.getCurrentClipNames();
+            for(int i = 0; i < currentClipNames.size(); i++){
+                Clip & clip = clipTimeline.getClipFromName(currentClipNames[i]);
+                os << clip.getName() << " " << clip.getClipLoading() << " " << clip.getClipStopping() << (i == currentClipNames.size() - 1 ? "" : ", ");
             }
             
             appModel->setProperty("Clips", os.str());
@@ -116,9 +114,9 @@ ClipGroup PlayController::makeClipGroup(){
     ClipGroup & allListenClips = appModel->getClipGroupReference("allListenClips");
     ClipGroup & allStatClips = appModel->getClipGroupReference("allStatClips");
     ClipGroup & allIntroClips = appModel->getClipGroupReference("allIntroClips");
-    cout << allIntroClips << endl;
-    ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
     
+    ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
+    cout << "FUCK: " << allTitleClips << endl;
     ClipGroup & statistics = appModel->getClipGroupReference("statistics");
     
     ClipGroup newClipGroup;
@@ -126,9 +124,6 @@ ClipGroup PlayController::makeClipGroup(){
     string category = "";
     int flip;
     int lastAudioFreeFrame = 0;
-    Clip lastClip;
-    lastClip.clipPosition.videostart = 0;
-    lastClip.clipPosition.videoend = 0;
     
     while(true){
         
@@ -177,8 +172,8 @@ ClipGroup PlayController::makeClipGroup(){
             ClipGroup introGroup;
             
             for(int j = 0; j < uniqueNameGroup.size(); j++){
-                Clip introClip = allIntroClips.getContains(PERSON, uniqueNameGroup[j].person).poprandom();
-                cout << uniqueNameGroup[j].person << " " << introClip << endl;
+                Clip introClip = allIntroClips.getContains(PERSON, uniqueNameGroup[j].getClipInfo().person).poprandom();
+                cout << uniqueNameGroup[j].getClipInfo().person << " " << introClip << endl;
                 introGroup.push(introClip);
             }
             cout << introGroup << endl;
@@ -191,7 +186,7 @@ ClipGroup PlayController::makeClipGroup(){
             
             // make sure no statement is by someone answering a question
             for(int j = 0; j < uniqueNameGroup.size(); j++){
-                statementGroup = statementGroup.getExcludes(PERSON, statementGroup[j].person);
+                statementGroup = statementGroup.getExcludes(PERSON, statementGroup[j].getClipInfo().person);
             }
             
             for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
@@ -218,110 +213,31 @@ ClipGroup PlayController::makeClipGroup(){
             
             uniqueNameGroup.push_front(titleClip);
             
+            ClipTimeline & timeline = appModel->getClipTimeline();
+            
             // calculate audio overlaps and pack
             for(int j = 0; j < uniqueNameGroup.size(); j++){
                 
                 ClipPosition clipPosition;
                 Clip & clip = uniqueNameGroup[j];
                 
-                if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
+                bool insertedOk = false;
+                
+                if(clip.getName().rfind("OOOO_00_TITLE") != string::npos){
                     // calculate frame starts and ends
-                    clipPosition.videostart = lastAudioFreeFrame;
-                    clipPosition.videoend = clipPosition.videostart + clip.frames;
-                    clipPosition.audiostart = clipPosition.videostart;
-                    clipPosition.audioend = clipPosition.videoend;
+                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame);
                 }else{
                     // calculate frame starts and ends
-                    clipPosition.videostart = lastAudioFreeFrame - (clip.frames * clip.audioinpct);
-                    clipPosition.videoend = clipPosition.videostart + clip.frames;
-                    clipPosition.audiostart = clipPosition.videostart + (clip.frames * clip.audioinpct);
-                    clipPosition.audioend = clipPosition.videostart + (clip.frames * clip.audioutpct);
+                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame - clip.getAudioInFrameOffset());
                 }
                 
-                lastAudioFreeFrame = clipPosition.audioend;
-
-                bool fitted = false;
-                
-                ClipGroup rectTestGroup;
-                rectTestGroup.push(uniqueNameGroup);
-                rectTestGroup.push(newClipGroup);
-                
-                vector<string> clipNamesAtStart;
-                rectTestGroup.getClipNamesAt(clipPosition.videostart, clipNamesAtStart);
-                rectTestGroup.getClipNamesAt(clipPosition.audiostart, clipNamesAtStart);
-                
-                vector<string> clipNamesAtEnd;
-                rectTestGroup.getClipNamesAt(clipPosition.videoend, clipNamesAtEnd);
-                rectTestGroup.getClipNamesAt(clipPosition.audioend, clipNamesAtEnd);
-                
-                int attempts = 0;
-                bool reject = false;
-                while(!fitted){
-                    
-                    attempts++;
-                    if(attempts > 2000){
-                        reject = true;
-                        fitted = true;
-                        continue;
-                    }
-                    
-                    // prefer screen right hand screen most of the time
-                    clipPosition.screen = getRandomDistribution(2, 0.7f, 0.3f);
-                    
-                    fitted = false;
-                    clipPosition.position.x = ofRandom(1920.0f - clip.rect.width) - clip.rect.x;
-                    clipPosition.position.y = (1080.0f - 100.0f) - clip.rect.height - clip.rect.y; // TODO: replace with screen height prop 200 = floor height; make this a prop
-                    
-                    // could scale with these ??
-                    clipPosition.position.width = clip.rect.width;
-                    clipPosition.position.height = clip.rect.height;
-                    
-//                    if(clip.name.rfind("TTLE_OOOO_00_TITLE") != string::npos){
-//                        fitted = true;
-//                        continue;
-//                    }
-                    
-                    for(int k = 0; k < clipNamesAtStart.size(); k++){
-                        Clip & clip = rectTestGroup.getClip(clipNamesAtStart[k]);
-                        ofRectangle r = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
-                        if(clip.clipPosition.screen != clipPosition.screen){
-                            fitted = true;
-                            continue;
-                        }
-                        if(clipPosition.position.intersects(r)){
-                            fitted = false;
-                            break;
-                        }
-                    }
-                    if(!fitted) continue;
-                    for(int k = 0; k < clipNamesAtEnd.size(); k++){
-                        Clip & clip = rectTestGroup.getClip(clipNamesAtEnd[k]);
-                        ofRectangle r = ofRectangle(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.position.width, clip.clipPosition.position.height);
-                        if(clip.clipPosition.screen != clipPosition.screen){
-                            fitted = true;
-                            continue;
-                        }
-                        if(clipPosition.position.intersects(r)){
-                            fitted = false;
-                            break;
-                        }
-                    }
-                }
-                
-                if(reject){
-                    ostringstream os;
-                    os << clip;
+                if(insertedOk){
+                    lastAudioFreeFrame = clip.getAudioEnd();
+                }else{
                     ofxLogWarning() << "Rejected" << clip << endl;
                     uniqueNameGroup.pop(clip);
                     continue;
                 }
-                
-                clipPosition.isLoading = false;
-                clipPosition.isPlaying = false;
-                clipPosition.isPaused = false;
-                
-                clip.clipPosition = clipPosition;
-                lastClip = clip;
                 
             }
 
@@ -351,6 +267,7 @@ void PlayController::resetClipGroups(){
         ClipGroup allIntroClips, originalIntroClips;
         ClipGroup allStatClips, originalStatClips;
         ClipGroup allSpecClips, originalSpecClips;
+        ClipGroup allCategoryClips, originalCategoryClips;
         ClipGroup allTitleClips;
         
         ClipGroup statistics, playGroup;
@@ -374,6 +291,14 @@ void PlayController::resetClipGroups(){
         originalStatClips = originalClips.getContains(CATEGORY, "STAT");
         originalSpecClips = originalClips.getContains(CATEGORY, "SPEC");
         
+        originalCategoryClips = originalClips;
+        originalCategoryClips.pop(originalListenClips);
+        originalCategoryClips.pop(originalIntroClips);
+        originalCategoryClips.pop(originalStatClips);
+        originalCategoryClips.pop(originalSpecClips);
+        
+        allCategoryClips = originalCategoryClips;
+        
         // make copies of these
         allListenClips = originalListenClips;
         allIntroClips = originalIntroClips;
@@ -386,13 +311,16 @@ void PlayController::resetClipGroups(){
         appModel->setClipGroup("originalIntroClips", originalIntroClips);
         appModel->setClipGroup("originalStatClips", originalStatClips);
         appModel->setClipGroup("originalSpecClips", originalSpecClips);
+        appModel->setClipGroup("originalCategoryClips", originalCategoryClips);
         
         appModel->setClipGroup("allClips", allClips);
         appModel->setClipGroup("allListenClips", allListenClips);
         appModel->setClipGroup("allIntroClips", allIntroClips);
         appModel->setClipGroup("allStatClips", allStatClips);
         appModel->setClipGroup("allSpecClips", allSpecClips);
+        appModel->setClipGroup("allCategoryClips", allCategoryClips);
         appModel->setClipGroup("allTitleClips", allTitleClips);
+        
         
         appModel->setClipGroup("statistics", statistics);
         appModel->setClipGroup("playGroup", playGroup);
@@ -407,6 +335,7 @@ void PlayController::resetClipGroups(){
         appModel->getClipGroupReference("allIntroClips") = appModel->getClipGroup("originalIntroClips");
         appModel->getClipGroupReference("allStatClips") = appModel->getClipGroup("originalStatClips");
         appModel->getClipGroupReference("allSpecClips") = appModel->getClipGroup("originalSpecClips");
+        appModel->getClipGroupReference("allCategoryClips") = appModel->getClipGroup("originalCategoryClips");
         
     }
 }
