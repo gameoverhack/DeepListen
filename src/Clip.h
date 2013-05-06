@@ -851,7 +851,7 @@ public:
             
             if(video->getIsMovieDone()){
                 
-                Clip & clip = getClipFromPath(video->getPath());
+                Clip & clip = getClipFromPath(video->getMoviePath());
                 
                 //ofxLogVerbose() << "Stop clip ( " << i << " ): " << clip.name << endl;
                 
@@ -864,7 +864,7 @@ public:
             }
             
             if(video->isPlaying()){
-                Clip & clip = getClipFromPath(video->getPath());
+                Clip & clip = getClipFromPath(video->getMoviePath());
                 currentframe = clip.clipPosition.videostart + video->getCurrentFrame();
                 syncClipName = clip.name;
             }
@@ -896,8 +896,8 @@ public:
     }
     
     void threadedVideoEvent(ofxThreadedVideoEvent & e){
-        ofxLogVerbose() << "VideoEvent: " << e.video->getEventTypeAsString(e.eventType) << " for " << e.video->getPath() << endl;
-        Clip & clip = getClipFromPath(e.video->getPath());
+        ofxLogVerbose() << "VideoEvent: " << e.video->getEventTypeAsString(e.eventType) << " for " << e.video->getMoviePath() << endl;
+        Clip & clip = getClipFromPath(e.video->getMoviePath());
         switch(e.eventType){
             case VIDEO_EVENT_LOAD_OK:
             {
@@ -936,7 +936,7 @@ public:
             
             if(video->isPlaying()){
                 
-                Clip & clip = getClipFromPath(video->getPath());
+                Clip & clip = getClipFromPath(video->getMoviePath());
                 
                 if(clip.clipPosition.screen == screen){
                     
