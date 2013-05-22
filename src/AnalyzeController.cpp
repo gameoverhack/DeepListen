@@ -20,17 +20,17 @@ AnalyzeController::~AnalyzeController(){
 
 //--------------------------------------------------------------
 void AnalyzeController::setup(){
-//    analyzeView = new AnalyzeView();
-//    
-//    analyzeView->setup(appModel->getProperty<float>("VideoWidth"), 
-//                       appModel->getProperty<float>("VideoHeight"), 
-//                       ViewOption(VIEW_USE_FBO | VIEW_USE_WINDOW),
-//                       (string)"analyze");
-//    
-//    analyzeView->setPosition(appModel->getProperty<float>("MonitorWidth")/2.0, 
-//                             0, 
-//                             appModel->getProperty<float>("MonitorWidth")/2.0, 
-//                             appModel->getProperty<float>("MonitorHeight")/2.0);
+    analyzeView = new AnalyzeView();
+    
+    analyzeView->setup(appModel->getProperty<float>("VideoWidth"), 
+                       appModel->getProperty<float>("VideoHeight"), 
+                       ViewOption(VIEW_USE_FBO | VIEW_USE_WINDOW),
+                       (string)"analyze");
+    
+    analyzeView->setPosition(appModel->getProperty<float>("MonitorWidth")/2.0, 
+                             0, 
+                             appModel->getProperty<float>("MonitorWidth")/2.0, 
+                             appModel->getProperty<float>("MonitorHeight")/2.0);
 }
 
 //--------------------------------------------------------------

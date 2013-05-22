@@ -26,9 +26,9 @@ void LoadController::setup(){
     ClipTimeline & clipTimeline = appModel->getClipTimeline();
     
     if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
-        clipTimeline.setup("/Volumes/DeepData/black.mov", OF_PIXELS_2YUV);
+        clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_2YUV);
     }else{
-        clipTimeline.setup("/Volumes/DeepData/black.mov", OF_PIXELS_BGRA);
+        clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_BGRA);
     }
     
 }
