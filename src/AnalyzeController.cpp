@@ -114,7 +114,7 @@ void AnalyzeController::update(){
                 for(int i = 0; i < contourFinder.getContours().size(); i++){
                     vector<cv::Point> pts = contourFinder.getContours()[i];
                     for(int j = 0; j < pts.size(); j++){
-                        ofRectangle & r = clip.getPosition();
+                        ofRectangle & r = clip.getRect();
                         r.x = MIN(pts[j].x, r.x);
                         r.y = MIN(pts[j].y, r.y);
                         r.width = MAX(pts[j].x, r.width + r.x) - r.x;

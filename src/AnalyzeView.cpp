@@ -75,7 +75,7 @@ void AnalyzeView::update(){
             contourFinder.draw();
             ofSetColor(255, 0, 0);
             ofNoFill();
-            ofRect(clip.getPosition());
+            ofRect(clip.getRect());
             ofSetColor(255, 255, 255, 255);
             waveformFBO.draw(0, 0);
             ofDisableBlendMode();
