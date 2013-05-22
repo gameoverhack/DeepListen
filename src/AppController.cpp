@@ -68,9 +68,9 @@ void AppController::setup(){
     appModel->load("config", ARCHIVE_BINARY);
     
     // set properties here (can comment once saved)
-    appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
-    appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
+    appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/ANIME60/");
+    appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);
@@ -87,7 +87,9 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth", 1920.0f);
     appModel->setProperty("OutputHeight", 1080.0f);
     
-    appModel->setProperty("PixelFormat", (string)"JPEG");
+    appModel->setProperty("PixelFormat", (string)"BGRA");
+    
+    appModel->setProperty("ShowTimeline", true);
     
     // create appView windows
     for(int screen = 0; screen < 2; screen++){
@@ -248,6 +250,10 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             appViewStates.toggleState(kAPPVIEW_SHOWWARP_1);
             warp1.setShowWarpGrid(appViewStates.getState(kAPPVIEW_SHOWWARP_1));
             break;
+        case 'w':
+            warp0.toggleDoWarp();
+            warp1.toggleDoWarp();
+            break;
         case 'r':
             if(appViewStates.getState(kAPPVIEW_SHOWWARP_0)) warp0.resetWarpGrid();
             if(appViewStates.getState(kAPPVIEW_SHOWWARP_1)) warp1.resetWarpGrid();
@@ -282,6 +288,9 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case '/':
             timeline.togglePaused();
+            break;
+        case 't':
+            appModel->setProperty("ShowTimeline", !appModel->getProperty<bool>("ShowTimeline"));
             break;
     }
 

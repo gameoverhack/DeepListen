@@ -67,7 +67,7 @@ void main(void){
     g = y - c * (1.0 - kb) * (kb / (1.0 - kb - kr)) * u - c * (1.0 - kr) * (kr / (1.0 - kb - kr)) * v;
     b = y + c * (1.0 - kb) * u;
     
-    gl_FragColor = vec4(r, g, b, fade);
+    gl_FragColor = vec4(r * fade, g * fade, b * fade, 1.0 * fade);
     
     //    vec4 tl = texture2DRect(yuvTex, uv);
     //    vec4 tr = texture2DRect(textureSampler, uv + vec2(texelSize, 0));

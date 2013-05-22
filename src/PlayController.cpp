@@ -73,7 +73,7 @@ void PlayController::update(){
             
             clipTimeline.update();
             
-            vector<ofxThreadedVideo*> videos = clipTimeline.getVideos();
+            vector<ofxThreadedVideo*> & videos = clipTimeline.getVideos();
             for(int i = 0; i < videos.size(); i++){
                 ofxThreadedVideo * video = videos[i];
                 appModel->setProperty("PlayState_"+ofToString(i), ofToString(video->isPlaying()) + " " + ofToString(video->getIsMovieDone()) + " " + ofToString(video->getFrameRate()));
@@ -116,7 +116,6 @@ ClipGroup PlayController::makeClipGroup(){
     ClipGroup & allIntroClips = appModel->getClipGroupReference("allIntroClips");
     
     ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
-    cout << "FUCK: " << allTitleClips << endl;
     ClipGroup & statistics = appModel->getClipGroupReference("statistics");
     
     ClipGroup newClipGroup;
@@ -161,9 +160,6 @@ ClipGroup PlayController::makeClipGroup(){
             string question = questionGroup.poprandom();
             ClipGroup uniqueNameGroup = categoryGroup.getContains(QUESTION, question).getUnique(PERSON, numberOfQuestions);
             
-            
-            
-            
             // mix up the order
             // TODO: might want to use a randomDist
             // to weight statements at start etc
@@ -176,7 +172,7 @@ ClipGroup PlayController::makeClipGroup(){
                 cout << uniqueNameGroup[j].getClipInfo().person << " " << introClip << endl;
                 introGroup.push(introClip);
             }
-            cout << introGroup << endl;
+            
             for(int j = 0; j < numberOfIntros; j++){
                 Clip introClip = introGroup.poprandom();
                 uniqueNameGroup.push_front(introClip);
@@ -208,11 +204,10 @@ ClipGroup PlayController::makeClipGroup(){
                 }
                 uniqueNameGroup.push_front(statementClip);
             }
-            
-            Clip titleClip = allTitleClips.getContains(CATEGORY, category)[0];
-            
-            uniqueNameGroup.push_front(titleClip);
-            
+            if(allTitleClips.size() > 0){
+                Clip titleClip = allTitleClips.getContains(CATEGORY, category)[0];
+                uniqueNameGroup.push_front(titleClip);
+            }
             ClipTimeline & timeline = appModel->getClipTimeline();
             
             // calculate audio overlaps and pack
@@ -275,7 +270,7 @@ void PlayController::resetClipGroups(){
         // iterate through all clips and add to an "all" clips ClipGroup
         for(int i = 0; i < appModel->getClips().size(); i++){
             Clip & clip = appModel->getClip(i);
-            originalClips.push(clip);
+            if(!clip.getDeleted()) originalClips.push(clip);
         }
         
         // get all the title clips and delete them from the original list

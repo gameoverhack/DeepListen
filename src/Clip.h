@@ -350,6 +350,10 @@ public:
         return name;
     }
     
+    string getVideoPath(){
+        return videoFile.path;
+    }
+    
     ClipInfo& getClipInfo(){
         return clipInfo;
     }
@@ -1037,9 +1041,9 @@ inline ostream& operator<<(ostream& os, const ClipGroup &cg){
 };
 
 class ClipTimeline {
-    
+
 public:
-    
+        
     ClipTimeline(){
         clear();
     };
@@ -1056,14 +1060,17 @@ public:
         
         ofxThreadedVideo * video = new ofxThreadedVideo;
         video->setPixelFormat(pixelFormat);
-        video->setLoopState(OF_LOOP_NORMAL);
         video->setUseAutoPlay(true);
         video->loadMovie(blackpath);
         
-        while(!video->isPlaying()) video->update();
+        while(!video->isLoaded()){
+            video->update();
+        }
+        
+        video->setVolume(0.0f);
+        video->setLoopState(OF_LOOP_NORMAL);
         
         videos.push_back(video);
-        
         
         if(pixelFormat == OF_PIXELS_2YUV){
             shader.load(ofToDataPath("yuyvtorgba"));
@@ -1079,10 +1086,8 @@ public:
         if(!bPaused){
             
             for(int i = 0; i < videos.size(); i++){
-                videos[i]->update();
+                if(videos[i]->isLoading() || videos[i]->isPlaying()) videos[i]->update();
             }
-            
-            if(videos[0]->isPlaying() && videos[0]->isFrameNew()) currentFrame++;
             
             currentClipNames = getClipNamesFrom(currentFrame, currentFrame);
             
@@ -1095,9 +1100,9 @@ public:
                     ofxThreadedVideo * video = isClipAssigned(clip);
                     
                     if(video == NULL && !clip.getClipLoading() && !clip.getClipStopping()){
-                        cout << "Loading " << clip.getVideoFile().path << endl;
+                        cout << "Loading " << clip.getVideoPath() << endl;
                         video = assignVideoPlayer();
-                        if(video->loadMovie(clip.getVideoFile().path)) clip.setClipLoading(true);
+                        if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
                         while(!video->isLoading()) video->update();
                     }
                     
@@ -1105,7 +1110,7 @@ public:
                     
                     if(video->isLoaded() && !video->isPlaying()){
                         if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getCropEnd())) continue;
-                        cout << "Playing " << clip.getVideoFile().path << endl;
+                        cout << "Playing " << clip.getVideoPath() << endl;
                         video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
                         video->setLoopState(OF_LOOP_NONE);
                         video->play();
@@ -1114,10 +1119,23 @@ public:
                     }
                     
                     if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getCropEnd())){
-                        cout << "Stopping " << clip.getVideoFile().path << endl;
+                        cout << "Stopping " << clip.getVideoPath() << endl;
                         video->stop();
                         clip.setClipLoading(false);
                         clip.setClipStopping(true);
+                    }
+                }
+            }
+            for(int i = videos.size() - 1; i >= 0 ; i--){
+                if(videos[i]->isPlaying()){
+                    if(i == 0){
+                        cout << "MOFO1" << endl;
+                        if(videos[0]->isFrameNew()) currentFrame++;
+                    }else{
+                        Clip & clip = getClipFromPath(videos[i]->getMoviePath());
+                        currentFrame = clip.getVideoStart() + videos[i]->getCurrentFrame();
+                        syncClipName = clip.getName();
+                        break;
                     }
                 }
             }
@@ -1148,9 +1166,9 @@ public:
     ofxThreadedVideo * isClipAssigned(Clip & clip){
         assert(videos.size() > 0);
         for(int i = 1; i < videos.size(); i++){
-            string clipPath = clip.getVideoFile().path;
+            string clipPath = clip.getVideoPath();
             if(videos[i]->getMoviePath() == clipPath ||
-               videos[i]->isQueued(clipPath)){
+                videos[i]->isQueued(clipPath)){
                 return videos[i];
             }
         }
@@ -1159,9 +1177,9 @@ public:
     
     void previousClip(){
         int previousClipFrame = currentFrame;
-        vector<string> clipsNow = getClipNamesFrom(currentFrame, currentFrame);
+        vector<string> clipsNow = getClipNamesFrom(previousClipFrame, previousClipFrame);
         int numDiffs = 0;
-        for(int i = currentFrame; i >= 0; i--){
+        for(int i = previousClipFrame; i >= 0; i--){
             vector<string> clipsThen = getClipNamesFrom(i, i);
             if(clipsThen != clipsNow){
                 if(numDiffs == 1){
@@ -1171,7 +1189,6 @@ public:
                     numDiffs++;
                     clipsNow = clipsThen;
                 }
-                
             }
         }
         setFrame(previousClipFrame);
@@ -1179,14 +1196,15 @@ public:
     
     void nextClip(){
         int nextClipFrame = currentFrame;
-        vector<string> clipsNow = getClipNamesFrom(currentFrame, currentFrame);
-        for(int i = currentFrame; i < getTotalFrames(); i++){
+        vector<string> clipsNow = getClipNamesFrom(nextClipFrame, nextClipFrame);
+        for(int i = nextClipFrame; i < getTotalFrames(); i++){
             vector<string> clipsThen = getClipNamesFrom(i, i);
             if(clipsThen != clipsNow){
                 nextClipFrame = i;
                 break;
             }
         }
+        cout << "MOFO2: " << nextClipFrame << endl;
         setFrame(nextClipFrame);
     }
     
@@ -1232,8 +1250,23 @@ public:
         setPaused(!bPaused);
     }
     
+    void draw(){
+        if(videos.size() == 0) return;
+        videos[0]->draw(0,0,0,0);
+        glPushMatrix();
+        ofFill();
+        ofSetColor(0, 0, 0, 255);
+        ofRect(0, 200, 1920.0 * 6, 1080.0/2.0);
+        ofSetColor(255, 255, 255, 255);
+        //ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+        for(int i = 1; i < videos.size(); i++){
+            videos[i]->draw(200 + 480 * (i - 2), 200, 1920.0/2.0, 1080.0/2.0);
+        }
+        //ofDisableBlendMode();
+        glPopMatrix();
+    }
+    
     void draw(int screen){
-        
         if(videos.size() < 2) return;
         
         videos[0]->draw(0,0,0,0);
@@ -1251,8 +1284,8 @@ public:
                     float fade = 1.0f;
                     int fadeInSeconds = 3;
                     int currentFrame = video->getCurrentFrame();
-                    
-                    if(currentFrame > 0 && currentFrame < fadeInSeconds * 25){
+
+                    if(currentFrame >= 0 && currentFrame < fadeInSeconds * 25){
                         fade = (float)currentFrame / (float)(fadeInSeconds * 25);
                     }else if(currentFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFrame < clip.getTotalFrames()){
                         fade = (((float)clip.getTotalFrames() - currentFrame) / (float)(fadeInSeconds * 25));
@@ -1291,14 +1324,15 @@ public:
         
         glPushMatrix();
         
-//        ostringstream os;
-//        os << "FRAME: " << getCurrentFrame() << " / " << getTotalFrames() << endl;
-//        
-//        for(int i = 0; i < videos.size(); i++){
-//            os << "VIDEO_" << i << ": " << videos[i]->getMoviePath() << endl; 
-//        }
-//        
-//        ofDrawBitmapString(os.str(), 20, 20);
+        ostringstream os;
+        os << "FRAME: " << getCurrentFrame() << " / " << getTotalFrames() << endl;
+        os << "FPS: " << ofGetFrameRate() << endl;
+        
+        for(int i = 0; i < videos.size(); i++){
+            os << "VIDEO_" << i << ": " << videos[i]->getFrameRate() << "  " << videos[i]->getMoviePath() << endl;
+        }
+        
+        ofDrawBitmapString(os.str(), 20, 20);
         
         glPopMatrix();
         
@@ -1322,32 +1356,32 @@ public:
             ofFill();
             glPushMatrix();
             ofTranslate(0.0f, 1920.0f * (clip.getScreen()), 0.0f);
-            if(clip.getName() == ""){
+            if(clip.getName() == syncClipName){
                 ofSetColor(64, 64, 128, 64);
-                ofRect(clip.getVideoStart(), 
-                       clip.getPosition().x, 
-                       clip.getTotalFrames(), 
+                ofRect(clip.getVideoStart(),
+                       clip.getPosition().x,
+                       clip.getTotalFrames(),
                        clip.getPosition().width);
                 ofSetColor(0, 0, 255);
             }else{
                 ofSetColor(64 * clip.getScreen(), 64, 64, 32);
-                ofRect(clip.getVideoStart(), 
-                       clip.getPosition().x, 
-                       clip.getTotalFrames(), 
+                ofRect(clip.getVideoStart(),
+                       clip.getPosition().x,
+                       clip.getTotalFrames(),
                        clip.getPosition().width);
                 ofSetColor(255, 255, 255);
                 
             }
             
             ofNoFill();
-            ofRect(clip.getVideoStart(), 
-                   clip.getPosition().x, 
-                   clip.getTotalFrames(), 
+            ofRect(clip.getVideoStart(),
+                   clip.getPosition().x,
+                   clip.getTotalFrames(),
                    clip.getPosition().width);
             ofSetColor(255, 0, 0);
-            ofRect(clip.getAudioStart(), 
-                   clip.getPosition().x + 1, 
-                   clip.getAudioEnd() - clip.getAudioStart(), 
+            ofRect(clip.getAudioStart(),
+                   clip.getPosition().x + 1,
+                   clip.getAudioEnd() - clip.getAudioStart(),
                    clip.getPosition().width - 2);
             ofSetColor(255, 255, 255);
             
@@ -1391,10 +1425,10 @@ public:
             y = (1080.0f - 100.0f) - originalRect.height - originalRect.y;
             width = originalRect.width;
             
-            fitted = !getAnyClipAt(frame, 
-                                   x, 
-                                   frame + clip.getTotalFrames(), 
-                                   width, 
+            fitted = !getAnyClipAt(frame,
+                                   x,
+                                   frame + clip.getTotalFrames(),
+                                   width,
                                    screen);
             
             if(!fitted && tries > 44){
@@ -1426,9 +1460,9 @@ public:
             
             Clip & clip = group[i];
             
-            ofRectangle r = ofRectangle((clip.getVideoStart() + 2000 - getCurrentFrame()) * framescale, 
-                                        (clip.getPosition().x * pixelscale) + (clip.getScreen() * 1920.0f * pixelscale), 
-                                        clip.getTotalFrames() * framescale, 
+            ofRectangle r = ofRectangle((clip.getVideoStart() + 2000 - getCurrentFrame()) * framescale,
+                                        (clip.getPosition().x * pixelscale) + (clip.getScreen() * 1920.0f * pixelscale),
+                                        clip.getTotalFrames() * framescale,
                                         clip.getPosition().width * pixelscale);
             
             ofPoint p = ofPoint(ofGetMouseX(), ofGetMouseY());
@@ -1449,18 +1483,18 @@ public:
     
     void getClipNamesFrom(int startFrame, int endFrame, vector<string> & clipNames){
         
-        ofRectangle f = ofRectangle(startFrame, 
-                                    0, 
-                                    endFrame - startFrame, 
+        ofRectangle f = ofRectangle(startFrame,
+                                    0,
+                                    endFrame - startFrame,
                                     1);
         
         for(int i = 0; i < group.size(); i++){
             
             Clip & clip = group[i];
             
-            ofRectangle r = ofRectangle(clip.getVideoStart(), 
-                                        0, 
-                                        clip.getTotalFrames(), 
+            ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                        0,
+                                        clip.getTotalFrames(),
                                         1);
             
             if(r.intersects(f)){
@@ -1477,9 +1511,9 @@ public:
     
     void getClipNamesFrom(int startFrame, float x, int endFrame, float width, int screen, vector<string> & clipNames){
         
-        ofRectangle f = ofRectangle(startFrame, 
-                                    x, 
-                                    endFrame - startFrame, 
+        ofRectangle f = ofRectangle(startFrame,
+                                    x,
+                                    endFrame - startFrame,
                                     width);
         
         for(int i = 0; i < group.size(); i++){
@@ -1488,9 +1522,9 @@ public:
             
             if(clip.getScreen() != screen) continue;
             
-            ofRectangle r = ofRectangle(clip.getVideoStart(), 
-                                        clip.getPosition().x, 
-                                        clip.getTotalFrames(), 
+            ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                        clip.getPosition().x,
+                                        clip.getTotalFrames(),
                                         clip.getPosition().width);
             
             if(r.intersects(f)){
@@ -1505,9 +1539,9 @@ public:
     
     bool getAnyClipAt(int startFrame, float x, int endFrame, float width, int screen){
         
-        ofRectangle f = ofRectangle(startFrame, 
-                                    x, 
-                                    endFrame - startFrame, 
+        ofRectangle f = ofRectangle(startFrame,
+                                    x,
+                                    endFrame - startFrame,
                                     width);
         
         for(int i = 0; i < group.size(); i++){
@@ -1516,9 +1550,9 @@ public:
             
             if(clip.getScreen() != screen) continue;
             
-            ofRectangle r = ofRectangle(clip.getVideoStart(), 
-                                        clip.getPosition().x, 
-                                        clip.getTotalFrames(), 
+            ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                        clip.getPosition().x,
+                                        clip.getTotalFrames(),
                                         clip.getPosition().width);
             
             if(r.intersects(f)){
@@ -1556,34 +1590,34 @@ public:
         for(int i = 0; i < group.size(); i++){
             totalFrames = MAX(totalFrames, group[i].getVideoEnd());
         }
-    }
-    
-    vector<string>& getCurrentClipNames(){
-        return currentClipNames;
-    }
+    };
     
     vector<ofxThreadedVideo*>& getVideos(){
         return videos;
     }
     
+    vector<string>& getCurrentClipNames(){
+        return currentClipNames;
+    }
+
 protected:
-    
+        
     ClipGroup group;
     Clip dummyClip;
     
     bool bPaused;
     
-    vector<string> currentClipNames;
-    
     int currentFrame;
     int totalFrames;
     
+    string syncClipName;
+    
     ofPixelFormat pixelFormat;
     vector<ofxThreadedVideo*> videos;
+    vector<string> currentClipNames;
     
     ofShader shader;
     ofFbo renderer;
-    
 };
 
 #endif

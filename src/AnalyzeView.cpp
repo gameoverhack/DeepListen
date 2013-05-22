@@ -28,7 +28,7 @@ void AnalyzeView::update(){
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
     StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
     
-    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY)){
+    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY) && appModel->getProperty<bool>("ShowTimeline")){
         ClipTimeline & clipTimeline = appModel->getClipTimeline();
         begin();
         {

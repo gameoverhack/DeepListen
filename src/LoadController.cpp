@@ -26,9 +26,9 @@ void LoadController::setup(){
     ClipTimeline & clipTimeline = appModel->getClipTimeline();
     
     if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
-        clipTimeline.setup("/Volumes/Ersatz/CODECTESTS/black.mov", OF_PIXELS_2YUV);
+        clipTimeline.setup("/Volumes/DeepData/black.mov", OF_PIXELS_2YUV);
     }else{
-        clipTimeline.setup("/Volumes/Ersatz/CODECTESTS/black.mov", OF_PIXELS_BGRA);
+        clipTimeline.setup("/Volumes/DeepData/black.mov", OF_PIXELS_BGRA);
     }
     
 }
@@ -130,7 +130,7 @@ void LoadController::update(){
             // mark the clip as deleted in case we're just
             // temporarily removing the file
             
-            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos) continue;
+            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos && videoFiles.getFileExists(clip.getName())) continue;
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for DELETION" << endl;
             
@@ -157,14 +157,14 @@ void LoadController::update(){
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
             
-            clip.setAnalyzed(false);
+            clip.setAnalyzed(true);
         }
         
     }
     
-//    Clips clips;
-//    clips.clips = appModel->getClips();
-//    clips.save();
+    Clips clips;
+    clips.clips = appModel->getClips();
+    clips.save();
     
     if(appModel->getNumClipsForAnalysis() > 0){
         appControllerStates.setState(kAPPCONTROLLER_ANALYZE);
