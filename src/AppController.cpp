@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 trace media. All rights reserved.
 //
 
+//#define MINI
+
 #include "AppController.h"
 
 //--------------------------------------------------------------
@@ -67,11 +69,18 @@ void AppController::setup(){
     // load the config file
     appModel->load("config", ARCHIVE_BINARY);
     
+#ifdef MINI
     // set properties here (can comment once saved)
     appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
     appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/ANIME60/");
     appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
-    appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov"); //"/Volumes/DeepData/black.mov"
+    appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
+#else
+    appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
+    appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
+    appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
+#endif
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);

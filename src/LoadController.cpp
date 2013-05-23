@@ -157,7 +157,7 @@ void LoadController::update(){
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
             
-            clip.setAnalyzed(false);
+            clip.setAnalyzed(true);
         }
         
     }
