@@ -1086,7 +1086,8 @@ public:
         if(!bPaused){
             
             for(int i = 0; i < videos.size(); i++){
-                if(videos[i]->isLoading() || videos[i]->isPlaying()) videos[i]->update();
+                //if(videos[i]->isLoading() || videos[i]->isPlaying())
+                videos[i]->update();
             }
             
             currentClipNames = getClipNamesFrom(currentFrame, currentFrame);

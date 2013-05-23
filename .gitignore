@@ -1,4 +1,7 @@
-# Applications
+#System
+.DS_Store
+
+#Applications
 *.app
 *.exe
 

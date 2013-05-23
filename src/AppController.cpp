@@ -68,10 +68,10 @@ void AppController::setup(){
     appModel->load("config", ARCHIVE_BINARY);
     
     // set properties here (can comment once saved)
-    appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
-    appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
-    appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov"); //"/Volumes/DeepData/black.mov"
+    appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/ANIME60/");
+    appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
+    appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov"); //"/Volumes/DeepData/black.mov"
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);
@@ -86,7 +86,7 @@ void AppController::setup(){
     appModel->setProperty("VideoHeight", 1080.0f);
     
     appModel->setProperty("OutputWidth", 1920.0f);
-    appModel->setProperty("OutputHeight", 1080.0f);
+    appModel->setProperty("OutputHeight", 1024.0f);
     
     appModel->setProperty("PixelFormat", (string)"JPEG");
     
