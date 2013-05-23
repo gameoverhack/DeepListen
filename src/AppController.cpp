@@ -19,7 +19,7 @@ AppController::AppController(){
 AppController::~AppController(){
     ofxLogVerbose() << "Destroying AppController" << endl;
 }
-#include "ofxSamplePlayer.h"
+
 //--------------------------------------------------------------
 void AppController::setup(){
     
