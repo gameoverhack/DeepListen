@@ -1452,28 +1452,29 @@ public:
         
     };
     
-    Clip & getClipAt(float x, float y, float width, float height){
+    Clip getClipAt(float x, float y, float width, float height){
         
         float framescale = (1.0/(float)getTotalFrames()) * width * 16;
         float pixelscale = (height/(2 * 1920.0f));
-        
+
         for(int i = 0; i < group.size(); i++){
             
-            Clip & clip = group[i];
+            Clip clip = group[i];
             
             ofRectangle r = ofRectangle((clip.getVideoStart() + 2000 - getCurrentFrame()) * framescale,
                                         (clip.getPosition().x * pixelscale) + (clip.getScreen() * 1920.0f * pixelscale),
                                         clip.getTotalFrames() * framescale,
                                         clip.getPosition().width * pixelscale);
             
-            ofPoint p = ofPoint(ofGetMouseX(), ofGetMouseY());
+            ofPoint p = ofPoint(x, y);
             
             if(r.inside(p)){
-                cout << clip << endl;
                 return clip;
             }
             
         }
+        
+        return dummyClip;
     }
     
     vector<string> getClipNamesFrom(int startFrame, int endFrame){

@@ -20,6 +20,8 @@ public:
     ~AnalyzeView();
     
     void update();
+
+    void mousePressed(int x, int y, int button);
     
 protected:
 	

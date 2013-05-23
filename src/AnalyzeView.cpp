@@ -82,7 +82,11 @@ void AnalyzeView::update(){
         }
         end();
     }
-    
-    
-    
+
+}
+
+//--------------------------------------------------------------
+void AnalyzeView::mousePressed(int x, int y, int button){
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    cout << timeline.getClipAt(x, y, ofGetWidth(), ofGetHeight()) << endl;
 }
