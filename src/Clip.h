@@ -193,7 +193,6 @@ struct ClipPosition {
     bool isAudio;
     bool isCropped;
     bool isLoading;
-    bool isStopping;
     bool isPlaying;
     bool isPaused;
 };
@@ -255,7 +254,6 @@ public:
         clipPosition.isAudio = false;
         clipPosition.isCropped = false;
         clipPosition.isLoading = false;
-        clipPosition.isStopping = false;
         clipPosition.isPlaying = false;
         clipPosition.isPaused = false;
         
@@ -488,14 +486,6 @@ public:
     
     bool setClipLoading(bool b){
         clipPosition.isLoading = b;
-    }
-    
-    bool getClipStopping(){
-        return clipPosition.isStopping;
-    }
-    
-    bool setClipStopping(bool b){
-        clipPosition.isStopping = b;
     }
     
     bool getAnalyzed(){
@@ -1100,7 +1090,8 @@ public:
                     
                     ofxThreadedVideo * video = isClipAssigned(clip);
                     
-                    if(video == NULL && !clip.getClipLoading() && !clip.getClipStopping()){
+                    if(video == NULL && !clip.getClipLoading() && currentFrame < clip.getVideoEnd() - 100){// && !clip.getClipStopping()){
+                        cout << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
                         cout << "Loading " << clip.getVideoPath() << endl;
                         video = assignVideoPlayer();
                         if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
@@ -1110,20 +1101,18 @@ public:
                     if(video == NULL) continue;
                     
                     if(video->isLoaded() && !video->isPlaying()){
-                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getCropEnd())) continue;
+                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getVideoEnd())) continue;
                         cout << "Playing " << clip.getVideoPath() << endl;
                         video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
                         video->setLoopState(OF_LOOP_NONE);
                         video->play();
                         clip.setClipLoading(false);
-                        clip.setClipStopping(false);
                     }
-                    
-                    if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getCropEnd())){
+
+                    if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)){
                         cout << "Stopping " << clip.getVideoPath() << endl;
                         video->stop();
                         clip.setClipLoading(false);
-                        clip.setClipStopping(true);
                     }
                 }
             }
@@ -1134,7 +1123,9 @@ public:
                         if(videos[0]->isFrameNew()) currentFrame++;
                     }else{
                         Clip & clip = getClipFromPath(videos[i]->getMoviePath());
-                        currentFrame = clip.getVideoStart() + videos[i]->getCurrentFrame();
+                        if(videos[i]->getCurrentFrame() < clip.getCropStart()) continue;
+                        //cout << currentFrame << " " << clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart() << " " << videos[i]->getCurrentFrame() << endl;
+                        currentFrame = clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart();
                         syncClipName = clip.getName();
                         break;
                     }
@@ -1225,7 +1216,6 @@ public:
         for(int i = 0; i < group.size(); i++){
             Clip & clip = group[i];
             clip.setClipLoading(false);
-            clip.setClipStopping(false);
         }
         setPaused(true);
     }
@@ -1284,13 +1274,19 @@ public:
                     
                     float fade = 1.0f;
                     int fadeInSeconds = 3;
-                    int currentFrame = video->getCurrentFrame();
-
-                    if(currentFrame >= 0 && currentFrame < fadeInSeconds * 25){
-                        fade = (float)currentFrame / (float)(fadeInSeconds * 25);
-                    }else if(currentFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFrame < clip.getTotalFrames()){
-                        fade = (((float)clip.getTotalFrames() - currentFrame) / (float)(fadeInSeconds * 25));
+                    int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
+                    
+                    if(video->getCurrentFrame() < clip.getCropStart()) continue;
+                    
+                    if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
+                        fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
+                    }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
+                        fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
+                    }else if(currentFadeFrame >= clip.getTotalFrames()){
+                        fade = 0.0f;
                     }
+                    
+                    //cout << fade << " " << currentFrame << " " <<  currentFadeFrame << " " << clip.getName() << " " << video->getCurrentFrame() << " " << clip.getCropStart() << " " << clip.getVideoEnd() << " " << clip.getTotalFrames() << endl;
                     
                     if(video->getPixelFormat() == OF_PIXELS_2YUV){
                         

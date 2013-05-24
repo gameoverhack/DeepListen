@@ -83,7 +83,7 @@ void PlayController::update(){
             vector<string> & currentClipNames = clipTimeline.getCurrentClipNames();
             for(int i = 0; i < currentClipNames.size(); i++){
                 Clip & clip = clipTimeline.getClipFromName(currentClipNames[i]);
-                os << clip.getName() << " " << clip.getClipLoading() << " " << clip.getClipStopping() << (i == currentClipNames.size() - 1 ? "" : ", ");
+                os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClipNames.size() - 1 ? "" : ", ");
             }
             
             appModel->setProperty("Clips", os.str());

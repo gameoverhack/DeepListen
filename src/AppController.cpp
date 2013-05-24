@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 trace media. All rights reserved.
 //
 
-//#define MINI
+#define MINI
 
 #include "AppController.h"
 

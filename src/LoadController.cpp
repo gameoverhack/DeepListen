@@ -112,6 +112,7 @@ void LoadController::update(){
         
         // init the clip so that category, question etc are all generated
         clip.init();
+        //clip.setCrop(100, MIN(500, clip.getTotalFrames()));
         
         // no need to check if this clip needs analysis and is not deleted
         if(clip.getAnalyzed() == false && clip.getDeleted() == false){
