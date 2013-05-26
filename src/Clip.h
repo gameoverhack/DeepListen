@@ -1101,7 +1101,7 @@ public:
                     if(video == NULL) continue;
                     
                     if(video->isLoaded() && !video->isPlaying()){
-                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame > clip.getVideoEnd())) continue;
+                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) continue;
                         cout << "Playing " << clip.getVideoPath() << endl;
                         video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
                         video->setLoopState(OF_LOOP_NONE);
@@ -1123,7 +1123,7 @@ public:
                         if(videos[0]->isFrameNew()) currentFrame++;
                     }else{
                         Clip & clip = getClipFromPath(videos[i]->getMoviePath());
-                        if(videos[i]->getCurrentFrame() < clip.getCropStart()) continue;
+                        if(videos[i]->getCurrentFrame() < clip.getCropStart() || videos[i]->getIsMovieDone()) continue;
                         //cout << currentFrame << " " << clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart() << " " << videos[i]->getCurrentFrame() << endl;
                         currentFrame = clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart();
                         syncClipName = clip.getName();
