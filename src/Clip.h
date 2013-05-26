@@ -1133,7 +1133,7 @@ public:
                     if(video->isLoaded() && !video->isPlaying()){
                         if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) continue;
                         cout << "Playing " << clip.getVideoPath() << endl;
-                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                        if(clip.getIsCropped()) video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
                         video->setLoopState(OF_LOOP_NONE);
                         video->play();
                         clip.setClipLoading(false);

@@ -119,8 +119,8 @@ void AppController::setup(){
         
         // setup the warp grid for this appView window
         BezierWarp & warp = appViews[screen]->getWarp<BezierWarp>();
-        warp.setWarpGrid(5, 3);
-        warp.setWarpGridResolution(100.0f);
+        warp.setWarpGrid(5, 4);
+        warp.setWarpGridResolution(80.0f);
         
         // load the control points for this appView Window
         string pntPropName = "warpPoints_"+ofToString(screen);
