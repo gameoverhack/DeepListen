@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 trace media. All rights reserved.
 //
 
-#define MINI
-
 #include "AppController.h"
 
 //--------------------------------------------------------------
@@ -79,7 +77,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
 #else
     appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60Crop/");
     appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
 #endif
@@ -96,8 +94,10 @@ void AppController::setup(){
     appModel->setProperty("VideoWidth", 1920.0f);
     appModel->setProperty("VideoHeight", 1080.0f);
     
-    appModel->setProperty("OutputWidth", 1920.0f);
-    appModel->setProperty("OutputHeight", 1024.0f);
+    appModel->setProperty("OutputWidth_0", 1920.0f);
+    appModel->setProperty("OutputHeight_0", 1024.0f);
+    appModel->setProperty("OutputWidth_1", 1440.0f);
+    appModel->setProperty("OutputHeight_1", 1024.0f);
     
 #ifdef MINI
     appModel->setProperty("PixelFormat", (string)"BGRA");
@@ -108,8 +108,8 @@ void AppController::setup(){
     // create appView windows
     for(int screen = 0; screen < 2; screen++){
         appViews[screen] = new AppView();
-        appViews[screen]->setup(appModel->getProperty<float>("OutputWidth"), 
-                                appModel->getProperty<float>("OutputHeight"),
+        appViews[screen]->setup(appModel->getProperty<float>("OutputWidth_" + ofToString(screen)),
+                                appModel->getProperty<float>("OutputHeight_" + ofToString(screen)),
 #ifdef USE_FENSTER
                                 ViewOption(VIEW_USE_BEZIERWARP | VIEW_USE_WINDOW),
 #else
@@ -249,8 +249,8 @@ void AppController::draw(){
         {
 #ifndef USE_FENSTER
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-            appViews[0]->draw(0, 0, ofGetWidth()/2.0f, (ofGetWidth()/2.0f) / 16.0 * 9.0);
-            appViews[1]->draw(ofGetWidth()/2.0f, 0, ofGetWidth()/2.0f, (ofGetWidth()/2.0f) / 16.0 * 9.0);
+            appViews[0]->draw(0, 0, 1920.0f * 1920.0f / (ofGetWidth()/2.0f), 1920.0f * 1920.0f / (ofGetWidth()/2.0f) / 16.0 * 9.0);
+            appViews[1]->draw(1920.0f * 1920.0f / (ofGetWidth()/2.0f), 0, 1440.0f * 1920.0f / (ofGetWidth()/2.0f), (1440.0f * 1920.0f / (ofGetWidth()/2.0f)) / 4.0 * 3.0);
 #endif
         }
             break;

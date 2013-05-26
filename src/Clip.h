@@ -1133,7 +1133,10 @@ public:
                     if(video->isLoaded() && !video->isPlaying()){
                         if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) continue;
                         cout << "Playing " << clip.getVideoPath() << endl;
-                        if(clip.getIsCropped()) video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                        if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                            cout << "Setframing" << endl;
+                            video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                        }
                         video->setLoopState(OF_LOOP_NONE);
                         video->play();
                         clip.setClipLoading(false);
@@ -1371,9 +1374,9 @@ public:
         
         ofNoFill();
         ofSetColor(0, 255, 0);
-        ofLine(2000, 0, 2000, 1920 * 2.0f);
+        ofLine(2000, 0, 2000, 1920 + 1440);
         ofRect(0, 0, (float)getTotalFrames(), 1920.0f);
-        ofRect(0, 1919.0f, (float)getTotalFrames(), 1920.0f);
+        ofRect(0, 1919.0f, (float)getTotalFrames(), 1440.0f);
         ofTranslate(2000 - getCurrentFrame(), 0.0f, 0.0f);
         
         for(int i = 0; i < group.size(); i++){
@@ -1448,8 +1451,8 @@ public:
             
             ofRectangle & originalRect = clip.getRect();
             
-            x = ofRandom(0, 1920.0f - originalRect.width);
-            y = (1080.0f - 100.0f) - originalRect.height - originalRect.y;
+            x = ofRandom(0, (screen == 0 ? 1920.0f : 1440.0f) - originalRect.width);
+            y = (1080.0f - 200.0f) - originalRect.height - originalRect.y;
             width = originalRect.width;
             
             fitted = !getAnyClipAt(frame,

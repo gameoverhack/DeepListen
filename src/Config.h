@@ -10,5 +10,6 @@
 #define _H_CONFIG
 
 //#define USE_FENSTER
+#define MINI
 
 #endif
