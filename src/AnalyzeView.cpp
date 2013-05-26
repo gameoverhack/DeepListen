@@ -70,14 +70,26 @@ void AnalyzeView::update(){
         begin();
         {
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+            
             ofSetColor(255, 255, 255, 255);
-            video.draw(0, 0, width, height);
+            
+            ofPushMatrix();
+            ofTranslate((width - clip.getWidth())/2.0f, (height - clip.getHeight())/2.0f);
+            
+            video.draw(0, 0, clip.getWidth(), clip.getHeight());
             contourFinder.draw();
+            
             ofSetColor(255, 0, 0);
             ofNoFill();
+            
             ofRect(clip.getRect());
+            
+            ofPopMatrix();
+            
             ofSetColor(255, 255, 255, 255);
+            
             waveformFBO.draw(0, 0);
+            
             ofDisableBlendMode();
         }
         end();

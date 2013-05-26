@@ -240,6 +240,8 @@ public:
         audioinpct = 0;
         audioutpct = 0;
         analyzed = deleted = false;
+        width = height = 0.0f;
+        scale = 1.0f;
         
         clipPosition.position = ofRectangle(-1, -1, -1, -1);
         clipPosition.videostart = -1;
@@ -327,7 +329,7 @@ public:
         clipPosition.position.x = x;
         clipPosition.position.y = y;
         clipPosition.position.width = rect.width;
-        clipPosition.position.height = rect.height;
+        clipPosition.position.height = rect.width;
     }
     
     void setCrop(int startframe, int endframe){
@@ -366,6 +368,27 @@ public:
     
     ofRectangle& getPosition(){ // transformed rect position (where to draw things)
         return clipPosition.position;
+    }
+    
+    void setSize(float w, float h){
+        width = w;
+        height = h;
+    }
+    
+    float getWidth(){
+        return width;
+    }
+    
+    float getHeight(){
+        return height;
+    }
+    
+    void setScale(float s){
+        scale = s;
+    }
+    
+    float getScale(){
+        return scale;
     }
     
     int getScreen(){
@@ -545,6 +568,10 @@ protected:
     float audioinpct;
     float audioutpct;
     
+    float width;
+    float height;
+    float scale;
+    
     friend class boost::serialization::access;
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version){
@@ -559,6 +586,9 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(frames);
         ar & BOOST_SERIALIZATION_NVP(audioinpct);
         ar & BOOST_SERIALIZATION_NVP(audioutpct);
+        ar & BOOST_SERIALIZATION_NVP(width);
+        ar & BOOST_SERIALIZATION_NVP(height);
+        ar & BOOST_SERIALIZATION_NVP(scale);
 	};
     
 private:

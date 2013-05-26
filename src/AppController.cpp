@@ -28,7 +28,7 @@ void AppController::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     // set veryical sync (does this work on all windows?)
-    ofSetVerticalSync(true);
+    //ofSetVerticalSync(true);
     
     // set name of the primary window
     ofxFensterManager::get()->getPrimaryWindow()->setWindowTitle("debug");
@@ -84,7 +84,7 @@ void AppController::setup(){
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);
-    appModel->setProperty("ContourThreshold", 10);
+    appModel->setProperty("ContourThreshold", 16);
     
     appModel->setProperty("FrameJump", 100);
     
@@ -97,7 +97,11 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth", 1920.0f);
     appModel->setProperty("OutputHeight", 1024.0f);
     
+#ifdef MINI
+    appModel->setProperty("PixelFormat", (string)"BGRA");
+#else
     appModel->setProperty("PixelFormat", (string)"JPEG");
+#endif
     
     appModel->setProperty("ShowTimeline", true);
     

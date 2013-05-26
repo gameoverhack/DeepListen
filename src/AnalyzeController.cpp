@@ -86,8 +86,12 @@ void AnalyzeController::update(){
             video.loadMovie(clip.getVideoFile().path);
             clip.setTotalFrames(video.getTotalNumFrames());
             
+            // set width height and scale
+            clip.setSize(video.getWidth(), video.getHeight());
+            clip.setScale(1.0f);
+            
             // set rect to opposite minimum and maximums
-            clip.setRect(ofRectangle(appModel->getProperty<float>("OutputWidth"), appModel->getProperty<float>("OutputHeight"), 0, 0));
+            clip.setRect(ofRectangle(clip.getWidth(), clip.getHeight(), 0, 0));
             
             ofxLogNotice() << "Frames: " << clip.getTotalFrames() << " audio in: " << clip.getTotalFrames() * clip.getAudioInPct() << " out: " << clip.getTotalFrames() * clip.getAudioOutPct() << endl;
             
