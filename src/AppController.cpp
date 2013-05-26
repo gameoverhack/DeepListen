@@ -26,7 +26,7 @@ void AppController::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     // set veryical sync (does this work on all windows?)
-    ofSetVerticalSync(true);
+    //ofSetVerticalSync(true);
     
 #ifdef USE_FENSTER
     // set name of the primary window
@@ -95,9 +95,9 @@ void AppController::setup(){
     appModel->setProperty("VideoHeight", 1080.0f);
     
     appModel->setProperty("OutputWidth_0", 1920.0f);
-    appModel->setProperty("OutputHeight_0", 1024.0f);
+    appModel->setProperty("OutputHeight_0", 1080.0f);
     appModel->setProperty("OutputWidth_1", 1440.0f);
-    appModel->setProperty("OutputHeight_1", 1024.0f);
+    appModel->setProperty("OutputHeight_1", 1080.0f);
     
 #ifdef MINI
     appModel->setProperty("PixelFormat", (string)"BGRA");
@@ -120,7 +120,7 @@ void AppController::setup(){
         // setup the warp grid for this appView window
         BezierWarp & warp = appViews[screen]->getWarp<BezierWarp>();
         warp.setWarpGrid(5, 4);
-        warp.setWarpGridResolution(80.0f);
+        warp.setWarpGridResolution(ceil(1920.0/80.0f), ceil(1080.0/80.0f));
         
         // load the control points for this appView Window
         string pntPropName = "warpPoints_"+ofToString(screen);
@@ -249,8 +249,10 @@ void AppController::draw(){
         {
 #ifndef USE_FENSTER
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-            appViews[0]->draw(0, 0, 1920.0f * 1920.0f / (ofGetWidth()/2.0f), 1920.0f * 1920.0f / (ofGetWidth()/2.0f) / 16.0 * 9.0);
-            appViews[1]->draw(1920.0f * 1920.0f / (ofGetWidth()/2.0f), 0, 1440.0f * 1920.0f / (ofGetWidth()/2.0f), (1440.0f * 1920.0f / (ofGetWidth()/2.0f)) / 4.0 * 3.0);
+//            appViews[0]->draw(0, 0, 1920, 1080);
+//            appViews[1]->draw(1920, 0, 1440, 1080);
+            appViews[0]->draw(0, 0, 1920.0f * (ofGetWidth()/2.0f) / 1920.0f, 1920.0f * (ofGetWidth()/2.0f) / 1920.0f / 16.0 * 9.0);
+            appViews[1]->draw(1920.0f * (ofGetWidth()/2.0f) / 1920.0f, 0, 1440.0f * (ofGetWidth()/2.0f) / 1920.0f, (1440.0f * (ofGetWidth()/2.0f) / 1920.0f) / 4.0 * 3.0);
 #endif
         }
             break;
