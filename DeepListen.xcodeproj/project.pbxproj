@@ -192,6 +192,7 @@
 		04f77e5c73a62e2e77c78ec64f2fa05c /* ofxMidiOut.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxMidiOut.cpp; path = ../../../addons/ofxMidi/src/ofxMidiOut.cpp; sourceTree = SOURCE_ROOT; };
 		05f6cf127d4a621113d4a62fe197ab39 /* ofxMidi.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMidi.h; path = ../../../addons/ofxMidi/src/ofxMidi.h; sourceTree = SOURCE_ROOT; };
 		085876edb79687158a7ed5d58e810a2e /* GHOST_EventCursor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = GHOST_EventCursor.h; path = ../../../addons/ofxFenster/libs/ghost/include/GHOST_EventCursor.h; sourceTree = SOURCE_ROOT; };
+		0C96DFA4175234E20068ADCF /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		0a13cd9d4d74e8ec50c203f313ca812e /* hGui_all.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = hGui_all.h; path = ../../../addons/ofxhGui/src/hGui_all.h; sourceTree = SOURCE_ROOT; };
 		0a1dac09f322ae313a40706d6408ef69 /* ofxToggle.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxToggle.h; path = ../../../addons/ofxGui/src/ofxToggle.h; sourceTree = SOURCE_ROOT; };
 		0ac920ece4961d5e58f34335773898c8 /* hDrawingPrimitives.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = hDrawingPrimitives.h; path = ../../../addons/ofxhGui/src/hDrawingPrimitives.h; sourceTree = SOURCE_ROOT; };
@@ -904,6 +905,7 @@
 				7716013F1709DE0300E217F4 /* Clip.h */,
 				7716012917084C4700E217F4 /* FileList.h */,
 				7716013017088C8E00E217F4 /* VectorUtils.h */,
+				0C96DFA4175234E20068ADCF /* Config.h */,
 			);
 			name = Utils;
 			sourceTree = "<group>";

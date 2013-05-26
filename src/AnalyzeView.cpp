@@ -14,7 +14,15 @@ using namespace cv;
 //--------------------------------------------------------------
 AnalyzeView::AnalyzeView(){
     ofxLogNotice() << "Constructing AnalyzeView" << endl;
-    ofSetBackgroundColor(0, 0, 0);
+    StateGroup newAnalyzeViewStates("AnalyzeViewStates", false);
+    
+    newAnalyzeViewStates.addState(State(kANALYZEVIEW_SHOW, "kANALYZEVIEW_SHOW"));
+    
+    appModel->addStateGroup(newAnalyzeViewStates);
+    
+    StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
+    
+    analyzeViewStates.setState(kANALYZEVIEW_SHOW, true);
 }
 
 //--------------------------------------------------------------
@@ -28,7 +36,13 @@ void AnalyzeView::update(){
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
     StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
     
-    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY) && appModel->getProperty<bool>("ShowTimeline")){
+#ifdef USE_FENSTER
+    StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
+    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY) && analyzeViewStates.getState(kANALYZEVIEW_SHOW)){
+#else
+    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY)){
+#endif
+        
         ClipTimeline & clipTimeline = appModel->getClipTimeline();
         begin();
         {

@@ -28,10 +28,12 @@ void AppController::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     // set veryical sync (does this work on all windows?)
-    //ofSetVerticalSync(true);
+    ofSetVerticalSync(true);
     
+#ifdef USE_FENSTER
     // set name of the primary window
     ofxFensterManager::get()->getPrimaryWindow()->setWindowTitle("debug");
+#endif
     
     ofxLogNotice() << "AppController start setup" << endl;
     
@@ -103,14 +105,16 @@ void AppController::setup(){
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #endif
     
-    appModel->setProperty("ShowTimeline", true);
-    
     // create appView windows
     for(int screen = 0; screen < 2; screen++){
         appViews[screen] = new AppView();
         appViews[screen]->setup(appModel->getProperty<float>("OutputWidth"), 
-                                appModel->getProperty<float>("OutputHeight"), 
+                                appModel->getProperty<float>("OutputHeight"),
+#ifdef USE_FENSTER
                                 ViewOption(VIEW_USE_BEZIERWARP | VIEW_USE_WINDOW),
+#else
+                                ViewOption(VIEW_USE_BEZIERWARP),
+#endif
                                 (string)"screen_" + ofToString(screen));
         
         // setup the warp grid for this appView window
@@ -124,11 +128,12 @@ void AppController::setup(){
             warp.setControlPoints(appModel->getProperty< vector<float> >(pntPropName));
         }
         
+#ifdef USE_FENSTER
         appViews[screen]->setPosition(appModel->getProperty<float>("MonitorWidth")/2.0 * screen, 
                                       appModel->getProperty<float>("MonitorHeight")/2.0, 
                                       appModel->getProperty<float>("MonitorWidth")/2.0, 
                                       appModel->getProperty<float>("MonitorHeight")/2.0);
-        
+#endif
         appViews[screen]->setInstanceID(screen);
         
         // TODO: manage putting onto correct screens...
@@ -142,6 +147,24 @@ void AppController::setup(){
                      ofGetHeight(), 
                      ViewOption(VIEW_USE_FBO),
                      (string)"debug");
+    
+    analyzeView = new AnalyzeView();
+    
+    analyzeView->setup(appModel->getProperty<float>("VideoWidth"),
+                       appModel->getProperty<float>("VideoHeight"),
+#ifdef USE_FENSTER
+                       ViewOption(VIEW_USE_FBO | VIEW_USE_WINDOW),
+#else
+                       ViewOption(VIEW_USE_FBO),
+#endif
+                       (string)"analyze");
+    
+#ifdef USE_FENSTER
+    analyzeView->setPosition(appModel->getProperty<float>("MonitorWidth")/2.0,
+                             0,
+                             appModel->getProperty<float>("MonitorWidth")/2.0,
+                             appModel->getProperty<float>("MonitorHeight")/2.0);
+#endif
     
     // Create other controllers
     
@@ -184,17 +207,27 @@ void AppController::update(){
             break;
     }
     
-    appViews[0]->update();
-    appViews[1]->update();
-    
-    StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
-    if(debugViewStates.getState(kDEBUGVIEW_SHOWINFO)) debugView->update();
 }
 
 //--------------------------------------------------------------
 void AppController::draw(){
     
+    StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
+    StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
+
+#ifndef USE_FENSTER
+    ofSetColor(0, 0, 0);
+    ofFill();
+    ofRect(0, 0, ofGetWidth(), ofGetHeight());
+    ofSetColor(255, 255, 255);
+#endif
+    
+    appViews[0]->update();
+    appViews[1]->update();
+
+    if(debugViewStates.getState(kDEBUGVIEW_SHOWINFO)) debugView->update();
+    if(analyzeViewStates.getState(kANALYZEVIEW_SHOW)) analyzeView->update();
     
     switch (appControllerStates.getState()) {
         case kAPPCONTROLLER_INIT:
@@ -214,13 +247,24 @@ void AppController::draw(){
             break;
         case kAPPCONTROLLER_PLAY:
         {
-            // nothing to do
+#ifndef USE_FENSTER
+            ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+            appViews[0]->draw(0, 0, ofGetWidth()/2.0f, (ofGetWidth()/2.0f) / 16.0 * 9.0);
+            appViews[1]->draw(ofGetWidth()/2.0f, 0, ofGetWidth()/2.0f, (ofGetWidth()/2.0f) / 16.0 * 9.0);
+#endif
         }
             break;
     }
     
-    StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     if(debugViewStates.getState(kDEBUGVIEW_SHOWINFO)) debugView->draw();
+
+#ifndef USE_FENSTER
+    
+    if(analyzeViewStates.getState(kANALYZEVIEW_SHOW)) analyzeView->draw();
+    ofDisableBlendMode();
+#endif
+    
+    glFlush();
     
 }
 
@@ -233,6 +277,7 @@ void AppController::exit(){
 void AppController::keyPressed(ofKeyEventArgs & e){
     
     StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
+    StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     StateGroup & appViewStates = appModel->getStateGroup("AppViewStates");
     StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
     
@@ -255,6 +300,9 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 's':
             debugViewStates.toggleState(kDEBUGVIEW_SHOWSTATES);
+            break;
+        case 'a':
+            analyzeViewStates.toggleState(kANALYZEVIEW_SHOW);
             break;
         case '1':
             appViewStates.toggleState(kAPPVIEW_SHOWWARP_0);
@@ -303,8 +351,8 @@ void AppController::keyPressed(ofKeyEventArgs & e){
         case '/':
             timeline.togglePaused();
             break;
-        case 't':
-            appModel->setProperty("ShowTimeline", !appModel->getProperty<bool>("ShowTimeline"));
+        case 'f':
+            ofToggleFullscreen();
             break;
     }
 

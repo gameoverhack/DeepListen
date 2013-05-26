@@ -11,8 +11,6 @@
 
 #include "BaseController.h"
 #include "AppModel.h"
-#include "AnalyzeView.h"
-
 
 class AnalyzeController : public BaseController {
     
@@ -23,11 +21,9 @@ public:
     
     void setup();
     void update();
-    void draw();
     
 protected:
 	
-    AnalyzeView * analyzeView;
     
 private:
 	

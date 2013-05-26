@@ -24,6 +24,10 @@ enum {
 };
 
 enum {
+    kANALYZEVIEW_SHOW = 0
+};
+
+enum {
     kPLAYCONTROLLER_INIT = 0,
     kPLAYCONTROLLER_MAKE,
     kPLAYCONTROLLER_PLAY

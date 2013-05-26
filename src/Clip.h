@@ -1271,21 +1271,21 @@ public:
         setPaused(!bPaused);
     }
     
-    void draw(){
-        if(videos.size() == 0) return;
-        videos[0]->draw(0,0,0,0);
-        glPushMatrix();
-        ofFill();
-        ofSetColor(0, 0, 0, 255);
-        ofRect(0, 200, 1920.0 * 6, 1080.0/2.0);
-        ofSetColor(255, 255, 255, 255);
-        //ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-        for(int i = 1; i < videos.size(); i++){
-            videos[i]->draw(200 + 480 * (i - 2), 200, 1920.0/2.0, 1080.0/2.0);
-        }
-        //ofDisableBlendMode();
-        glPopMatrix();
-    }
+//    void draw(){
+//        if(videos.size() == 0) return;
+//        videos[0]->draw(0,0,0,0);
+//        glPushMatrix();
+//        ofFill();
+//        ofSetColor(0, 0, 0, 255);
+//        ofRect(0, 200, 1920.0 * 6, 1080.0/2.0);
+//        ofSetColor(255, 255, 255, 255);
+//        //ofEnableBlendMode(OF_BLENDMODE_SCREEN);
+//        for(int i = 1; i < videos.size(); i++){
+//            videos[i]->draw(200 + 480 * (i - 2), 200, 1920.0/2.0, 1080.0/2.0);
+//        }
+//        //ofDisableBlendMode();
+//        glPopMatrix();
+//    }
     
     void draw(int screen){
         if(videos.size() < 2) return;
@@ -1349,19 +1349,19 @@ public:
     
     void drawTimeline(float x, float y, float width, float height){
         
-        glPushMatrix();
-        
-        ostringstream os;
-        os << "FRAME: " << getCurrentFrame() << " / " << getTotalFrames() << endl;
-        os << "FPS: " << ofGetFrameRate() << endl;
-        
-        for(int i = 0; i < videos.size(); i++){
-            os << "VIDEO_" << i << ": " << videos[i]->getFrameRate() << "  " << videos[i]->getMoviePath() << endl;
-        }
-        
-        ofDrawBitmapString(os.str(), 20, 20);
-        
-        glPopMatrix();
+//        glPushMatrix();
+//        
+//        ostringstream os;
+//        os << "FRAME: " << getCurrentFrame() << " / " << getTotalFrames() << endl;
+//        os << "FPS: " << ofGetFrameRate() << endl;
+//        
+//        for(int i = 0; i < videos.size(); i++){
+//            os << "VIDEO_" << i << ": " << videos[i]->getFrameRate() << "  " << videos[i]->getMoviePath() << endl;
+//        }
+//        
+//        ofDrawBitmapString(os.str(), 20, 20);
+//        
+//        glPopMatrix();
         
         glPushMatrix();
         float framescale = (1.0/(float)getTotalFrames()) * width * 16;

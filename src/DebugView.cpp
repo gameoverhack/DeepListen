@@ -79,9 +79,11 @@ void DebugView::update(){
     begin();
     {
         ofSetBackgroundColor(0, 0, 0);
+        ofEnableBlendMode(OF_BLENDMODE_SCREEN);
         ofSetColor(0, 255, 0);
         ofDrawBitmapString(os.str(), 20, 20);
         ofSetColor(255, 255, 255);
+        ofDisableBlendMode();
     }
     end();
     

@@ -12,6 +12,7 @@
 #include "AppModel.h"
 #include "AppView.h"
 #include "DebugView.h"
+#include "AnalyzeView.h"
 #include "LoadController.h"
 #include "AnalyzeController.h"
 #include "PlayController.h"
@@ -54,6 +55,7 @@ private:
     
     AppView * appViews[2];
     DebugView * debugView;
+    AnalyzeView * analyzeView;
 
 };
 

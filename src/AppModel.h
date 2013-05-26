@@ -8,6 +8,7 @@
 #ifndef _H_APPMODEL
 #define _H_APPMODEL
 
+#include "Config.h"
 #include "BaseModel.h"
 #include "AppStates.h"
 #include "FileList.h"
