@@ -22,7 +22,7 @@ public:
     void setup();
     void update();
     
-    ClipGroup makeClipGroup();
+    void makeClipGroup();
     void resetClipGroups();
     
 protected:

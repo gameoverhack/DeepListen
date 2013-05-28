@@ -41,8 +41,6 @@ void PlayController::update(){
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
     StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
     
-    ClipGroup & playGroup = appModel->getClipGroupReference("playGroup");
-    
     switch (playControllerStates.getState()) {
         case kPLAYCONTROLLER_INIT:
         {
@@ -55,15 +53,15 @@ void PlayController::update(){
         case kPLAYCONTROLLER_MAKE:
         {
             // generate clip group
-            ClipTimeline & clipTimeline = appModel->getClipTimeline();
-            clipTimeline.clear();
-            playGroup = makeClipGroup();
+            ClipTimeline & timeline = appModel->getClipTimeline();
+            timeline.clear();
+            makeClipGroup();
 
             ofxLogVerbose() << "\\/---------------------\\/" << endl;
-            ofxLogVerbose() << playGroup << endl;
+            ofxLogVerbose() << timeline.getGroup() << endl;
             ofxLogVerbose() << "/\\---------------------/\\" << endl;
             
-            clipTimeline.play();
+            timeline.play();
 
         }
             break;
@@ -73,17 +71,17 @@ void PlayController::update(){
             
             clipTimeline.update();
             
-            vector<ofxThreadedVideo*> & videos = clipTimeline.getVideos();
-            for(int i = 0; i < videos.size(); i++){
-                ofxThreadedVideo * video = videos[i];
+            vector<VideoClip> & videoClips = clipTimeline.getVideoClips();
+            for(int i = 0; i < videoClips.size(); i++){
+                ofxThreadedVideo * video = videoClips[i].video;
                 appModel->setProperty("PlayState_"+ofToString(i), ofToString(video->isPlaying()) + " " + ofToString(video->getIsMovieDone()) + " " + ofToString(video->getFrameRate()));
             }
             
             ostringstream os;
-            vector<string> & currentClipNames = clipTimeline.getCurrentClipNames();
-            for(int i = 0; i < currentClipNames.size(); i++){
-                Clip & clip = clipTimeline.getClipFromName(currentClipNames[i]);
-                os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClipNames.size() - 1 ? "" : ", ");
+            vector<Clip> & currentClips = clipTimeline.getCurrentClips();
+            for(int i = 0; i < currentClips.size(); i++){
+                Clip & clip = currentClips[i];
+                os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClips.size() - 1 ? "" : ", ");
             }
             
             appModel->setProperty("Clips", os.str());
@@ -102,7 +100,7 @@ void PlayController::update(){
 }
 
 //--------------------------------------------------------------
-ClipGroup PlayController::makeClipGroup(){
+void PlayController::makeClipGroup(){
     
     ofxLogNotice() << "Making new ClipGroup for playback" << endl;
     
@@ -118,14 +116,30 @@ ClipGroup PlayController::makeClipGroup(){
     ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
     ClipGroup & statistics = appModel->getClipGroupReference("statistics");
     
-    ClipGroup newClipGroup;
-    
     string category = "";
     int flip;
     int lastAudioFreeFrame = 0;
     
+//    ClipTimeline & timeline = appModel->getClipTimeline();
+//    
+//    for (int i = 0; i < 1000; i++){
+//        bool insertedOk = false;
+//        int r = ofRandom(5);
+//        Clip & clip = allIntroClips[r];
+//        
+//        // calculate frame starts and ends
+//        insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame - clip.getAudioInFrameOffset());
+//        
+//
+//        if(insertedOk){
+//            lastAudioFreeFrame = timeline.getGroup()[timeline.getGroup().size() - 1].getAudioEnd();
+//        }
+//    }
+//    playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+    
+    
     while(true){
-        
+
         // flip for inserting a special or inserting a category
         flip = getRandomDistribution(2, 0.8f, 0.2f);
         
@@ -144,7 +158,7 @@ ClipGroup PlayController::makeClipGroup(){
             if (remainingNumCategories < 4){ // 5 is all categories
                 // reset the clip groups by changing state
                 playControllerStates.setState(kPLAYCONTROLLER_PLAY);
-                return newClipGroup;
+                return;// newClipGroup;
             }
             
             // could use a random distribution algorithm here instead
@@ -227,7 +241,7 @@ ClipGroup PlayController::makeClipGroup(){
                 }
                 
                 if(insertedOk){
-                    lastAudioFreeFrame = clip.getAudioEnd();
+                    lastAudioFreeFrame = timeline.getGroup()[timeline.getGroup().size() - 1].getAudioEnd();
                 }else{
                     ofxLogWarning() << "Rejected" << clip << endl;
                     uniqueNameGroup.pop(clip);
@@ -237,15 +251,13 @@ ClipGroup PlayController::makeClipGroup(){
             }
 
             allClips.pop(uniqueNameGroup);
-            newClipGroup.push(uniqueNameGroup);
+            //newClipGroup.push(uniqueNameGroup);
             
         }else{ // do a special
             
         }
     }
-    
-    // never get here?
-    return newClipGroup;
+
 }
 
 //--------------------------------------------------------------

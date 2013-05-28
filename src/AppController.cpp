@@ -26,7 +26,7 @@ void AppController::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     // set veryical sync (does this work on all windows?)
-    //ofSetVerticalSync(true);
+    ofSetVerticalSync(true);
     
 #ifdef USE_FENSTER
     // set name of the primary window

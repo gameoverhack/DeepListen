@@ -190,11 +190,8 @@ struct ClipPosition {
     int cropstart;
     int cropend;
     int cropframes;
-    bool isAudio;
     bool isCropped;
     bool isLoading;
-    bool isPlaying;
-    bool isPaused;
 };
 
 struct ClipInfo{
@@ -253,11 +250,8 @@ public:
         clipPosition.cropstart = -1;
         clipPosition.cropend = -1;
         clipPosition.cropframes = -1;
-        clipPosition.isAudio = false;
         clipPosition.isCropped = false;
         clipPosition.isLoading = false;
-        clipPosition.isPlaying = false;
-        clipPosition.isPaused = false;
         
         clipInfo.category = "";
         clipInfo.question = "";
@@ -528,7 +522,18 @@ public:
     }
     
     bool operator!=(const Clip &rhs) {
-        if(name != rhs.name){
+        if(name != rhs.name ||
+           clipPosition.position != rhs.clipPosition.position ||
+           clipPosition.videostart != rhs.clipPosition.videostart ||
+           clipPosition.videoend != rhs.clipPosition.videoend ||
+           clipPosition.videoframes != rhs.clipPosition.videoframes ||
+           clipPosition.audiostart != rhs.clipPosition.audiostart ||
+           clipPosition.audioend != rhs.clipPosition.audioend ||
+           clipPosition.screen != rhs.clipPosition.screen ||
+           clipPosition.cropstart != rhs.clipPosition.cropstart ||
+           clipPosition.cropend != rhs.clipPosition.cropend ||
+           clipPosition.cropframes != rhs.clipPosition.cropframes ||
+           clipPosition.isLoading != rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -536,7 +541,18 @@ public:
     }
     
     bool operator==(const Clip &rhs) {
-        if(name == rhs.name){
+        if(name == rhs.name &&
+           clipPosition.position == rhs.clipPosition.position &&
+           clipPosition.videostart == rhs.clipPosition.videostart &&
+           clipPosition.videoend == rhs.clipPosition.videoend &&
+           clipPosition.videoframes == rhs.clipPosition.videoframes &&
+           clipPosition.audiostart == rhs.clipPosition.audiostart &&
+           clipPosition.audioend == rhs.clipPosition.audioend &&
+           clipPosition.screen == rhs.clipPosition.screen &&
+           clipPosition.cropstart == rhs.clipPosition.cropstart &&
+           clipPosition.cropend == rhs.clipPosition.cropend &&
+           clipPosition.cropframes == rhs.clipPosition.cropframes &&
+           clipPosition.isLoading == rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -971,15 +987,6 @@ public:
         random_shuffle(group.begin(), group.end());
     }
     
-    void getClipNamesAt(int frame, vector<string>& clipNames){
-        for(int j = 0; j < group.size(); j++){
-            Clip & clip = group[j];
-            if(frame >= clip.getVideoStart() && frame <= clip.getVideoEnd()){
-                clipNames.push_back(clip.getName());
-            }
-        }
-    }
-    
     Clip & getClip(string name){
         for(int j = 0; j < group.size(); j++){
             if(group[j].getName() == name){
@@ -1060,6 +1067,11 @@ inline ostream& operator<<(ostream& os, const ClipGroup &cg){
     return os;
 };
 
+struct VideoClip {
+    ofxThreadedVideo* video;
+    Clip clip;
+};
+    
 class ClipTimeline {
 
 public:
@@ -1076,12 +1088,16 @@ public:
         
         ofxLogNotice() << "Setup timeline: " << blackpath << endl;
         
+        dummyVideoClip.video = NULL;
+        dummyVideoClip.clip = dummyClip;
+        
         pixelFormat = pixelformat;
         
         ofxThreadedVideo * video = new ofxThreadedVideo;
         video->setPixelFormat(pixelFormat);
         video->setUseAutoPlay(true);
         video->loadMovie(blackpath);
+        ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
         
         while(!video->isLoaded()){
             video->update();
@@ -1090,7 +1106,11 @@ public:
         video->setVolume(0.0f);
         video->setLoopState(OF_LOOP_NORMAL);
         
-        videos.push_back(video);
+        VideoClip vc;
+        vc.video = video;
+        vc.clip = dummyClip;
+        
+        videoClips.push_back(vc);
         
         if(pixelFormat == OF_PIXELS_2YUV){
             shader.load(ofToDataPath("yuyvtorgba"));
@@ -1101,29 +1121,31 @@ public:
     
     void update(){
         
-        if(videos.size() == 0) return;
+        if(videoClips.size() == 0) return;
         
         if(!bPaused){
             
-            for(int i = 0; i < videos.size(); i++){
+            for(int i = 0; i < videoClips.size(); i++){
                 //if(videos[i]->isLoading() || videos[i]->isPlaying())
-                videos[i]->update();
+                videoClips[i].video->update();
             }
             
-            currentClipNames = getClipNamesFrom(currentFrame, currentFrame);
+            currentClips = getClipsFrom(currentFrame, currentFrame);
             
-            if(currentClipNames.size() > 0){
+            if(currentClips.size() > 0){
                 
-                for(int i = 0; i < currentClipNames.size(); i++){
+                for(int i = 0; i < currentClips.size(); i++){
                     
-                    Clip & clip = getClipFromName(currentClipNames[i]);
+                    VideoClip & videoClip = isClipAssigned(currentClips[i]);
                     
-                    ofxThreadedVideo * video = isClipAssigned(clip);
+                    Clip & clip = videoClip.clip;
+                    ofxThreadedVideo * video = videoClip.video;
                     
-                    if(video == NULL && !clip.getClipLoading() && currentFrame < clip.getVideoEnd() - 100){// && !clip.getClipStopping()){
-                        cout << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
-                        cout << "Loading " << clip.getVideoPath() << endl;
-                        video = assignVideoPlayer();
+                    //cout << video->isLoaded() << " " << video->isPlaying() << " " << clip.getClipLoading() << " " << currentFrame << " " << clip.getVideoEnd() << " " << currentClips[i].getVideoEnd() << endl;
+                    
+                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && currentFrame < clip.getVideoEnd() - 100){// && !clip.getClipStopping()){
+                        //ofxLogVerbose() << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
+                        ofxLogVerbose() << "Loading " << clip.getVideoPath() << endl;
                         if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
                         while(!video->isLoading()) video->update();
                     }
@@ -1132,7 +1154,7 @@ public:
                     
                     if(video->isLoaded() && !video->isPlaying()){
                         if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) continue;
-                        cout << "Playing " << clip.getVideoPath() << endl;
+                        ofxLogVerbose() << "Playing " << clip.getVideoPath() << endl;
                         if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
                             cout << "Setframing" << endl;
                             video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
@@ -1143,22 +1165,24 @@ public:
                     }
 
                     if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)){
-                        cout << "Stopping " << clip.getVideoPath() << endl;
+                        ofxLogVerbose() << "Stopping " << clip.getVideoPath() << endl;
                         video->stop();
                         clip.setClipLoading(false);
+                        clip = dummyClip;
                     }
                 }
             }
-            for(int i = videos.size() - 1; i >= 0 ; i--){
-                if(videos[i]->isPlaying()){
+            for(int i = videoClips.size() - 1; i >= 0 ; i--){
+                if(videoClips[i].video->isPlaying()){
                     if(i == 0){
-                        cout << "MOFO1" << endl;
-                        if(videos[0]->isFrameNew()) currentFrame++;
+                        ofxLogVerbose() << "Black timestamp" << endl;
+                        if(videoClips[0].video->isFrameNew()) currentFrame++;
                     }else{
-                        Clip & clip = getClipFromPath(videos[i]->getMoviePath());
-                        if(videos[i]->getCurrentFrame() < clip.getCropStart() || videos[i]->getIsMovieDone()) continue;
-                        //cout << currentFrame << " " << clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart() << " " << videos[i]->getCurrentFrame() << endl;
-                        currentFrame = clip.getVideoStart() + videos[i]->getCurrentFrame() - clip.getCropStart();
+                        Clip & clip = videoClips[i].clip;
+                        ofxThreadedVideo * video = videoClips[i].video;
+                        if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+                        //cout << currentFrame << " " << clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart() << " " << video->getCurrentFrame() << endl;
+                        currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
                         syncClipName = clip.getName();
                         break;
                     }
@@ -1167,70 +1191,81 @@ public:
         }
     }
     
-    ofxThreadedVideo * assignVideoPlayer(){
-        assert(videos.size() > 0);
+    void threadedVideoEvent(ofxThreadedVideoEvent & e){
+        ofxLogVerbose() << e << endl;
+    }
+    
+   VideoClip& assignVideoClip(Clip & clip){
+        assert(videoClips.size() > 0);
         int freeIndex = -1;
-        for(int i = 0; i < videos.size(); i++){
-            if(!videos[i]->isLoading() && !videos[i]->isPlaying()){
+        for(int i = 0; i < videoClips.size(); i++){
+            if(!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying()){
                 freeIndex = i;
                 break;
             }
         }
         if(freeIndex != -1){
-            return videos[freeIndex];
+            videoClips[freeIndex].clip = clip;
+            return videoClips[freeIndex];
         }else{
             ofxThreadedVideo * video = new ofxThreadedVideo;
             video->setPixelFormat(pixelFormat);
             video->setUseAutoPlay(false);
             video->setUseQueue(false);
-            videos.push_back(video);
-            return video;
+            ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
+            VideoClip vc;
+            vc.video = video;
+            vc.clip = clip;
+            videoClips.push_back(vc);
+            return videoClips[videoClips.size() - 1];
         }
     }
     
-    ofxThreadedVideo * isClipAssigned(Clip & clip){
-        assert(videos.size() > 0);
-        for(int i = 1; i < videos.size(); i++){
+    VideoClip& isClipAssigned(Clip & clip){
+        assert(videoClips.size() > 0);
+        for(int i = 1; i < videoClips.size(); i++){
             string clipPath = clip.getVideoPath();
-            if(videos[i]->getMoviePath() == clipPath ||
-                videos[i]->isQueued(clipPath)){
-                return videos[i];
+            if(videoClips[i].clip == clip &&
+               (videoClips[i].video->getMoviePath() == clipPath ||
+                videoClips[i].video->isQueued(clipPath))){
+                return videoClips[i];
             }
         }
-        return NULL;
+        cout << "not assigned" << endl;
+        return assignVideoClip(clip);
     }
     
     void previousClip(){
-        int previousClipFrame = currentFrame;
-        vector<string> clipsNow = getClipNamesFrom(previousClipFrame, previousClipFrame);
-        int numDiffs = 0;
-        for(int i = previousClipFrame; i >= 0; i--){
-            vector<string> clipsThen = getClipNamesFrom(i, i);
-            if(clipsThen != clipsNow){
-                if(numDiffs == 1){
-                    previousClipFrame = i;
-                    break;
-                }else{
-                    numDiffs++;
-                    clipsNow = clipsThen;
-                }
-            }
-        }
-        setFrame(previousClipFrame);
+//        int previousClipFrame = currentFrame;
+//        vector<string> clipsNow = getClipsFrom(previousClipFrame, previousClipFrame);
+//        int numDiffs = 0;
+//        for(int i = previousClipFrame; i >= 0; i--){
+//            vector<string> clipsThen = getClipsFrom(i, i);
+//            if(clipsThen != clipsNow){
+//                if(numDiffs == 1){
+//                    previousClipFrame = i;
+//                    break;
+//                }else{
+//                    numDiffs++;
+//                    clipsNow = clipsThen;
+//                }
+//            }
+//        }
+//        setFrame(previousClipFrame);
     }
     
     void nextClip(){
-        int nextClipFrame = currentFrame;
-        vector<string> clipsNow = getClipNamesFrom(nextClipFrame, nextClipFrame);
-        for(int i = nextClipFrame; i < getTotalFrames(); i++){
-            vector<string> clipsThen = getClipNamesFrom(i, i);
-            if(clipsThen != clipsNow){
-                nextClipFrame = i;
-                break;
-            }
-        }
-        cout << "MOFO2: " << nextClipFrame << endl;
-        setFrame(nextClipFrame);
+//        int nextClipFrame = currentFrame;
+//        vector<string> clipsNow = getClipsFrom(nextClipFrame, nextClipFrame);
+//        for(int i = nextClipFrame; i < getTotalFrames(); i++){
+//            vector<string> clipsThen = getClipsFrom(i, i);
+//            if(clipsThen != clipsNow){
+//                nextClipFrame = i;
+//                break;
+//            }
+//        }
+//        //cout << "MOFO2: " << nextClipFrame << endl;
+//        setFrame(nextClipFrame);
     }
     
     void setFrame(int frame){
@@ -1241,9 +1276,9 @@ public:
     }
     
     void stop(){
-        if(videos.size() > 1){
-            for(int i = 1; i < videos.size(); i++){
-                videos[i]->stop();
+        if(videoClips.size() > 1){
+            for(int i = 1; i < videoClips.size(); i++){
+                videoClips[i].video->stop();
             }
         }
         for(int i = 0; i < group.size(); i++){
@@ -1260,12 +1295,12 @@ public:
     void setPaused(bool b){
         bPaused = b;
         if(bPaused){
-            for(int i = 0; i < videos.size(); i++){
-                videos[i]->setPaused(true);
+            for(int i = 0; i < videoClips.size(); i++){
+                videoClips[i].video->setPaused(true);
             }
         }else{
-            for(int i = 0; i < videos.size(); i++){
-                videos[i]->setPaused(false);
+            for(int i = 0; i < videoClips.size(); i++){
+                videoClips[i].video->setPaused(false);
             }
         }
     }
@@ -1291,17 +1326,16 @@ public:
 //    }
     
     void draw(int screen){
-        if(videos.size() < 2) return;
+        if(videoClips.size() < 2) return;
         
-        videos[0]->draw(0,0,0,0);
+        videoClips[0].video->draw(0,0,0,0);
         
-        for(int i = 1; i < videos.size(); i++){
+        for(int i = 1; i < videoClips.size(); i++){
             
-            ofxThreadedVideo * video = videos[i];
+            Clip & clip = videoClips[i].clip;
+            ofxThreadedVideo * video = videoClips[i].video;
             
             if(video->isPlaying()){
-                
-                Clip & clip = getClipFromPath(video->getMoviePath());
                 
                 if(clip.getScreen() == screen){
                     
@@ -1428,13 +1462,13 @@ public:
         calculateFrames();
         currentFrame = 0;
         bPaused = true;
-        if(videos.size() > 1){
+        if(videoClips.size() > 1){
             stop();
-            videos.erase(videos.begin() + 1, videos.end());
+            videoClips.erase(videoClips.begin() + 1, videoClips.end());
         }
     };
     
-    bool insertClipAt(Clip & clip, int frame){
+    bool insertClipAt(Clip clip, int frame){
         
         int tries = 0;
         bool fitted = false;
@@ -1506,13 +1540,13 @@ public:
         return dummyClip;
     }
     
-    vector<string> getClipNamesFrom(int startFrame, int endFrame){
-        vector<string> clipNames;
-        getClipNamesFrom(startFrame, endFrame, clipNames);
-        return clipNames;
+    vector<Clip> getClipsFrom(int startFrame, int endFrame){
+        vector<Clip> clips;
+        getClipsFrom(startFrame, endFrame, clips);
+        return clips;
     };
     
-    void getClipNamesFrom(int startFrame, int endFrame, vector<string> & clipNames){
+    void getClipsFrom(int startFrame, int endFrame, vector<Clip> & clips){
         
         ofRectangle f = ofRectangle(startFrame,
                                     0,
@@ -1529,7 +1563,7 @@ public:
                                         1);
             
             if(r.intersects(f)){
-                clipNames.push_back(clip.getName());
+                clips.push_back(clip);
             }
         }
     };
@@ -1540,7 +1574,7 @@ public:
     //        return clips;
     //    };
     
-    void getClipNamesFrom(int startFrame, float x, int endFrame, float width, int screen, vector<string> & clipNames){
+    void getClipsFrom(int startFrame, float x, int endFrame, float width, int screen, vector<Clip> & clips){
         
         ofRectangle f = ofRectangle(startFrame,
                                     x,
@@ -1559,7 +1593,7 @@ public:
                                         clip.getPosition().width);
             
             if(r.intersects(f)){
-                clipNames.push_back(clip.getName());
+                clips.push_back(clip);
             }
         }
     };
@@ -1593,20 +1627,20 @@ public:
         return false;
     };
     
-    Clip & getClipFromName(string name){
-        for(int i = 0; i < group.size(); i++){
-            if(group[i].getName() == name){
-                return group[i];
-            }
-        }
-        ofxLogError() << "Clip out of bounds with name: " << name;
-        return dummyClip;
-    }
-    
-    Clip & getClipFromPath(string path){
-        vector<string> pathParts = ofSplitString(path, "/");
-        return getClipFromName(ofSplitString(pathParts[pathParts.size() - 1], ".")[0]);
-    }
+//    Clip & getClipFromName(string name){
+//        for(int i = 0; i < group.size(); i++){
+//            if(group[i].getName() == name){
+//                return group[i];
+//            }
+//        }
+//        ofxLogError() << "Clip out of bounds with name: " << name;
+//        return dummyClip;
+//    }
+//    
+//    Clip & getClipFromPath(string path){
+//        vector<string> pathParts = ofSplitString(path, "/");
+//        return getClipFromName(ofSplitString(pathParts[pathParts.size() - 1], ".")[0]);
+//    }
     
     int getCurrentFrame(){
         return currentFrame;
@@ -1623,14 +1657,18 @@ public:
         }
     };
     
-    vector<ofxThreadedVideo*>& getVideos(){
-        return videos;
+    vector<VideoClip>& getVideoClips(){
+        return videoClips;
     }
     
-    vector<string>& getCurrentClipNames(){
-        return currentClipNames;
+    vector<Clip>& getCurrentClips(){
+        return currentClips;
     }
 
+    ClipGroup& getGroup(){
+        return group;
+    }
+    
 protected:
         
     ClipGroup group;
@@ -1644,8 +1682,10 @@ protected:
     string syncClipName;
     
     ofPixelFormat pixelFormat;
-    vector<ofxThreadedVideo*> videos;
-    vector<string> currentClipNames;
+    vector<VideoClip> videoClips;
+    VideoClip dummyVideoClip;
+    
+    vector<Clip> currentClips;
     
     ofShader shader;
     ofFbo renderer;
