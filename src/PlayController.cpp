@@ -74,7 +74,7 @@ void PlayController::update(){
             vector<VideoClip> & videoClips = clipTimeline.getVideoClips();
             for(int i = 0; i < videoClips.size(); i++){
                 ofxThreadedVideo * video = videoClips[i].video;
-                appModel->setProperty("PlayState_"+ofToString(i), ofToString(video->isPlaying()) + " " + ofToString(video->getIsMovieDone()) + " " + ofToString(video->getFrameRate()));
+                appModel->setProperty("PlayState_"+ofToString(i), ofToString(video->isLoading()) + " " + ofToString(video->isPlaying()) + " " + ofToString(video->getIsMovieDone()) + " " + ofToString(video->getFrameRate()) + " " + videoClips[i].video->getMovieName());
             }
             
             ostringstream os;
@@ -120,143 +120,143 @@ void PlayController::makeClipGroup(){
     int flip;
     int lastAudioFreeFrame = 0;
     
-//    ClipTimeline & timeline = appModel->getClipTimeline();
-//    
-//    for (int i = 0; i < 1000; i++){
-//        bool insertedOk = false;
-//        int r = ofRandom(5);
-//        Clip & clip = allIntroClips[r];
-//        
-//        // calculate frame starts and ends
-//        insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame - clip.getAudioInFrameOffset());
-//        
-//
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    
+    for (int i = 0; i < 10000; i++){
+        bool insertedOk = false;
+        int r = ofRandom(5);
+        Clip & clip = allIntroClips[r];
+        lastAudioFreeFrame = lastAudioFreeFrame + ofRandom(100);
+        // calculate frame starts and ends
+        insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame);
+        
+
 //        if(insertedOk){
 //            lastAudioFreeFrame = timeline.getGroup()[timeline.getGroup().size() - 1].getAudioEnd();
 //        }
-//    }
-//    playControllerStates.setState(kPLAYCONTROLLER_PLAY);
-    
-    
-    while(true){
-
-        // flip for inserting a special or inserting a category
-        flip = getRandomDistribution(2, 0.8f, 0.2f);
-        
-        if(true){//flip == 0){ // do a category
-            
-            ClipType allCategoryTypes = allClips.getClipTypes(CATEGORY);
-            
-            allCategoryTypes.popall("LSTN");
-            allCategoryTypes.popall("SPEC");
-            allCategoryTypes.popall("STAT");
-            allCategoryTypes.popall("INTR");
-            allCategoryTypes.popall(category);
-            
-            int remainingNumCategories = allCategoryTypes.countunique();
-
-            if (remainingNumCategories < 4){ // 5 is all categories
-                // reset the clip groups by changing state
-                playControllerStates.setState(kPLAYCONTROLLER_PLAY);
-                return;// newClipGroup;
-            }
-            
-            // could use a random distribution algorithm here instead
-            int numberOfQuestions = (int)ofRandom(3) + 2; // min 1; max 2
-            int numberOfStatements = (int)ofRandom(2) + 1; // min 1; max 2
-            int numberOfIntros = (int)ofRandom(2) + 1;
-            
-            category = allCategoryTypes.poprandom();
-            
-            ClipGroup categoryGroup = allClips.getContains(CATEGORY, category);
-            ClipType questionGroup = categoryGroup.getClipTypes(QUESTION);
-            
-            string question = questionGroup.poprandom();
-            ClipGroup uniqueNameGroup = categoryGroup.getContains(QUESTION, question).getUnique(PERSON, numberOfQuestions);
-            
-            // mix up the order
-            // TODO: might want to use a randomDist
-            // to weight statements at start etc
-            uniqueNameGroup.shuffle();
-            
-            ClipGroup introGroup;
-            
-            for(int j = 0; j < uniqueNameGroup.size(); j++){
-                Clip introClip = allIntroClips.getContains(PERSON, uniqueNameGroup[j].getClipInfo().person).poprandom();
-                cout << uniqueNameGroup[j].getClipInfo().person << " " << introClip << endl;
-                introGroup.push(introClip);
-            }
-            
-            for(int j = 0; j < numberOfIntros; j++){
-                Clip introClip = introGroup.poprandom();
-                uniqueNameGroup.push_front(introClip);
-            }
-            
-            ClipGroup statementGroup = allStatClips;
-            
-            // make sure no statement is by someone answering a question
-            for(int j = 0; j < uniqueNameGroup.size(); j++){
-                statementGroup = statementGroup.getExcludes(PERSON, statementGroup[j].getClipInfo().person);
-            }
-            
-            for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
-                Clip statementClip;
-                if(category == "CNTY"){
-                    statementClip = statementGroup.getContains(QUESTION, "CNIS").poprandom();
-                }
-                if(category == "CULT"){
-                    statementClip = statementGroup.getContains(QUESTION, "CUIS").poprandom();
-                }
-                if(category == "FAML"){
-                    statementClip = statementGroup.getContains(QUESTION, "FAIS").poprandom();
-                }
-                if(category == "IDEN"){
-                    statementClip = statementGroup.getContains(QUESTION, "IDIS").poprandom();
-                }
-                if(category == "RITE"){
-                    statementClip = statementGroup.getContains(QUESTION, "RIIS").poprandom();
-                }
-                uniqueNameGroup.push_front(statementClip);
-            }
-            if(allTitleClips.size() > 0){
-                Clip titleClip = allTitleClips.getContains(CATEGORY, category)[0];
-                uniqueNameGroup.push_front(titleClip);
-            }
-            ClipTimeline & timeline = appModel->getClipTimeline();
-            
-            // calculate audio overlaps and pack
-            for(int j = 0; j < uniqueNameGroup.size(); j++){
-                
-                ClipPosition clipPosition;
-                Clip & clip = uniqueNameGroup[j];
-                
-                bool insertedOk = false;
-                
-                if(clip.getName().rfind("OOOO_00_TITLE") != string::npos){
-                    // calculate frame starts and ends
-                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame);
-                }else{
-                    // calculate frame starts and ends
-                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame - clip.getAudioInFrameOffset());
-                }
-                
-                if(insertedOk){
-                    lastAudioFreeFrame = timeline.getGroup()[timeline.getGroup().size() - 1].getAudioEnd();
-                }else{
-                    ofxLogWarning() << "Rejected" << clip << endl;
-                    uniqueNameGroup.pop(clip);
-                    continue;
-                }
-                
-            }
-
-            allClips.pop(uniqueNameGroup);
-            //newClipGroup.push(uniqueNameGroup);
-            
-        }else{ // do a special
-            
-        }
     }
+    playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+    
+    
+//    while(true){
+//
+//        // flip for inserting a special or inserting a category
+//        flip = getRandomDistribution(2, 0.8f, 0.2f);
+//        
+//        if(true){//flip == 0){ // do a category
+//            
+//            ClipType allCategoryTypes = allClips.getClipTypes(CATEGORY);
+//            
+//            allCategoryTypes.popall("LSTN");
+//            allCategoryTypes.popall("SPEC");
+//            allCategoryTypes.popall("STAT");
+//            allCategoryTypes.popall("INTR");
+//            allCategoryTypes.popall(category);
+//            
+//            int remainingNumCategories = allCategoryTypes.countunique();
+//
+//            if (remainingNumCategories < 4){ // 5 is all categories
+//                // reset the clip groups by changing state
+//                playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+//                return;// newClipGroup;
+//            }
+//            
+//            // could use a random distribution algorithm here instead
+//            int numberOfQuestions = (int)ofRandom(3) + 2; // min 1; max 2
+//            int numberOfStatements = (int)ofRandom(2) + 1; // min 1; max 2
+//            int numberOfIntros = (int)ofRandom(2) + 1;
+//            
+//            category = allCategoryTypes.poprandom();
+//            
+//            ClipGroup categoryGroup = allClips.getContains(CATEGORY, category);
+//            ClipType questionGroup = categoryGroup.getClipTypes(QUESTION);
+//            
+//            string question = questionGroup.poprandom();
+//            ClipGroup uniqueNameGroup = categoryGroup.getContains(QUESTION, question).getUnique(PERSON, numberOfQuestions);
+//            
+//            // mix up the order
+//            // TODO: might want to use a randomDist
+//            // to weight statements at start etc
+//            uniqueNameGroup.shuffle();
+//            
+//            ClipGroup introGroup;
+//            
+//            for(int j = 0; j < uniqueNameGroup.size(); j++){
+//                Clip introClip = allIntroClips.getContains(PERSON, uniqueNameGroup[j].getClipInfo().person).poprandom();
+//                cout << uniqueNameGroup[j].getClipInfo().person << " " << introClip << endl;
+//                introGroup.push(introClip);
+//            }
+//            
+//            for(int j = 0; j < numberOfIntros; j++){
+//                Clip introClip = introGroup.poprandom();
+//                uniqueNameGroup.push_front(introClip);
+//            }
+//            
+//            ClipGroup statementGroup = allStatClips;
+//            
+//            // make sure no statement is by someone answering a question
+//            for(int j = 0; j < uniqueNameGroup.size(); j++){
+//                statementGroup = statementGroup.getExcludes(PERSON, statementGroup[j].getClipInfo().person);
+//            }
+//            
+//            for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
+//                Clip statementClip;
+//                if(category == "CNTY"){
+//                    statementClip = statementGroup.getContains(QUESTION, "CNIS").poprandom();
+//                }
+//                if(category == "CULT"){
+//                    statementClip = statementGroup.getContains(QUESTION, "CUIS").poprandom();
+//                }
+//                if(category == "FAML"){
+//                    statementClip = statementGroup.getContains(QUESTION, "FAIS").poprandom();
+//                }
+//                if(category == "IDEN"){
+//                    statementClip = statementGroup.getContains(QUESTION, "IDIS").poprandom();
+//                }
+//                if(category == "RITE"){
+//                    statementClip = statementGroup.getContains(QUESTION, "RIIS").poprandom();
+//                }
+//                uniqueNameGroup.push_front(statementClip);
+//            }
+//            if(allTitleClips.size() > 0){
+//                Clip titleClip = allTitleClips.getContains(CATEGORY, category)[0];
+//                uniqueNameGroup.push_front(titleClip);
+//            }
+//            ClipTimeline & timeline = appModel->getClipTimeline();
+//            
+//            // calculate audio overlaps and pack
+//            for(int j = 0; j < uniqueNameGroup.size(); j++){
+//                
+//                ClipPosition clipPosition;
+//                Clip & clip = uniqueNameGroup[j];
+//                
+//                bool insertedOk = false;
+//                
+//                if(clip.getName().rfind("OOOO_00_TITLE") != string::npos){
+//                    // calculate frame starts and ends
+//                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame);
+//                }else{
+//                    // calculate frame starts and ends
+//                    insertedOk = timeline.insertClipAt(clip, lastAudioFreeFrame - clip.getAudioInFrameOffset());
+//                }
+//                
+//                if(insertedOk){
+//                    lastAudioFreeFrame = timeline.getGroup()[timeline.getGroup().size() - 1].getAudioEnd();
+//                }else{
+//                    ofxLogWarning() << "Rejected" << clip << endl;
+//                    uniqueNameGroup.pop(clip);
+//                    continue;
+//                }
+//                
+//            }
+//
+//            allClips.pop(uniqueNameGroup);
+//            //newClipGroup.push(uniqueNameGroup);
+//            
+//        }else{ // do a special
+//            
+//        }
+//    }
 
 }
 

@@ -191,6 +191,7 @@ struct ClipPosition {
     int cropend;
     int cropframes;
     bool isCropped;
+    bool isStopping;
     bool isLoading;
 };
 
@@ -251,6 +252,7 @@ public:
         clipPosition.cropend = -1;
         clipPosition.cropframes = -1;
         clipPosition.isCropped = false;
+        clipPosition.isStopping = false;
         clipPosition.isLoading = false;
         
         clipInfo.category = "";
@@ -505,6 +507,14 @@ public:
         clipPosition.isLoading = b;
     }
     
+    bool getClipStopping(){
+        return clipPosition.isStopping;
+    }
+    
+    bool setClipStopping(bool b){
+        clipPosition.isStopping = b;
+    }
+    
     bool getAnalyzed(){
         return analyzed;
     }
@@ -533,6 +543,7 @@ public:
            clipPosition.cropstart != rhs.clipPosition.cropstart ||
            clipPosition.cropend != rhs.clipPosition.cropend ||
            clipPosition.cropframes != rhs.clipPosition.cropframes ||
+           clipPosition.isStopping != rhs.clipPosition.isStopping ||
            clipPosition.isLoading != rhs.clipPosition.isLoading){
             return true;
         }else{
@@ -552,6 +563,7 @@ public:
            clipPosition.cropstart == rhs.clipPosition.cropstart &&
            clipPosition.cropend == rhs.clipPosition.cropend &&
            clipPosition.cropframes == rhs.clipPosition.cropframes &&
+           clipPosition.isStopping == rhs.clipPosition.isStopping &&
            clipPosition.isLoading == rhs.clipPosition.isLoading){
             return true;
         }else{
@@ -624,7 +636,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
     c.clipPosition.videoend << " (" <<
     c.frames << ") " << " [" <<
     c.clipPosition.cropstart << ":" <<
-    c.clipPosition.cropend << "]";// << " [" <<
+    c.clipPosition.cropend << "]" << " " <<
+    c.clipPosition.isLoading << " " <<
+    c.clipPosition.isStopping;// << " [" <<
     //            c.frames * c.audioinpct << ":" <<
     //            c.frames * c.audioutpct<< "]" << "  " <<
     //            c.clipPosition.videostart - c.clipPosition.videostart << ", " <<
@@ -1143,20 +1157,25 @@ public:
                     
                     //cout << video->isLoaded() << " " << video->isPlaying() << " " << clip.getClipLoading() << " " << currentFrame << " " << clip.getVideoEnd() << " " << currentClips[i].getVideoEnd() << endl;
                     
-                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && currentFrame < clip.getVideoEnd() - 100){// && !clip.getClipStopping()){
+                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){// && !clip.getClipStopping()){
                         //ofxLogVerbose() << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
-                        ofxLogVerbose() << "Loading " << clip.getVideoPath() << endl;
+                        ofxLogVerbose() << "Loading " << clip << endl;
                         if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
                         while(!video->isLoading()) video->update();
                     }
                     
                     if(video == NULL) continue;
                     
-                    if(video->isLoaded() && !video->isPlaying()){
-                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) continue;
-                        ofxLogVerbose() << "Playing " << clip.getVideoPath() << endl;
+                    if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
+                        ofxLogVerbose() << "Playing " << clip << endl;
+                        ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
+//                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)){
+//                            ofxLogVerbose() << "continue" << endl;
+//                            continue;
+//                        }
+                        
                         if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-                            cout << "Setframing" << endl;
+                            ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
                             video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
                         }
                         video->setLoopState(OF_LOOP_NONE);
@@ -1164,11 +1183,12 @@ public:
                         clip.setClipLoading(false);
                     }
 
-                    if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)){
-                        ofxLogVerbose() << "Stopping " << clip.getVideoPath() << endl;
+                    if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) && !clip.getClipStopping()){
+                        ofxLogVerbose() << "Stopping " << clip << endl;
+                        ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
                         video->stop();
                         clip.setClipLoading(false);
-                        clip = dummyClip;
+                        clip.setClipStopping(true);
                     }
                 }
             }
@@ -1199,7 +1219,7 @@ public:
         assert(videoClips.size() > 0);
         int freeIndex = -1;
         for(int i = 0; i < videoClips.size(); i++){
-            if(!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying()){
+            if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){
                 freeIndex = i;
                 break;
             }
@@ -1231,7 +1251,6 @@ public:
                 return videoClips[i];
             }
         }
-        cout << "not assigned" << endl;
         return assignVideoClip(clip);
     }
     
