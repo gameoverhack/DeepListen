@@ -542,9 +542,9 @@ public:
            clipPosition.screen != rhs.clipPosition.screen ||
            clipPosition.cropstart != rhs.clipPosition.cropstart ||
            clipPosition.cropend != rhs.clipPosition.cropend ||
-           clipPosition.cropframes != rhs.clipPosition.cropframes ||
-           clipPosition.isStopping != rhs.clipPosition.isStopping ||
-           clipPosition.isLoading != rhs.clipPosition.isLoading){
+           clipPosition.cropframes != rhs.clipPosition.cropframes){
+//           clipPosition.isStopping != rhs.clipPosition.isStopping ||
+//           clipPosition.isLoading != rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -562,9 +562,9 @@ public:
            clipPosition.screen == rhs.clipPosition.screen &&
            clipPosition.cropstart == rhs.clipPosition.cropstart &&
            clipPosition.cropend == rhs.clipPosition.cropend &&
-           clipPosition.cropframes == rhs.clipPosition.cropframes &&
-           clipPosition.isStopping == rhs.clipPosition.isStopping &&
-           clipPosition.isLoading == rhs.clipPosition.isLoading){
+           clipPosition.cropframes == rhs.clipPosition.cropframes){
+//           clipPosition.isStopping == rhs.clipPosition.isStopping &&
+//           clipPosition.isLoading == rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -1140,11 +1140,38 @@ public:
         if(!bPaused){
             
             for(int i = 0; i < videoClips.size(); i++){
-                //if(videos[i]->isLoading() || videos[i]->isPlaying())
-                videoClips[i].video->update();
+
+                VideoClip & videoClip = videoClips[i];
+                
+                Clip & clip = getRealClip(videoClip.clip);
+                ofxThreadedVideo * video = videoClip.video;
+                
+                video->update();
+                
+                if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
+                    ofxLogVerbose() << "Playing " << clip << endl;
+                    //ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
+                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
+                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                    }
+                    video->setLoopState(OF_LOOP_NONE);
+                    video->play();
+                    clip.setClipLoading(false);
+                }
+                
+                if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
+                    ofxLogVerbose() << "Stopping " << clip << endl;
+                    //ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
+                    video->stop();
+                    clip.setClipLoading(false);
+                    clip.setClipStopping(true);
+                }
+                
             }
             
-            currentClips = getClipsFrom(currentFrame, currentFrame);
+            currentClips.clear();
+            getClipsFrom(currentFrame, currentFrame, currentClips);
             
             if(currentClips.size() > 0){
                 
@@ -1152,7 +1179,7 @@ public:
                     
                     VideoClip & videoClip = isClipAssigned(currentClips[i]);
                     
-                    Clip & clip = videoClip.clip;
+                    Clip & clip = getRealClip(videoClip.clip);
                     ofxThreadedVideo * video = videoClip.video;
                     
                     //cout << video->isLoaded() << " " << video->isPlaying() << " " << clip.getClipLoading() << " " << currentFrame << " " << clip.getVideoEnd() << " " << currentClips[i].getVideoEnd() << endl;
@@ -1164,32 +1191,6 @@ public:
                         while(!video->isLoading()) video->update();
                     }
                     
-                    if(video == NULL) continue;
-                    
-                    if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
-                        ofxLogVerbose() << "Playing " << clip << endl;
-                        ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
-//                        if(video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)){
-//                            ofxLogVerbose() << "continue" << endl;
-//                            continue;
-//                        }
-                        
-                        if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-                            ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
-                            video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
-                        }
-                        video->setLoopState(OF_LOOP_NONE);
-                        video->play();
-                        clip.setClipLoading(false);
-                    }
-
-                    if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd() - 2)) && !clip.getClipStopping()){
-                        ofxLogVerbose() << "Stopping " << clip << endl;
-                        ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
-                        video->stop();
-                        clip.setClipLoading(false);
-                        clip.setClipStopping(true);
-                    }
                 }
             }
             for(int i = videoClips.size() - 1; i >= 0 ; i--){
@@ -1219,7 +1220,7 @@ public:
         assert(videoClips.size() > 0);
         int freeIndex = -1;
         for(int i = 0; i < videoClips.size(); i++){
-            if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){
+            if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
                 freeIndex = i;
                 break;
             }
@@ -1559,11 +1560,11 @@ public:
         return dummyClip;
     }
     
-    vector<Clip> getClipsFrom(int startFrame, int endFrame){
-        vector<Clip> clips;
-        getClipsFrom(startFrame, endFrame, clips);
-        return clips;
-    };
+//    vector<Clip> getClipsFrom(int startFrame, int endFrame){
+//        vector<Clip> clips;
+//        getClipsFrom(startFrame, endFrame, clips);
+//        return clips;
+//    };
     
     void getClipsFrom(int startFrame, int endFrame, vector<Clip> & clips){
         
@@ -1684,6 +1685,12 @@ public:
         return currentClips;
     }
 
+    Clip& getRealClip(Clip & clip){
+        for(int i = 0; i < group.size(); i++){
+            if(group[i] == clip) return group[i];
+        }
+    }
+    
     ClipGroup& getGroup(){
         return group;
     }
