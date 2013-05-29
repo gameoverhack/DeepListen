@@ -67,30 +67,33 @@ void PlayController::update(){
             break;
         case kPLAYCONTROLLER_PLAY:
         {
+            StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
             ClipTimeline & clipTimeline = appModel->getClipTimeline();
-            
+
             clipTimeline.update();
             
-            vector<VideoClip>& videoClips = clipTimeline.getVideoClips();
-            for(int i = 0; i < videoClips.size(); i++){
-                ofxThreadedVideo * video = videoClips[i].video;
+            if(debugViewStates.getState(kDEBUGVIEW_SHOWPROPS)){
+                vector<VideoClip>& videoClips = clipTimeline.getVideoClips();
+                for(int i = 0; i < videoClips.size(); i++){
+                    ofxThreadedVideo * video = videoClips[i].video;
+                    ostringstream os;
+                    os << ofToString(video->isLoading()) << " " << ofToString(video->isPlaying()) << " " << ofToString(video->getIsMovieDone()) << " " << ofToString(video->getFrameRate()) << " " << videoClips[i].clip;
+                    appModel->setProperty("PlayState_"+ofToString(i), os.str());
+                }
+                
                 ostringstream os;
-                os << ofToString(video->isLoading()) << " " << ofToString(video->isPlaying()) << " " << ofToString(video->getIsMovieDone()) << " " << ofToString(video->getFrameRate()) << " " << videoClips[i].clip;
-                appModel->setProperty("PlayState_"+ofToString(i), os.str());
+                vector<Clip> & currentClips = clipTimeline.getCurrentClips();
+                for(int i = 0; i < currentClips.size(); i++){
+                    Clip & clip = currentClips[i];
+                    os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClips.size() - 1 ? "" : ", ");
+                }
+                
+                appModel->setProperty("Clips", os.str());
+                
+                appModel->setProperty("TimeFrame", clipTimeline.getCurrentFrame());
+                appModel->setProperty("TimeFrames", clipTimeline.getTotalFrames());
             }
-            
-            ostringstream os;
-            vector<Clip> & currentClips = clipTimeline.getCurrentClips();
-            for(int i = 0; i < currentClips.size(); i++){
-                Clip & clip = currentClips[i];
-                os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClips.size() - 1 ? "" : ", ");
-            }
-            
-            appModel->setProperty("Clips", os.str());
-            
-            appModel->setProperty("TimeFrame", clipTimeline.getCurrentFrame());
-            appModel->setProperty("TimeFrames", clipTimeline.getTotalFrames());
-            
+
             if(clipTimeline.getCurrentFrame() >= clipTimeline.getTotalFrames()){
                 playControllerStates.setState(kPLAYCONTROLLER_INIT);
             }

@@ -41,8 +41,8 @@ void DebugView::update(){
     ostringstream os;
     
     if(debugViewStates.getState(kDEBUGVIEW_SHOWINFO)) os << ofGetFrameRate() << endl << endl;
-    if(debugViewStates.getState(kDEBUGVIEW_SHOWSTATES)) os << appModel->getAllPropsAsString() << endl;
-    if(debugViewStates.getState(kDEBUGVIEW_SHOWPROPS)) os << appModel->getAllStatesAsString() << endl;
+    if(debugViewStates.getState(kDEBUGVIEW_SHOWPROPS)) os << appModel->getAllPropsAsString() << endl;
+    if(debugViewStates.getState(kDEBUGVIEW_SHOWSTATES)) os << appModel->getAllStatesAsString() << endl;
     
 //    ClipGroup allClips = appModel->getClipGroup("originalClips");
 //    
