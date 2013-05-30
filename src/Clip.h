@@ -1168,6 +1168,11 @@ public:
                     clip.setClipStopping(true);
                 }
                 
+                if(video->getIsMovieDone() && video->isPlaying()){
+                    ofxLogVerbose() << "Force Stopping " << clip << endl;
+                    video->stop();
+                }
+                
             }
             
             currentClips.clear();
@@ -1188,7 +1193,7 @@ public:
                         //ofxLogVerbose() << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
                         ofxLogVerbose() << "Loading " << clip << endl;
                         if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
-                        while(!video->isLoading()) video->update();
+                        //while(!video->isLoading()) video->update();
                     }
                     
                 }
