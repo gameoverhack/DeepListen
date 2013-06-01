@@ -167,6 +167,14 @@ static string getQuestionFromCode(string categoryCode, string questionCode){
     if(categoryCode == "LSTN") return getListenQuestionFromCode(questionCode);
 };
 
+static string getStatementQuestionFromCategory(string category){
+    if(category == "CNTY") return "CNIS";
+    if(category == "CULT") return "CUIS";
+    if(category == "FAML") return "FAIS";
+    if(category == "IDEN") return "IDIS";
+    if(category == "RITE") return "RIIS";
+}
+
 enum SortType{
     NAME = 0,
     CATEGORY,
@@ -678,8 +686,21 @@ public:
         }
     }
     
+    string getrandom(){
+        string s = "";
+        int r = ofRandom(types.size());
+        int count = 0;
+        for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
+            if(count == r){
+                s = it->first;
+                break;
+            }
+        }
+        return s;
+    }
+    
     string poprandom(){
-        string s;
+        string s = "";
         int r = ofRandom(types.size());
         int count = 0;
         for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
@@ -692,7 +713,7 @@ public:
         return s;
     }
     
-    int count(string value){
+    int size(string value){
         if(types.find(value) != types.end()){
             return types[value];
         }else{
@@ -700,12 +721,24 @@ public:
         }
     }
     
-    int countunique(){
+    int size(){
         return types.size();
     }
     
     map<string, int> & getTypes(){
         return types;
+    }
+    
+    string operator[](int i){
+        string s = "";
+        int count = 0;
+        for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
+            if(count == i){
+                s = it->first;
+                break;
+            }
+        }
+        return s;
     }
     
     void clear(){
@@ -842,6 +875,16 @@ public:
         }
         return clipGroup;
     }
+    
+    ClipGroup getStatements(string category){
+        ClipGroup clipGroup;
+        string statementQuestion = getStatementQuestionFromCategory(category);
+        for(int i = 0; i < group.size(); i++){
+            if(group[i].getClipInfo().question == statementQuestion) clipGroup.push(group[i]);
+        }
+        return clipGroup;
+    }
+    
     
     ClipGroup getUnique(SortType type){
         ClipGroup cg;
@@ -987,13 +1030,20 @@ public:
         return cg;
     }
     
+    Clip getrandom(){
+        Clip clip;
+        if(group.size() > 0){
+            clip = group[ofRandom(group.size())];
+        }
+        return clip;
+    }
+    
     Clip poprandom(){
         Clip clip;
         if(group.size() > 0){
             clip = group[ofRandom(group.size())];
             pop(clip);
         }
-        
         return clip;
     }
     
@@ -1025,6 +1075,10 @@ public:
         personalTypes.clear();
         personTypes.clear();
         nameTypes.clear();
+    }
+    
+    Clip at(int i){
+        return group[i];
     }
     
     Clip & operator[](int i){
@@ -1237,7 +1291,7 @@ public:
             ofxThreadedVideo * video = new ofxThreadedVideo;
             video->setPixelFormat(pixelFormat);
             video->setUseAutoPlay(false);
-            video->setUseQueue(false);
+            video->setUseQueue(true);
             ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
             VideoClip vc;
             vc.video = video;
@@ -1698,6 +1752,10 @@ public:
     
     ClipGroup& getGroup(){
         return group;
+    }
+    
+    Clip getLastClip(){
+        return group[group.size() - 1];
     }
     
 protected:

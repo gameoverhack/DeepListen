@@ -128,6 +128,40 @@ ClipTimeline& AppModel::getClipTimeline(){
 }
 
 //--------------------------------------------------------------
+void AppModel::setTimer(string timerName, int timeMillis){
+    map<string, int>::iterator it = timers.find(timerName);
+    if(it == timers.end()){
+        ofxLogVerbose() << "Adding timer: " << timerName << " at " << timeMillis << endl;
+    }else{
+        ofxLogVerbose() << "Reset timer: " << timerName << " at " << timeMillis << endl;
+    }
+    timers[timerName] = timeMillis;
+}
+
+//--------------------------------------------------------------
+bool AppModel::getTimer(string timerName, int timeMillis, int timeOutMillis){
+    int timeDiff = 0;
+    bool timedOut = true;
+    map<string, int>::iterator it = timers.find(timerName);
+    if(it != timers.end()){
+        timeDiff = timeMillis - it->second;
+        timedOut = (timeDiff > timeOutMillis);
+        ofxLogVerbose() << "Checking timer: " << timerName << " (" << it->second << " " << timeMillis <<") " << timeDiff << " > " << timeOutMillis << " == " << timedOut << endl;
+    }else{
+        ofxLogVerbose() << "Timer doesn't exist...returning TRUE: " << timerName << endl;
+    }
+    return timedOut;
+}
+
+//--------------------------------------------------------------
+int AppModel::getTimerDifference(string timerName, int timeMillis){
+    map<string, int>::iterator it = timers.find(timerName);
+    assert(it != timers.end());
+    return timeMillis - it->second;
+    
+}
+
+//--------------------------------------------------------------
 int AppModel::getNumClipsForAnalysis(){
     int count = 0;
     for(int i = 0; i < clips.size(); i++){
