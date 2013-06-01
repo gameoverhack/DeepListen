@@ -1139,42 +1139,6 @@ public:
         
         if(!bPaused){
             
-            for(int i = 0; i < videoClips.size(); i++){
-
-                VideoClip & videoClip = videoClips[i];
-                
-                Clip & clip = getRealClip(videoClip.clip);
-                ofxThreadedVideo * video = videoClip.video;
-                
-                video->update();
-                
-                if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
-                    ofxLogVerbose() << "Playing " << clip << endl;
-                    //ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
-                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
-                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
-                    }
-                    video->setLoopState(OF_LOOP_NONE);
-                    video->play();
-                    clip.setClipLoading(false);
-                }
-                
-                if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
-                    ofxLogVerbose() << "Stopping " << clip << endl;
-                    //ofxLogVerbose() << video->getIsMovieDone() << " " << clip.getIsCropped() << " " << currentFrame << " " << clip.getVideoEnd() - 2 << endl;
-                    video->stop();
-                    clip.setClipLoading(false);
-                    clip.setClipStopping(true);
-                }
-                
-                if(video->getIsMovieDone() && video->isPlaying()){
-                    ofxLogVerbose() << "Force Stopping " << clip << endl;
-                    video->stop();
-                }
-                
-            }
-            
             currentClips.clear();
             getClipsFrom(currentFrame, currentFrame, currentClips);
             
@@ -1187,33 +1151,64 @@ public:
                     Clip & clip = getRealClip(videoClip.clip);
                     ofxThreadedVideo * video = videoClip.video;
                     
-                    //cout << video->isLoaded() << " " << video->isPlaying() << " " << clip.getClipLoading() << " " << currentFrame << " " << clip.getVideoEnd() << " " << currentClips[i].getVideoEnd() << endl;
-                    
-                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){// && !clip.getClipStopping()){
-                        //ofxLogVerbose() << currentFrame << " " << clip.getVideoStart() << " " << clip.getVideoEnd() << " " << clip.getCropStart() << " " << clip.getCropEnd() << endl;
+                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
                         ofxLogVerbose() << "Loading " << clip << endl;
-                        if(video->loadMovie(clip.getVideoPath())) clip.setClipLoading(true);
-                        //while(!video->isLoading()) video->update();
+                        if(video->loadMovie(clip.getVideoPath())){
+                            videoClip.clip.setClipLoading(true);
+                            clip.setClipLoading(true);
+                        }
                     }
                     
                 }
             }
+            
+            bool syncAssigned = false;
             for(int i = videoClips.size() - 1; i >= 0 ; i--){
-                if(videoClips[i].video->isPlaying()){
+                
+                VideoClip & videoClip = videoClips[i];
+                
+                Clip & clip = getRealClip(videoClip.clip);
+                ofxThreadedVideo * video = videoClip.video;
+                
+                video->update();
+                
+                if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
+                    ofxLogVerbose() << "Playing " << clip << endl;
+                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
+                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                    }
+                    video->setLoopState(OF_LOOP_NONE);
+                    video->play();
+                    clip.setClipLoading(false);
+                }
+                
+                if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
+                    ofxLogVerbose() << "Stopping " << clip << endl;
+                    video->stop();
+                    clip.setClipLoading(false);
+                    clip.setClipStopping(true);
+                }
+                
+                if(video->getIsMovieDone() && video->isPlaying()){
+                    ofxLogVerbose() << "Force Stopping " << clip << endl;
+                    video->stop();
+                }
+                
+                if(video->isPlaying() && !syncAssigned){
                     if(i == 0){
                         ofxLogVerbose() << "Black timestamp" << endl;
-                        if(videoClips[0].video->isFrameNew()) currentFrame++;
+                        if(video->isFrameNew()) currentFrame++;
+                        syncAssigned = true;
                     }else{
-                        Clip & clip = videoClips[i].clip;
-                        ofxThreadedVideo * video = videoClips[i].video;
                         if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                        //cout << currentFrame << " " << clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart() << " " << video->getCurrentFrame() << endl;
                         currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
                         syncClipName = clip.getName();
-                        break;
+                        syncAssigned = true;
                     }
                 }
             }
+            
         }
     }
     
@@ -1237,7 +1232,7 @@ public:
             ofxThreadedVideo * video = new ofxThreadedVideo;
             video->setPixelFormat(pixelFormat);
             video->setUseAutoPlay(false);
-            video->setUseQueue(false);
+            video->setUseQueue(true);
             ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
             VideoClip vc;
             vc.video = video;
