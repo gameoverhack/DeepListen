@@ -41,6 +41,11 @@ public:
     
     ClipTimeline& getClipTimeline();
     
+    // timer functions
+    void setTimer(string timerName, int timeMillis);
+    bool getTimer(string timerName, int timeMillis, int timeOutMillis);
+    int getTimerDifference(string timerName, int timeMillis);
+    
     // analysis functions
     int getNumClipsForAnalysis();
     Clip& getClipForAnalysis();
@@ -69,6 +74,8 @@ protected:
     
     map<string, ClipGroup>  clipGroups;
     ClipGroup               dummyClipGroup;
+    
+    map<string, int>        timers;
     
     FileList audioAssets;
     FileList videoAssets;

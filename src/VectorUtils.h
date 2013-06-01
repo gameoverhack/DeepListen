@@ -12,6 +12,18 @@
 #include <algorithm>
 #include <vector>
 
+inline int minutesToMillis(int minutes){
+    return minutes * 60 * 1000;
+}
+
+inline int framesToMillis(int frames){
+    return ceil( ( (float)frames/25.0f ) * 1000);
+}
+
+inline float framesToMinutes(int frames){
+    return (float)frames / 25.0 / 60.0f;
+}
+
 template<typename T>
 inline ostream& operator<<(ostream& os, vector<T> &v){
     for(int i = 0; i < v.size(); i++){
