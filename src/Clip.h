@@ -1560,7 +1560,7 @@ public:
             ofRectangle & originalRect = clip.getRect();
             
             x = ofRandom(0, (screen == 0 ? 1920.0f : 1440.0f) - originalRect.width);
-            y = (1080.0f - 200.0f) - originalRect.height - originalRect.y;
+            y = (1080.0 - 200.0f) + (- originalRect.height - originalRect.y);
             width = originalRect.width;
             
             fitted = !getAnyClipAt(frame,

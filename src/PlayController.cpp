@@ -235,7 +235,8 @@ void PlayController::makeClipGroup(){
             
             // insert statements
             ClipGroup statementGroup = allStatClips.getStatements(category);
-
+            ClipGroup theseStatementPeople;
+            
             for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
                 
                 bool personOk = false;
@@ -267,6 +268,7 @@ void PlayController::makeClipGroup(){
                             lastAudioFreeFrame = timeline.getLastClip().getAudioEnd();
                             appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
                             statementGroup.pop(clip);
+                            theseStatementPeople.push(clip);
                             personOk = true;
                         }else{
                             ofxLogWarning() << "Rejected: " << clip << endl;
@@ -280,6 +282,10 @@ void PlayController::makeClipGroup(){
             
             // insert responses
             ClipGroup questionGroup = categoryGroup.getContains(QUESTION, question);
+            
+            for(int j = 0; j < theseStatementPeople.size(); j++){
+                questionGroup = questionGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
+            }
             
             int responseLength = lastAudioFreeFrame;
             int responseCount = 0;
