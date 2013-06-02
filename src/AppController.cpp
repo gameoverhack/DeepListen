@@ -69,6 +69,9 @@ void AppController::setup(){
     // load the config file
     appModel->load("config", ARCHIVE_BINARY);
     
+    appModel->setProperty("mouseX", 0);
+    appModel->setProperty("mouseY", 0);
+    
 #ifdef MINI
     // set properties here (can comment once saved)
     appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
