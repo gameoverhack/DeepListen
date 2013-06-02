@@ -61,6 +61,13 @@ void PlayController::update(){
             ofxLogVerbose() << timeline.getGroup() << endl;
             ofxLogVerbose() << "/\\---------------------/\\" << endl;
             
+            cout << "Total length: " << framesToMinutes(timeline.getTotalFrames()) << " num clips: " << timeline.getGroup().size() << endl;
+            
+            ClipGroup & statistics = appModel->getClipGroupReference("statistics");
+            statistics.push(timeline.getGroup());
+            
+            //playControllerStates.setState(kPLAYCONTROLLER_INIT);
+            
             timeline.play();
 
         }
@@ -113,6 +120,8 @@ void PlayController::makeClipGroup(){
     
     ofSeedRandom();
     
+    appModel->resetTimers();
+    
     ClipGroup & allClips = appModel->getClipGroupReference("allClips");
     ClipGroup & allListenClips = appModel->getClipGroupReference("allListenClips");
     ClipGroup & allStatClips = appModel->getClipGroupReference("allStatClips");
@@ -140,6 +149,8 @@ void PlayController::makeClipGroup(){
     
     int respMax = 0;
     int statMax = 0;
+    int respMin = 20;
+    int statMin = 20;
     while(true){
 
         // flip for inserting a special or inserting a category
@@ -164,14 +175,17 @@ void PlayController::makeClipGroup(){
             }
             
             // could use a random distribution algorithm here instead
-            int numberOfResponses = (int)ofRandom(3) + 3; // min 2; max 5
-            int numberOfStatements = (int)ofRandom(2) + 2; // min 2; max 3
+            int numberOfResponses = floor((int)ofRandom(2)) + 2; // min 2; max 3
+            int numberOfStatements = floor((int)ofRandom(3)) + 2; // min 2; max 4
             
             respMax = MAX(respMax, numberOfResponses);
             statMax = MAX(statMax, numberOfStatements);
+            respMin = MIN(respMin, numberOfResponses);
+            statMin = MIN(statMin, numberOfStatements);
             
+            cout << "Response min: " << respMin << " Statement min: " << statMin << endl;
             cout << "Response max: " << respMax << " Statement max: " << statMax << endl;
-            
+
             int maxAttempts = 20;
             int attempts;
             
@@ -180,7 +194,7 @@ void PlayController::makeClipGroup(){
             while(!categoryOk && attempts < maxAttempts){
                 category = allCategoryTypes.getrandom();
                 ofxLogVerbose() << "Checking time for category: " << category << endl;
-                if(appModel->getTimer(category, framesToMillis(lastAudioFreeFrame), minutesToMillis(30))){
+                if(appModel->getTimer(category, framesToMillis(lastAudioFreeFrame), minutesToMillis(15))){
                     allCategoryTypes.popall(category);
                     categoryOk = true;
                 }
@@ -195,7 +209,7 @@ void PlayController::makeClipGroup(){
                         maxDifference = MAX(maxDifference, difference);
                     }
                     category = differences[maxDifference];
-                    ofxLogVerbose() << "Choose max difference for category: " << category << " " << maxDifference << endl;
+                    ofxLogVerbose() << "Choose max difference for category: " << category << " " << millisToMinutes(maxDifference) << endl;
                 }
                 attempts++;
             }
@@ -223,7 +237,7 @@ void PlayController::makeClipGroup(){
                         maxDifference = MAX(maxDifference, difference);
                     }
                     question = differences[maxDifference];
-                    ofxLogVerbose() << "Choose max difference for question: " << question << " " << maxDifference << endl;
+                    ofxLogVerbose() << "Choose max difference for question: " << question << " " << millisToMinutes(maxDifference) << endl;
                 }
                 attempts++;
             }
@@ -236,6 +250,7 @@ void PlayController::makeClipGroup(){
             // insert statements
             ClipGroup statementGroup = allStatClips.getStatements(category);
             ClipGroup theseStatementPeople;
+            string lastPerson = "";
             
             for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
                 
@@ -259,7 +274,11 @@ void PlayController::makeClipGroup(){
                             }
                             clip = differences[maxDifference];
                             person = clip.getClipInfo().person;
-                            ofxLogVerbose() << "Choose max difference for statement: " << person << " " << maxDifference << endl;
+                            ofxLogVerbose() << "Choose max difference for statement: " << person << " " << millisToMinutes(maxDifference) << endl;
+                            if(person == lastPerson){
+                                ofxLogVerbose() << "Same last person: " << clip << endl;
+                                break;
+                            }
                         }
                         int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
                         ofxLogVerbose() << "Attempting to insert clip at: " << insertFrame << endl;
@@ -269,6 +288,7 @@ void PlayController::makeClipGroup(){
                             appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
                             statementGroup.pop(clip);
                             theseStatementPeople.push(clip);
+                            lastPerson = person;
                             personOk = true;
                         }else{
                             ofxLogWarning() << "Rejected: " << clip << endl;
@@ -312,7 +332,11 @@ void PlayController::makeClipGroup(){
                             }
                             clip = differences[maxDifference];
                             person = clip.getClipInfo().person;
-                            ofxLogVerbose() << "Choose max difference for response: " << person << " " << maxDifference << endl;
+                            ofxLogVerbose() << "Choose max difference for response: " << person << " " << millisToMinutes(maxDifference) << endl;
+                            if(person == lastPerson){
+                                ofxLogVerbose() << "Same last person: " << clip << endl;
+                                break;
+                            }
                         }
 
                         int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
@@ -325,6 +349,7 @@ void PlayController::makeClipGroup(){
                             appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
                             questionGroup.pop(clip);
                             allClips.pop(clip);
+                            lastPerson = person;
                             personOk = true;
                         }else{
                             ofxLogWarning() << "Rejected: " << clip << endl;
@@ -423,6 +448,21 @@ void PlayController::resetClipGroups(){
         
         appModel->setClipGroup("statistics", statistics);
         appModel->setClipGroup("playGroup", playGroup);
+        
+        cout << "STATISTICS" << endl;
+        
+        ClipType categoryTypes = appModel->getClipGroup("originalClips").getClipTypes(CATEGORY);
+        
+        
+        for(int i = 0; i < categoryTypes.size(); i++){
+            cout << categoryTypes[i] << " [" << getCategoryFromCode(categoryTypes[i]) << "] " << categoryTypes[categoryTypes[i]] << endl;
+            ClipType questionTypes = appModel->getClipGroup("originalClips").getContains(CATEGORY, categoryTypes[i]).getClipTypes(QUESTION);
+            for(int j = 0; j < questionTypes.size(); j++){
+                cout << "   " << questionTypes[j] << " [" << getQuestionFromCode(categoryTypes[i], questionTypes[j]) << "] " << questionTypes[questionTypes[j]] << endl;
+            }
+            
+        }
+        
         
     }else{
         

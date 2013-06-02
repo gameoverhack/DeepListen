@@ -173,6 +173,11 @@ int AppModel::getNumClipsForAnalysis(){
 }
 
 //--------------------------------------------------------------
+void AppModel::resetTimers(){
+    timers.clear();
+}
+
+//--------------------------------------------------------------
 Clip& AppModel::getClipForAnalysis(){
     for(int i = 0; i < clips.size(); i++){
         Clip & clip = getClip(i);

@@ -729,6 +729,13 @@ public:
         return types;
     }
     
+    int operator[](string type){
+        int count = 0;
+        map<string, int>::iterator it = types.find(type);
+        if(it != types.end()) count = it->second;
+        return count;
+    }
+    
     string operator[](int i){
         string s = "";
         int count = 0;
@@ -1152,34 +1159,16 @@ public:
         clear();
     };
     
-    void setup(string blackpath, ofPixelFormat pixelformat){
+    void setup(ofPixelFormat pixelformat){
         
-        ofxLogNotice() << "Setup timeline: " << blackpath << endl;
+        ofxLogNotice() << "Setup timeline" << endl;
         
         dummyVideoClip.video = NULL;
         dummyVideoClip.clip = dummyClip;
         
         pixelFormat = pixelformat;
         
-        ofxThreadedVideo * video = new ofxThreadedVideo;
-        video->setPixelFormat(pixelFormat);
-        video->setUseAutoPlay(true);
-        video->loadMovie(blackpath);
-        ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
-        
-        while(!video->isLoaded()){
-            video->update();
-        }
-        
-        video->setVolume(0.0f);
-        video->setLoopState(OF_LOOP_NORMAL);
-        
-        VideoClip vc;
-        vc.video = video;
-        vc.clip = dummyClip;
-        
-        videoClips.push_back(vc);
-        
+        lastTimeMillis = ofGetElapsedTimeMillis();
         if(pixelFormat == OF_PIXELS_2YUV){
             shader.load(ofToDataPath("yuyvtorgba"));
             renderer.allocate(1920, 1080);
@@ -1188,8 +1177,6 @@ public:
     }
     
     void update(){
-        
-        if(videoClips.size() == 0) return;
         
         if(!bPaused){
             
@@ -1217,7 +1204,7 @@ public:
             }
             
             bool syncAssigned = false;
-            for(int i = videoClips.size() - 1; i >= 0 ; i--){
+            for(int i = 0; i < videoClips.size(); i++){
                 
                 VideoClip & videoClip = videoClips[i];
                 
@@ -1250,19 +1237,20 @@ public:
                 }
                 
                 if(video->isPlaying() && !syncAssigned){
-                    if(i == 0){
-                        ofxLogVerbose() << "Black timestamp" << endl;
-                        if(video->isFrameNew()) currentFrame++;
-                        syncAssigned = true;
-                    }else{
-                        if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                        currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                        syncClipName = clip.getName();
-                        syncAssigned = true;
-                    }
+                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
+                    syncClipName = clip.getName();
+                    syncAssigned = true;
                 }
             }
-            
+            if(!syncAssigned){
+                ofxLogVerbose() << "Black timestamp" << endl;
+                if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
+                    currentFrame++;
+                    lastTimeMillis = ofGetElapsedTimeMillis();
+                }
+                
+            }
         }
     }
     
@@ -1271,7 +1259,6 @@ public:
     }
     
    VideoClip& assignVideoClip(Clip & clip){
-        assert(videoClips.size() > 0);
         int freeIndex = -1;
         for(int i = 0; i < videoClips.size(); i++){
             if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
@@ -1297,8 +1284,7 @@ public:
     }
     
     VideoClip& isClipAssigned(Clip & clip){
-        assert(videoClips.size() > 0);
-        for(int i = 1; i < videoClips.size(); i++){
+        for(int i = 0; i < videoClips.size(); i++){
             string clipPath = clip.getVideoPath();
             if(videoClips[i].clip == clip &&
                (videoClips[i].video->getMoviePath() == clipPath ||
@@ -1350,10 +1336,8 @@ public:
     }
     
     void stop(){
-        if(videoClips.size() > 1){
-            for(int i = 1; i < videoClips.size(); i++){
-                videoClips[i].video->stop();
-            }
+        for(int i = 0; i < videoClips.size(); i++){
+            videoClips[i].video->stop();
         }
         for(int i = 0; i < group.size(); i++){
             Clip & clip = group[i];
@@ -1364,6 +1348,7 @@ public:
     
     void play(){
         setPaused(false);
+        currentFrame = group[0].getVideoStart();
     }
     
     void setPaused(bool b){
@@ -1383,28 +1368,9 @@ public:
         setPaused(!bPaused);
     }
     
-//    void draw(){
-//        if(videos.size() == 0) return;
-//        videos[0]->draw(0,0,0,0);
-//        glPushMatrix();
-//        ofFill();
-//        ofSetColor(0, 0, 0, 255);
-//        ofRect(0, 200, 1920.0 * 6, 1080.0/2.0);
-//        ofSetColor(255, 255, 255, 255);
-//        //ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-//        for(int i = 1; i < videos.size(); i++){
-//            videos[i]->draw(200 + 480 * (i - 2), 200, 1920.0/2.0, 1080.0/2.0);
-//        }
-//        //ofDisableBlendMode();
-//        glPopMatrix();
-//    }
-    
     void draw(int screen){
-        if(videoClips.size() < 2) return;
         
-        videoClips[0].video->draw(0,0,0,0);
-        
-        for(int i = 1; i < videoClips.size(); i++){
+        for(int i = 0; i < videoClips.size(); i++){
             
             Clip & clip = videoClips[i].clip;
             ofxThreadedVideo * video = videoClips[i].video;
@@ -1426,9 +1392,7 @@ public:
                     }else if(currentFadeFrame >= clip.getTotalFrames()){
                         fade = 0.0f;
                     }
-                    
-                    //cout << fade << " " << currentFrame << " " <<  currentFadeFrame << " " << clip.getName() << " " << video->getCurrentFrame() << " " << clip.getCropStart() << " " << clip.getVideoEnd() << " " << clip.getTotalFrames() << endl;
-                    
+
                     if(video->getPixelFormat() == OF_PIXELS_2YUV){
                         
                         renderer.begin();
@@ -1459,20 +1423,6 @@ public:
     };
     
     void drawTimeline(float x, float y, float width, float height){
-        
-//        glPushMatrix();
-//        
-//        ostringstream os;
-//        os << "FRAME: " << getCurrentFrame() << " / " << getTotalFrames() << endl;
-//        os << "FPS: " << ofGetFrameRate() << endl;
-//        
-//        for(int i = 0; i < videos.size(); i++){
-//            os << "VIDEO_" << i << ": " << videos[i]->getFrameRate() << "  " << videos[i]->getMoviePath() << endl;
-//        }
-//        
-//        ofDrawBitmapString(os.str(), 20, 20);
-//        
-//        glPopMatrix();
         
         glPushMatrix();
         float framescale = (1.0/(float)getTotalFrames()) * width * 16;
@@ -1614,12 +1564,6 @@ public:
         return dummyClip;
     }
     
-//    vector<Clip> getClipsFrom(int startFrame, int endFrame){
-//        vector<Clip> clips;
-//        getClipsFrom(startFrame, endFrame, clips);
-//        return clips;
-//    };
-    
     void getClipsFrom(int startFrame, int endFrame, vector<Clip> & clips){
         
         ofRectangle f = ofRectangle(startFrame,
@@ -1641,12 +1585,6 @@ public:
             }
         }
     };
-    
-    //    vector<Clip> getClipsFrom(ofRectangle & r, int screen){
-    //        vector<Clip> clips;
-    //        getClipsFrom(r.x, r.y, r.width, r.height, screen, clips);
-    //        return clips;
-    //    };
     
     void getClipsFrom(int startFrame, float x, int endFrame, float width, int screen, vector<Clip> & clips){
         
@@ -1672,10 +1610,6 @@ public:
         }
     };
     
-    //    bool getAnyClipAt(ofRectangle & r, int screen){
-    //        return getAnyClipAt(r.x, r.y, r.width, r.height, screen);
-    //    };
-    
     bool getAnyClipAt(int startFrame, float x, int endFrame, float width, int screen){
         
         ofRectangle f = ofRectangle(startFrame,
@@ -1700,21 +1634,6 @@ public:
         }
         return false;
     };
-    
-//    Clip & getClipFromName(string name){
-//        for(int i = 0; i < group.size(); i++){
-//            if(group[i].getName() == name){
-//                return group[i];
-//            }
-//        }
-//        ofxLogError() << "Clip out of bounds with name: " << name;
-//        return dummyClip;
-//    }
-//    
-//    Clip & getClipFromPath(string path){
-//        vector<string> pathParts = ofSplitString(path, "/");
-//        return getClipFromName(ofSplitString(pathParts[pathParts.size() - 1], ".")[0]);
-//    }
     
     int getCurrentFrame(){
         return currentFrame;
@@ -1763,6 +1682,7 @@ protected:
     int currentFrame;
     int totalFrames;
     
+    int lastTimeMillis;
     string syncClipName;
     
     ofPixelFormat pixelFormat;

@@ -370,6 +370,8 @@ void AppController::keyReleased(ofKeyEventArgs & e){
 //--------------------------------------------------------------
 void AppController::mouseMoved(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
+    appModel->setProperty("mouseX", e.x);
+    appModel->setProperty("mouseY", e.y);
 }
 
 //--------------------------------------------------------------
@@ -380,6 +382,8 @@ void AppController::mouseDragged(ofMouseEventArgs & e){
 //--------------------------------------------------------------
 void AppController::mousePressed(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    cout << timeline.getClipAt(e.x, e.y, ofGetWidth() / 2.0f, ofGetHeight()) << endl;
 }
 
 //--------------------------------------------------------------

@@ -45,6 +45,7 @@ public:
     void setTimer(string timerName, int timeMillis);
     bool getTimer(string timerName, int timeMillis, int timeOutMillis);
     int getTimerDifference(string timerName, int timeMillis);
+    void resetTimers();
     
     // analysis functions
     int getNumClipsForAnalysis();

@@ -24,6 +24,10 @@ inline float framesToMinutes(int frames){
     return (float)frames / 25.0 / 60.0f;
 }
 
+inline float millisToMinutes(int millis){
+    return ((float)millis / 1000.0f / 60.0f);
+}
+
 template<typename T>
 inline ostream& operator<<(ostream& os, vector<T> &v){
     for(int i = 0; i < v.size(); i++){
