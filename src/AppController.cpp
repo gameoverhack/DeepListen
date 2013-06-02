@@ -356,6 +356,12 @@ void AppController::keyPressed(ofKeyEventArgs & e){
         case 'f':
             ofToggleFullscreen();
             break;
+        case OF_KEY_RIGHT:
+            timeline.nextClip();
+            break;
+        case OF_KEY_LEFT:
+            timeline.previousClip();
+            break;
     }
 
 //    ofxLogVerbose() << e.key << endl;

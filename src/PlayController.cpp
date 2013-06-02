@@ -302,13 +302,11 @@ void PlayController::makeClipGroup(){
             
             // insert responses
             ClipGroup questionGroup = categoryGroup.getContains(QUESTION, question);
+            ClipGroup theseResponsePeople;
             
             for(int j = 0; j < theseStatementPeople.size(); j++){
                 questionGroup = questionGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
             }
-            
-            int responseLength = lastAudioFreeFrame;
-            int responseCount = 0;
             
             for(int j = 0; j < MIN(questionGroup.size(), numberOfResponses); j++){ // make sure we don't exceed questionGroup size!
                 
@@ -342,13 +340,13 @@ void PlayController::makeClipGroup(){
                         int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
                         ofxLogVerbose() << "Attempting to insert clip at: " << insertFrame << endl;
                         if(timeline.insertClipAt(clip, insertFrame)){
-                            ofxLogVerbose() << "Inserted: " << timeline.getLastClip() << endl;
-                            lastAudioFreeFrame = timeline.getLastClip().getAudioEnd();
-                            responseLength += lastAudioFreeFrame;
-                            responseCount++;
-                            appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
+                            Clip lastClip = timeline.getLastClip();
+                            ofxLogVerbose() << "Inserted: " << lastClip << endl;
+                            lastAudioFreeFrame = lastClip.getAudioEnd();
+                            appModel->setTimer(person, framesToMillis(lastClip.getVideoEnd()));
                             questionGroup.pop(clip);
                             allClips.pop(clip);
+                            theseResponsePeople.push(lastClip);
                             lastPerson = person;
                             personOk = true;
                         }else{
@@ -361,12 +359,86 @@ void PlayController::makeClipGroup(){
                 }
             }
             
-            // insert LISTENERS here
-            cout << "Response count: " << responseCount << " " << framesToMinutes(responseLength) << endl;
-            if(framesToMinutes(responseLength) > 2.0){
-                cout << "Insert listener" << endl;
+            int responseCount = theseResponsePeople.size();
+            if(responseCount > 0){
+                
+                int responseLength = theseResponsePeople[responseCount - 1].getVideoEnd() - theseResponsePeople[0].getVideoStart();
+                
+                // insert LISTENERS here
+                ofxLogVerbose() << "Response count: " << responseCount << " " << framesToMinutes(responseLength) << endl;
+                if(framesToMinutes(responseLength) > 3.0){
+                    
+                    ClipGroup listenerGroup = allListenClips;
+                    
+                    ofxLogVerbose() << "Insert listeners from: " << listenerGroup.size() << endl;
+                    
+//                    for(int j = 0; j < theseStatementPeople.size(); j++){
+//                        listenerGroup = listenerGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
+//                    }
+//                    for(int j = 0; j < theseResponsePeople.size(); j++){
+//                        listenerGroup = listenerGroup.getExcludes(PERSON, theseResponsePeople[j].getClipInfo().person);
+//                    }
+//                    
+//                    for(int j = 0; j < listenerGroup.size(); j++){
+//                        Clip & clip = listenerGroup[j];
+//                        string person = clip.getClipInfo().person;
+//                        if(!appModel->getTimer(person, framesToMillis(lastAudioFreeFrame), minutesToMillis(5))) listenerGroup.pop(clip);
+//                    }
+//                    
+//                    ofxLogVerbose() << "Number of listeners: " << listenerGroup.size() << endl;
+//                    
+//                    ClipGroup leftListeners;
+//                    ClipGroup l1 = listenerGroup.getContains(QUESTION, "LFPR");
+//                    ClipGroup l2 = listenerGroup.getContains(QUESTION, "LFTR");
+//                    leftListeners.push(l1);
+//                    leftListeners.push(l2);
+//                    
+//                    ClipGroup rightListeners;
+//                    ClipGroup r1 = listenerGroup.getContains(QUESTION, "RIPR");
+//                    ClipGroup r2 = listenerGroup.getContains(QUESTION, "RITR");
+//                    rightListeners.push(l1);
+//                    rightListeners.push(l2);
+//                    
+//                    ClipGroup frontListeners = listenerGroup.getContains(QUESTION, "FRON");
+//                    
+//                    int lastListenerFrame = theseResponsePeople[0].getVideoStart() + ((int)ofRandom(30) * 25) - (15 * 25);
+//                    int listenerCount = 0;
+//                    for(int j = 0; j < theseResponsePeople.size(); j++){
+//                        Clip & clip = theseResponsePeople[j];
+//                        ofxLogVerbose() << clip << endl;
+//                        ofxLogVerbose() << "Clip is on " << (clip.getScreen() == LEFT ? "LEFT" : "RIGHT") << " screen" << endl;
+//                        ofxLogVerbose() << "Clip is on " << (clip.getSide() == LEFT ? "LEFT" : "RIGHT") << " side" << endl;
+//                        int tryScreen = (clip.getScreen() == LEFT ? RIGHT : LEFT);
+//                        int xMin, xMax;
+//                        Clip listener;
+//                        if((clip.getSide() == LEFT && tryScreen == clip.getScreen()) || (tryScreen == RIGHT && clip.getScreen() == LEFT)){
+//                            xMin = clip.getPosition().x + clip.getPosition().width;
+//                            xMax = -1;
+//                            listener = leftListeners.getrandom();
+//                        }else if((clip.getSide() == RIGHT && tryScreen == clip.getScreen()) || (tryScreen == LEFT && clip.getScreen() == RIGHT)){
+//                            xMin = -1;
+//                            xMax = clip.getPosition().x;
+//                            listener = rightListeners.getrandom();
+//                        }
+//                        ofxLogVerbose() << "Listener attempt: " << xMin << " " << xMax << " " << listener << endl;
+//                        cout << theseResponsePeople[j].getTotalFrames() << " " << lastListenerFrame << " " << listener.getTotalFrames() << endl;
+//                        listener.setCrop(0, MIN(theseResponsePeople[j].getTotalFrames() + lastListenerFrame, listener.getTotalFrames()));
+//                        if(timeline.insertClipAt(listener, lastListenerFrame, tryScreen, xMin, xMax)){
+//                            ofxLogVerbose() << "Listener inserted: " << listener << endl;
+//                            lastListenerFrame = listener.getVideoEnd();
+//                            listenerCount++;
+//                        }
+//                        if(lastListenerFrame > theseResponsePeople[responseCount - 1].getVideoEnd() || listenerCount > 0){
+//                            ofxLogVerbose() << "Bailing listeners" << endl;
+//                            break;
+//                        }
+//                    }
+//                    
+                }
+            }else{
+                ofxLogVerbose() << "No respondents" << endl;
             }
-            
+                        
             appModel->setTimer(category, framesToMillis(timeline.getLastClip().getVideoEnd()));
             appModel->setTimer(question, framesToMillis(timeline.getLastClip().getVideoEnd()));
             

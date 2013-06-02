@@ -187,6 +187,11 @@ enum SortType{
     PERSON
 };
 
+enum ClipSide{
+    LEFT = 0,
+    RIGHT
+};
+
 struct ClipPosition {
     ofRectangle position;
     int videostart;
@@ -338,7 +343,7 @@ public:
     
     void setCrop(int startframe, int endframe){
         assert(endframe > startframe);
-        assert(endframe - startframe < frames);
+        assert(endframe - startframe <= frames);
         if(startframe != 0 && endframe != frames){
             clipPosition.isCropped = true;
         }else{
@@ -395,8 +400,14 @@ public:
         return scale;
     }
     
-    int getScreen(){
-        return clipPosition.screen;
+    ClipSide getSide(){
+        int xPos = getPosition().x + getPosition().width;
+        int halfScreen = (getScreen() == LEFT ? 1920.0f/2.0f : 1440.0f/2.0f);
+        return (xPos <= halfScreen ? LEFT : RIGHT);
+    }
+    
+    ClipSide getScreen(){
+        return (ClipSide)clipPosition.screen;
     }
     
     int getVideoStart(){
@@ -1297,10 +1308,12 @@ public:
     
     void previousClip(){
 //        int previousClipFrame = currentFrame;
-//        vector<string> clipsNow = getClipsFrom(previousClipFrame, previousClipFrame);
+//        vector<Clip> clipsNow;
+//        getClipsFrom(previousClipFrame, previousClipFrame, clipsNow);
 //        int numDiffs = 0;
 //        for(int i = previousClipFrame; i >= 0; i--){
-//            vector<string> clipsThen = getClipsFrom(i, i);
+//            vector<Clip> clipsThen;
+//            getClipsFrom(i, i, clipsThen);
 //            if(clipsThen != clipsNow){
 //                if(numDiffs == 1){
 //                    previousClipFrame = i;
@@ -1312,20 +1325,32 @@ public:
 //            }
 //        }
 //        setFrame(previousClipFrame);
+        setFrame(currentFrame - 1000);
     }
     
     void nextClip(){
 //        int nextClipFrame = currentFrame;
-//        vector<string> clipsNow = getClipsFrom(nextClipFrame, nextClipFrame);
+//        vector<Clip> clipsNow;
+//        getClipsFrom(nextClipFrame, nextClipFrame, clipsNow);
 //        for(int i = nextClipFrame; i < getTotalFrames(); i++){
-//            vector<string> clipsThen = getClipsFrom(i, i);
-//            if(clipsThen != clipsNow){
+//            vector<Clip> clipsThen;
+//            getClipsFrom(i, i, clipsThen);
+//            if(clipsThen.size() != clipsNow.size()){
 //                nextClipFrame = i;
 //                break;
 //            }
+//            bool isDiff = false;
+//            for(int j = 0; j < clipsThen.size(); j++){
+//                if(clipsThen[j] != clipsNow[j]){
+//                    nextClipFrame = i;
+//                    isDiff = true;
+//                    break;
+//                }
+//            }
+//            if(isDiff) break;
 //        }
 //        //cout << "MOFO2: " << nextClipFrame << endl;
-//        setFrame(nextClipFrame);
+        setFrame(currentFrame + 1000);
     }
     
     void setFrame(int frame){
@@ -1492,24 +1517,26 @@ public:
         }
     };
     
-    bool insertClipAt(Clip clip, int frame){
+    bool insertClipAt(Clip clip, int frame, int screen = -1, int xMin = -1, int xMax = -1){
         
         int tries = 0;
         bool fitted = false;
         bool possible = true;
         
-        int screen;
         float x, y, width;
         
         while(!fitted && possible){
             
             tries++;
             
-            screen = getRandomDistribution(2, 0.7f, 0.3f);
+            if(screen == -1) screen = getRandomDistribution(2, 0.7f, 0.3f);
             
             ofRectangle & originalRect = clip.getRect();
             
-            x = ofRandom(0, (screen == 0 ? 1920.0f : 1440.0f) - originalRect.width);
+            if(xMin == -1) xMin = 0;
+            if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
+            
+            x = ofRandom(xMin, xMax - originalRect.width);
             y = (1080.0 - 200.0f) + (- originalRect.height - originalRect.y);
             width = originalRect.width;
             
