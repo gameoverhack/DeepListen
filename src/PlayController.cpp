@@ -151,6 +151,7 @@ void PlayController::makeClipGroup(){
     int statMax = 0;
     int respMin = 20;
     int statMin = 20;
+    
     while(true){
 
         // flip for inserting a special or inserting a category
@@ -245,7 +246,23 @@ void PlayController::makeClipGroup(){
             ClipTimeline & timeline = appModel->getClipTimeline();
             
             // insert a TITLE here
+            Clip title = allTitleClips.getContains(CATEGORY, category).getrandom();
             
+            int titleInsertFrame;
+            if(timeline.getGroup().size() > 0){
+                Clip lastClip = timeline.getLastClip();
+                titleInsertFrame = lastClip.getAudioEnd() - (12 * 25);
+            }else{
+                titleInsertFrame = 0;
+                //title.setCrop(12 * 25, title.getTotalFrames());
+            }
+            
+            if(timeline.insertClipAt(title, titleInsertFrame)){
+                ofxLogVerbose() << "Inserted title: " << timeline.getLastClip() << endl;
+                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + (27 * 25);
+            }else{
+                ofxLogWarning() << "Rejected title: " << title << endl;
+            }
             
             // insert statements
             ClipGroup statementGroup = allStatClips.getStatements(category);

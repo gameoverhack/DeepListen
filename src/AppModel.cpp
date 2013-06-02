@@ -156,9 +156,11 @@ bool AppModel::getTimer(string timerName, int timeMillis, int timeOutMillis){
 //--------------------------------------------------------------
 int AppModel::getTimerDifference(string timerName, int timeMillis){
     map<string, int>::iterator it = timers.find(timerName);
-    assert(it != timers.end());
+    if(it != timers.end()){
+        ofxLogWarning() << "Timer doesn't exist! Returning infinity for " << timerName << endl;
+        return INFINITY;
+    }
     return timeMillis - it->second;
-    
 }
 
 //--------------------------------------------------------------
