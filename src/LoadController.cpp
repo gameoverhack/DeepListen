@@ -25,11 +25,21 @@ void LoadController::setup(){
 
     ClipTimeline & clipTimeline = appModel->getClipTimeline();
     
+#ifdef VIDEO_TIMECODE
+    if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
+        clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_2YUV);
+    }else{
+        clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_BGRA);
+    }
+#else
     if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
         clipTimeline.setup(OF_PIXELS_2YUV);
     }else{
         clipTimeline.setup(OF_PIXELS_BGRA);
     }
+#endif
+    
+    
     
 }
 

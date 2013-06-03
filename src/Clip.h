@@ -1174,15 +1174,38 @@ public:
     ~ClipTimeline(){
         clear();
     };
-    
+#ifdef VIDEO_TIMECODE
+    void setup(string blackPath, ofPixelFormat pixelformat){
+#else
     void setup(ofPixelFormat pixelformat){
-        
+#endif
         ofxLogNotice() << "Setup timeline" << endl;
         
         dummyVideoClip.video = NULL;
         dummyVideoClip.clip = dummyClip;
         
         pixelFormat = pixelformat;
+
+#ifdef VIDEO_TIMECODE
+        ofxThreadedVideo * video = new ofxThreadedVideo;
+        video->setPixelFormat(pixelFormat);
+        video->setUseAutoPlay(true);
+        video->loadMovie(blackPath);
+        ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
+        
+        while(!video->isLoaded()){
+            video->update();
+        }
+        
+        video->setVolume(0.0f);
+        video->setLoopState(OF_LOOP_NORMAL);
+        
+        VideoClip vc;
+        vc.video = video;
+        vc.clip = dummyClip;
+        
+        videoClips.push_back(vc);
+#endif
         
         lastTimeMillis = ofGetElapsedTimeMillis();
         if(pixelFormat == OF_PIXELS_2YUV){
@@ -1220,7 +1243,11 @@ public:
             }
             
             bool syncAssigned = false;
+#ifdef VIDEO_TIMECODE
+            for(int i = videoClips.size() - 1; i >= 0 ; i--){
+#else
             for(int i = 0; i < videoClips.size(); i++){
+#endif
                 
                 VideoClip & videoClip = videoClips[i];
                 
@@ -1252,6 +1279,22 @@ public:
                     video->stop();
                 }
                 
+#ifdef VIDEO_TIMECODE
+                if(video->isPlaying() && !syncAssigned){
+                    if(i == 0){
+                        ofxLogVerbose() << "Black timestamp" << endl;
+                        if(video->isFrameNew()) currentFrame++;
+                        syncAssigned = true;
+                    }else{
+                        if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+                        currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
+                        syncClipName = clip.getName();
+                        syncAssigned = true;
+                    }
+                }
+                
+            }
+#else
                 if(video->isPlaying() && !syncAssigned){
                     if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
                     currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
@@ -1259,14 +1302,15 @@ public:
                     syncAssigned = true;
                 }
             }
-            if(!syncAssigned){
-                ofxLogVerbose() << "Black timestamp" << endl;
-                if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
-                    currentFrame++;
-                    lastTimeMillis = ofGetElapsedTimeMillis();
+                if(!syncAssigned){
+                    ofxLogVerbose() << "Black timestamp" << endl;
+                    if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
+                        currentFrame++;
+                        lastTimeMillis = ofGetElapsedTimeMillis();
+                    }
+                    
                 }
-                
-            }
+#endif
         }
     }
     
@@ -1276,7 +1320,11 @@ public:
     
    VideoClip& assignVideoClip(Clip & clip){
         int freeIndex = -1;
+#ifdef VIDEO_TIMECODE
+        for(int i = 1; i < videoClips.size(); i++){
+#else
         for(int i = 0; i < videoClips.size(); i++){
+#endif
             if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
                 freeIndex = i;
                 break;
@@ -1300,11 +1348,14 @@ public:
     }
     
     VideoClip& isClipAssigned(Clip & clip){
+#ifdef VIDEO_TIMECODE
+        for(int i = 1; i < videoClips.size(); i++){
+#else
         for(int i = 0; i < videoClips.size(); i++){
-            string clipPath = clip.getVideoPath();
+#endif
             if(videoClips[i].clip == clip &&
-               (videoClips[i].video->getMoviePath() == clipPath ||
-                videoClips[i].video->isQueued(clipPath))){
+               (videoClips[i].video->getMoviePath() == clip.getVideoPath() ||
+                videoClips[i].video->isQueued(clip.getVideoPath()))){
                 return videoClips[i];
             }
         }
@@ -1404,6 +1455,13 @@ public:
             
             Clip & clip = videoClips[i].clip;
             ofxThreadedVideo * video = videoClips[i].video;
+            
+#ifdef VIDEO_TIMECODE
+            if(i == 0){
+                video->draw(0, 0, 0, 0);
+                continue;
+            }
+#endif
             
             if(video->isPlaying()){
                 
