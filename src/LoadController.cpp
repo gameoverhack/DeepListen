@@ -39,8 +39,6 @@ void LoadController::setup(){
     }
 #endif
     
-    
-    
 }
 
 //--------------------------------------------------------------
@@ -108,6 +106,8 @@ void LoadController::update(){
                 
                 appModel->setClip(clip);
                 
+            }else{
+                ofxLogNotice() << "IGNORING clip: " << name << endl;
             }
             
         }

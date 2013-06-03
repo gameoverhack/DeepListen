@@ -79,9 +79,14 @@ void AnalyzeController::update(){
             // set width height and scale
             clip.setSize(video.getWidth(), video.getHeight());
             clip.setScale(1.0f);
+            clip.setRectHeightAdjust(0.0f);
             
             // set rect to opposite minimum and maximums
-            clip.setRect(ofRectangle(clip.getWidth(), clip.getHeight(), 0, 0));
+            ofRectangle & r = clip.getRealRect();
+            r.x = clip.getWidth();
+            r.y = clip.getHeight();
+            r.width = 0;
+            r.height = 0;
             
             ofxLogNotice() << "Frames: " << clip.getTotalFrames() << " audio in: " << clip.getTotalFrames() * clip.getAudioInPct() << " out: " << clip.getTotalFrames() * clip.getAudioOutPct() << endl;
             
@@ -108,7 +113,7 @@ void AnalyzeController::update(){
                 for(int i = 0; i < contourFinder.getContours().size(); i++){
                     vector<cv::Point> pts = contourFinder.getContours()[i];
                     for(int j = 0; j < pts.size(); j++){
-                        ofRectangle & r = clip.getRect();
+                        ofRectangle & r = clip.getRealRect();
                         r.x = MIN(pts[j].x, r.x);
                         r.y = MIN(pts[j].y, r.y);
                         r.width = MAX(pts[j].x, r.width + r.x) - r.x;

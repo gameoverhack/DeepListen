@@ -120,7 +120,7 @@ void AnalyzeView::update(){
             ofSetColor(255, 0, 0);
             ofNoFill();
             
-            ofRect(clip.getRect());
+            ofRect(clip.getRealRect());
             
             ofPopMatrix();
             

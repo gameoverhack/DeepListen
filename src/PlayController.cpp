@@ -534,24 +534,31 @@ void PlayController::resetClipGroups(){
         appModel->setClipGroup("allCategoryClips", allCategoryClips);
         appModel->setClipGroup("allTitleClips", allTitleClips);
         
-        
         appModel->setClipGroup("statistics", statistics);
         appModel->setClipGroup("playGroup", playGroup);
         
-        cout << "STATISTICS" << endl;
+        cout << "CLIPSTATISTICS" << endl;
         
-        ClipType categoryTypes = appModel->getClipGroup("originalClips").getClipTypes(CATEGORY);
+        ClipType categoryTypes = originalClips.getClipTypes(CATEGORY);
         
+        cout << "Total clips: " << originalClips.size() << " + " << allTitleClips.size() << " of " << appModel->getVideoAssetLoader().size() << endl << endl;
+        
+        printTimes(originalClips);
+        
+        cout << endl << "CATSTATISTICS" << endl << endl;
         
         for(int i = 0; i < categoryTypes.size(); i++){
-            cout << categoryTypes[i] << " [" << getCategoryFromCode(categoryTypes[i]) << "] " << categoryTypes[categoryTypes[i]] << endl;
-            ClipType questionTypes = appModel->getClipGroup("originalClips").getContains(CATEGORY, categoryTypes[i]).getClipTypes(QUESTION);
+            cout << categoryTypes[i] << " [" << getCategoryFromCode(categoryTypes[i]) << "] " << categoryTypes[categoryTypes[i]] << " clips"<< endl;
+            ClipGroup categoryGroup = originalClips.getContains(CATEGORY, categoryTypes[i]);
+            cout << endl;
+            printTimes(categoryGroup);
+            cout << endl;
+            ClipType questionTypes = originalClips.getContains(CATEGORY, categoryTypes[i]).getClipTypes(QUESTION);
             for(int j = 0; j < questionTypes.size(); j++){
                 cout << "   " << questionTypes[j] << " [" << getQuestionFromCode(categoryTypes[i], questionTypes[j]) << "] " << questionTypes[questionTypes[j]] << endl;
             }
-            
+            cout << endl;
         }
-        
         
     }else{
         
@@ -565,5 +572,44 @@ void PlayController::resetClipGroups(){
         appModel->getClipGroupReference("allSpecClips") = appModel->getClipGroup("originalSpecClips");
         appModel->getClipGroupReference("allCategoryClips") = appModel->getClipGroup("originalCategoryClips");
         
+    }
+}
+
+void PlayController::printTimes(ClipGroup & group){
+    int minLength = INFINITY;
+    int maxLength = 0;
+    
+    for(int i = 0; i < group.size(); i++){
+        minLength = MIN(minLength, group[i].getTotalFrames());
+        maxLength = MAX(maxLength, group[i].getTotalFrames());
+    }
+    
+    int deltaLength = maxLength - minLength;
+    int bins = ceil((float) deltaLength/1500);
+    if(bins < 0) return;
+    vector<int> counts;
+    vector<float> times;
+    times.resize(bins + 1);
+    counts.assign(bins, 0);
+    
+    for(int i = 0; i < bins + 1; i++){
+        times[i] = (float)(minLength + ((float)deltaLength/bins) * i);
+    }
+    
+    for(int j = 0; j < group.size(); j++){
+        for(int i = 0; i < bins; i++){
+            if(group[j].getTotalFrames() > times[i] &&
+               group[j].getTotalFrames() <= times[i + 1]){
+                counts[i]++;
+            }
+        }
+    }
+
+    //cout << "   min length: " << Poco::DateTimeFormatter::format(Poco::Timespan(framesToMillis(minLength)/1000.0f, 0), "%M:%S") << " max length: " << Poco::DateTimeFormatter::format(Poco::Timespan(framesToMillis(maxLength)/1000.0f, 0), "%M:%S") << " bin size: " << Poco::DateTimeFormatter::format(Poco::Timespan(framesToMillis((float)deltaLength/bins)/1000.0f, 0), "%M:%S") << endl;
+    
+    for(int i = 0; i < bins; i++){
+        cout << "   " << Poco::DateTimeFormatter::format(Poco::Timespan(framesToMillis(times[i + 0])/1000.0f, 0), "%M:%S") << " - "
+             << Poco::DateTimeFormatter::format(Poco::Timespan(framesToMillis(times[i + 1])/1000.0f, 0), "%M:%S") << " (mins) == "
+             << counts[i] << endl;
     }
 }

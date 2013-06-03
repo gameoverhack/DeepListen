@@ -253,7 +253,7 @@ public:
         analyzed = deleted = false;
         width = height = 0.0f;
         scale = 1.0f;
-        adjustX = adjustY = 0.0f;
+        adjustHeight = 0.0f;
         
         clipPosition.position = ofRectangle(-1, -1, -1, -1);
         clipPosition.videostart = -1;
@@ -284,6 +284,12 @@ public:
         clipInfo.readabletime = "";
         clipInfo.readableframed = "";
         clipInfo.readablepersonal = "";
+        
+        imagePath = "";
+        image.clear();
+        imagePosition.x = imagePosition.y = 0.0f;
+        imageScale = 1.0f;
+        imageAdjust = false;
     }
     
     void init(){
@@ -322,6 +328,8 @@ public:
         clipPosition.cropstart = 0;
         clipPosition.cropend = frames;
         
+        setScale(scale);
+        
         setFrame(0);
         setPosition(0, 0, -1);
         
@@ -338,8 +346,8 @@ public:
         clipPosition.screen = screen;
         clipPosition.position.x = x;
         clipPosition.position.y = y;
-        clipPosition.position.width = rect.width;
-        clipPosition.position.height = rect.width;
+        clipPosition.position.width = scaledRect.width;
+        clipPosition.position.height = scaledRect.width;
     }
     
     void setCrop(int startframe, int endframe){
@@ -368,12 +376,12 @@ public:
         return clipInfo;
     }
     
-    ofRectangle& getRect(){ // actual size + pos of movement in video (relative to 0,0)
+    ofRectangle& getRealRect(){ // actual size + pos of movement in video (relative to 0,0)
         return rect;
     }
     
-    void setRect(ofRectangle r){
-        rect = r;
+    ofRectangle& getRect(){
+        return scaledRect;
     }
     
     ofRectangle& getPosition(){ // transformed rect position (where to draw things)
@@ -386,15 +394,28 @@ public:
     }
     
     float getWidth(){
-        return width;
+        return width * scale;
     }
     
     float getHeight(){
-        return height;
+        return height * scale;
     }
     
     void setScale(float s){
         scale = s;
+        scaledRect.x = rect.x * scale;
+        scaledRect.y = rect.y * scale;
+        scaledRect.width = rect.width * scale;
+        scaledRect.height = (rect.height + adjustHeight) * scale;
+    }
+    
+    void setRectHeightAdjust(float h){
+        adjustHeight = h;
+        setScale(scale);
+    }
+    
+    float getRectHeightAdjust(){
+        return adjustHeight;
     }
     
     float getScale(){
@@ -551,6 +572,55 @@ public:
         deleted = b;
     }
     
+    void setImagePath(string path){
+        imagePath = path;
+    }
+    
+    string getImagePath(){
+        return imagePath;
+    }
+    
+    ofImage & getClipImage(){
+        return image;
+    }
+    
+    void loadImage(){
+        image.loadImage(imagePath);
+    }
+    
+    void unloadImage(){
+        image.clear();
+    }
+    
+    void setImagePosition(float x, float y){
+        imagePosition.x = x;
+        imagePosition.y = y;
+    }
+    
+    ofPoint getImagePosition(){
+        return ofPoint(imagePosition.x, imagePosition.y - (scaledRect.height + scaledRect.y));
+    }
+    
+    void setImageScale(float s){
+        imageScale = s;
+    }
+    
+    float getImageScale(){
+        return imageScale;
+    }
+    
+    void toggleImageAdjust(){
+        imageAdjust ^= true;
+    }
+    
+    void setImageAdjust(bool b){
+        imageAdjust = b;
+    }
+    
+    bool getImageAdjust(){
+        return imageAdjust;
+    }
+    
     bool operator!=(const Clip &rhs) {
         if(name != rhs.name ||
            clipPosition.position != rhs.clipPosition.position ||
@@ -611,6 +681,7 @@ protected:
     
     string text;
     ofRectangle rect;
+    ofRectangle scaledRect;
     
     int frames;
     float audioinpct;
@@ -618,9 +689,15 @@ protected:
     
     float width;
     float height;
+    
     float scale;
-    float adjustX;
-    float adjustY;
+    float adjustHeight;
+    
+    string imagePath;
+    ofImage image;
+    ofPoint imagePosition;
+    float imageScale;
+    bool imageAdjust;
     
     friend class boost::serialization::access;
 	template<class Archive>
@@ -639,8 +716,7 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(width);
         ar & BOOST_SERIALIZATION_NVP(height);
         ar & BOOST_SERIALIZATION_NVP(scale);
-        ar & BOOST_SERIALIZATION_NVP(adjustX);
-        ar & BOOST_SERIALIZATION_NVP(adjustY);
+        ar & BOOST_SERIALIZATION_NVP(adjustHeight);
 	};
     
 private:
@@ -686,7 +762,7 @@ public:
         types[value]++; 
     }
     
-    void pop(string value){
+    string pop(string value){
         if(types.find(value) != types.end()){
             if(types[value] - 1 == 0){
                 types.erase(types.find(value));
@@ -694,12 +770,14 @@ public:
                 types[value]--;
             }
         }
+        return value;
     }
     
-    void popall(string value){
+    string popall(string value){
         if(types.find(value) != types.end()){
             types.erase(types.find(value));
         }
+        return value;
     }
     
     string getrandom(){
@@ -1417,7 +1495,11 @@ public:
     }
     
     void stop(){
+#ifdef VIDEO_TIMECODE
+        for(int i = 1; i < videoClips.size(); i++){
+#else
         for(int i = 0; i < videoClips.size(); i++){
+#endif
             videoClips[i].video->stop();
         }
         for(int i = 0; i < group.size(); i++){
@@ -1429,7 +1511,7 @@ public:
     
     void play(){
         setPaused(false);
-        currentFrame = group[0].getVideoStart();
+        if(group.size() > 0) currentFrame = group[0].getVideoStart();
     }
     
     void setPaused(bool b){
@@ -1480,7 +1562,13 @@ public:
                     }else if(currentFadeFrame >= clip.getTotalFrames()){
                         fade = 0.0f;
                     }
-
+                    
+                    glPushMatrix();
+                    
+                    glTranslatef(clip.getPosition().x - clip.getRect().x, clip.getPosition().y, 0.0f);
+                    glScalef(clip.getScale(), clip.getScale(), 1.0f);
+                    
+                    
                     if(video->getPixelFormat() == OF_PIXELS_2YUV){
                         
                         renderer.begin();
@@ -1490,15 +1578,16 @@ public:
                         shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
                         shader.setUniform1i("conversionType", (false ? 709 : 601));
                         shader.setUniform1f("fade", fade);
-                        renderer.draw(clip.getPosition().x - clip.getRect().x, clip.getPosition().y);
+                        renderer.draw(0, 0);
                         shader.end();
                         
                     }else{
                         
                         ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
-                        video->draw(clip.getPosition().x - clip.getRect().x, clip.getPosition().y);
+                        video->draw(0, 0);
                         
                     }
+                    glPopMatrix();
                     ofSetColor(255, 255, 255, 255);
                 }
             }
@@ -1594,14 +1683,14 @@ public:
             
             if(screen == -1) screen = getRandomDistribution(2, 0.7f, 0.3f);
             
-            ofRectangle & originalRect = clip.getRect();
+            ofRectangle & scaledRect = clip.getRect();
             
             if(xMin == -1) xMin = 0;
             if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
             
-            x = ofRandom(xMin, xMax - originalRect.width);
-            y = (1080.0 - 200.0f) + (- originalRect.height - originalRect.y);
-            width = originalRect.width;
+            x = ofRandom(xMin, xMax - scaledRect.width);
+            y = (1080.0 - 200.0f) - (scaledRect.height + scaledRect.y);
+            width = scaledRect.width;
             
             fitted = !getAnyClipAt(frame,
                                    x,
@@ -1752,6 +1841,7 @@ public:
         for(int i = 0; i < group.size(); i++){
             if(group[i] == clip) return group[i];
         }
+        return dummyClip;
     }
     
     ClipGroup& getGroup(){

@@ -24,6 +24,7 @@ public:
     
     void makeClipGroup();
     void resetClipGroups();
+    void printTimes(ClipGroup & group);
     
 protected:
 	
