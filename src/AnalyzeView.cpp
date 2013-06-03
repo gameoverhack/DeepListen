@@ -40,7 +40,7 @@ void AnalyzeView::update(){
     StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     if(playControllerStates.getState(kPLAYCONTROLLER_PLAY) && analyzeViewStates.getState(kANALYZEVIEW_SHOW)){
 #else
-    if(playControllerStates.getState(kPLAYCONTROLLER_PLAY) || playControllerStates.getState(kPLAYCONTROLLER_INIT)){
+    if((playControllerStates.getState(kPLAYCONTROLLER_PLAY) || playControllerStates.getState(kPLAYCONTROLLER_INIT)) && !appControllerStates.getState(kAPPCONTROLLER_ANALYZE)){
 #endif
         
         ClipTimeline & clipTimeline = appModel->getClipTimeline();

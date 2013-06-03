@@ -157,8 +157,9 @@ void LoadController::update(){
             clip.setAudioFile(audioFiles[clip.getName()]);
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
-            
+
             clip.setAnalyzed(false);
+
         }
         
     }

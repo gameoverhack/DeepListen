@@ -125,7 +125,11 @@ void AnalyzeController::update(){
                 video.close();
                 
                 // save the app model so we don't lose data (is this a good idea?)
+#ifdef JPEG
+                appModel->save("config_jpeg", ARCHIVE_BINARY);
+#else
                 appModel->save("config", ARCHIVE_BINARY);
+#endif
             }
             
         }

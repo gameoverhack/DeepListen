@@ -67,7 +67,11 @@ void AppController::setup(){
     appViewStates.setState(kAPPVIEW_SHOWWARP_1, false);
     
     // load the config file
+#ifdef JPEG
+    appModel->load("config_jpeg", ARCHIVE_BINARY);
+#else
     appModel->load("config", ARCHIVE_BINARY);
+#endif
     
     appModel->setProperty("mouseX", 0);
     appModel->setProperty("mouseY", 0);
@@ -75,19 +79,23 @@ void AppController::setup(){
 #ifdef MINI
     // set properties here (can comment once saved)
     appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
+#ifdef JPEG
+    appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/JPEG60/");
+#else
     appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/ANIME60/");
+#endif
     appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
     appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
 #else
     appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60Crop/");
+    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
     appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
 #endif
     
     appModel->setProperty("ContourMinArea", 10);
     appModel->setProperty("ContourMaxArea", 1200);
-    appModel->setProperty("ContourThreshold", 16);
+    appModel->setProperty("ContourThreshold", 11);
     
     appModel->setProperty("FrameJump", 100);
     
@@ -103,7 +111,11 @@ void AppController::setup(){
     appModel->setProperty("OutputHeight_1", 1080.0f);
     
 #ifdef MINI
+#ifdef JPEG
+    appModel->setProperty("PixelFormat", (string)"JPEG");
+#else
     appModel->setProperty("PixelFormat", (string)"BGRA");
+#endif
 #else
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #endif
@@ -275,7 +287,11 @@ void AppController::draw(){
 
 //--------------------------------------------------------------
 void AppController::exit(){
+#ifdef JPEG
+    appModel->save("config_jpeg", ARCHIVE_BINARY);
+#else
     appModel->save("config", ARCHIVE_BINARY);
+#endif
 }
 
 //--------------------------------------------------------------

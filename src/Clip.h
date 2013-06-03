@@ -253,6 +253,7 @@ public:
         analyzed = deleted = false;
         width = height = 0.0f;
         scale = 1.0f;
+        adjustX = adjustY = 0.0f;
         
         clipPosition.position = ofRectangle(-1, -1, -1, -1);
         clipPosition.videostart = -1;
@@ -618,6 +619,8 @@ protected:
     float width;
     float height;
     float scale;
+    float adjustX;
+    float adjustY;
     
     friend class boost::serialization::access;
 	template<class Archive>
@@ -636,6 +639,8 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(width);
         ar & BOOST_SERIALIZATION_NVP(height);
         ar & BOOST_SERIALIZATION_NVP(scale);
+        ar & BOOST_SERIALIZATION_NVP(adjustX);
+        ar & BOOST_SERIALIZATION_NVP(adjustY);
 	};
     
 private:
