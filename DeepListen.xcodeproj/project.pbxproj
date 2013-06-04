@@ -1783,6 +1783,7 @@
 					"-mtune=native",
 				);
 				OTHER_LDFLAGS = (
+					"-ljack",
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
 				);
@@ -1895,6 +1896,7 @@
 					"-mtune=native",
 				);
 				OTHER_LDFLAGS = (
+					"-ljack",
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
 				);

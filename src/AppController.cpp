@@ -192,6 +192,9 @@ void AppController::setup(){
     playController = new PlayController();
     playController->setup();
     
+    soundController = new SoundController();
+    soundController->setup();
+
 }
 
 //--------------------------------------------------------------

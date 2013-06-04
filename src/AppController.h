@@ -16,6 +16,7 @@
 #include "LoadController.h"
 #include "AnalyzeController.h"
 #include "PlayController.h"
+#include "SoundController.h"
 
 class AppController : public BaseController {
     
@@ -52,6 +53,7 @@ private:
     LoadController * loadController;
     AnalyzeController * analyzeController;
     PlayController * playController;
+    SoundController * soundController;
     
     AppView * appViews[2];
     DebugView * debugView;
