@@ -22,22 +22,36 @@ SoundController::~SoundController(){
 
 //--------------------------------------------------------------
 bool SoundController::setup(int inChannels, int outChannels){
+    
     if(ofxJackClient::setup((string)"SoundController", true)){
+        
+        ofxLogVerbose() << "Starting ofxJackClient" << endl;
         
         start();
         
         if(setNumChannels(inChannels, outChannels)){
             
+            ofxLogVerbose() << "Created " << inChannels << " inChannels and " << outChannels << " outChannels" << endl;
+            
             setAllChannelVolumes(1.0f);
             
             return true;
         }else{
+            
+            ofxLogError() << "Could not create " << inChannels << " inChannels and " << outChannels << " outChannels" << endl;
+            
             return false;
         }
         
     }else{
+        
+        ofxLogError() << "Could not start ofxJackClient" << endl;
+        assert(false);
+        
         return false;
     }
+    
+
 }
 
 //--------------------------------------------------------------
@@ -46,13 +60,23 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     bool ok = false;
     
     for(int channel = 1; channel < outChannels + 1; channel++){
+        ofxLogVerbose() << "Creating input: " << channel << " ..." << endl;
         ok = createPort("input" + ofToString(channel), JackPortIsInput);
+        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
+        ofxLogVerbose() << "Creating putput: " << channel << " ..." << endl;
         ok = createPort("output" + ofToString(channel), JackPortIsOutput);
+        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
-        ok = connect("emptyExampleDebu:out"+ofToString(channel), "SoundController:input" + ofToString(channel));
+        ofxLogVerbose() << "Connecting input: " << appModel->getApplicationName() + ":output"+ofToString(channel)
+                        << " to " << "SoundController:input" + ofToString(channel) << " ..." << endl;
+        ok = connect(appModel->getApplicationName() + ":output"+ofToString(channel), "SoundController:input" + ofToString(channel));
+        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
+        ofxLogVerbose() << "Connecting input: " << "SoundController:output" + ofToString(channel)
+                        << " to " << "system:playback_" + ofToString(channel) << " ..." << endl;
         ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
+        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
     }
     
