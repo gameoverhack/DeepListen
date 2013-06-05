@@ -43,6 +43,7 @@ void AppController::setup(){
     StateGroup newAppControllerStates("AppControllerStates");
     newAppControllerStates.addState(State(kAPPCONTROLLER_INIT, "kAPPCONTROLLER_INIT"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_LOAD, "kAPPCONTROLLER_LOAD"));
+//    newAppControllerStates.addState(State(kAPPCONTROLLER_SOUND, "kAPPCONTROLLER_SOUND"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_ANALYZE, "kAPPCONTROLLER_ANALYZE"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_PLAY, "kAPPCONTROLLER_PLAY"));
     
@@ -182,7 +183,6 @@ void AppController::setup(){
 #endif
     
     // Create other controllers
-    
     loadController = new LoadController();
     loadController->setup();
     
@@ -192,9 +192,8 @@ void AppController::setup(){
     playController = new PlayController();
     playController->setup();
     
-    soundController = new SoundController();
     soundController->setup();
-
+    
 }
 
 //--------------------------------------------------------------
@@ -213,6 +212,11 @@ void AppController::update(){
             loadController->update();
         }
             break;
+//        case kAPPCONTROLLER_SOUND:
+//        {
+//
+//        }
+//            break;
         case kAPPCONTROLLER_ANALYZE:
         {
             analyzeController->update();

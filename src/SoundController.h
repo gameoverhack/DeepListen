@@ -9,10 +9,8 @@
 #ifndef _H_SOUNDCONTROLLER
 #define _H_SOUNDCONTROLLER
 
+#include "ofxLogger.h"
 #include "BaseController.h"
-#include "AppModel.h"
-#include "PlayController.h"
-
 #include "ofxJackClient.h"
 
 class SoundController : public BaseController, public ofxJackClient {
@@ -30,12 +28,15 @@ public:
     int getNumOutChannels(int inChannel);
     
     void setAllChannelVolumes(float volume);
-    void setAllChannelOutVolumes(int inChannel, float volume);
+    void setAllChannelVolumes(int inChannel, float volume);
     
     bool setChannelVolume(int inChannel, int outChannel, float volume);
     float getChannelVolume(int inChannel, int outChannel);
     
     int process(jack_nframes_t nframes);
+    
+    ofPoint getPan(float value, float maxValue, int numSpeakers);
+    int getChannelLabel(int channel);
     
 protected:
 	
@@ -44,5 +45,9 @@ protected:
 private:
 	
 };
+
+typedef Singleton<SoundController> SoundControllerSingleton;					// Global declaration
+
+static SoundController * soundController = SoundControllerSingleton::Instance();
 
 #endif

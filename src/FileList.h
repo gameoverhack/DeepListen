@@ -49,12 +49,14 @@ public:
      
     bool operator == (const File& rhs) const{
         return (fullname == rhs.fullname &&
+                path == rhs.path &&
                 date == rhs.date && 
                 size == rhs.size);
     };
     
     bool operator != (const File& rhs) const{
         return (fullname != rhs.fullname ||
+                path != rhs.path ||
                 date != rhs.date || 
                 size != rhs.size);
     };

@@ -10,7 +10,7 @@
 
 //--------------------------------------------------------------
 SoundController::SoundController(){
-    ofxLogVerbose() << "Creating AppController" << endl;
+    //ofxLogVerbose() << "Creating AppController" << endl;
 }
 
 //--------------------------------------------------------------
@@ -60,23 +60,13 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     bool ok = false;
     
     for(int channel = 1; channel < outChannels + 1; channel++){
-        ofxLogVerbose() << "Creating input: " << channel << " ..." << endl;
         ok = createPort("input" + ofToString(channel), JackPortIsInput);
-        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
-        ofxLogVerbose() << "Creating putput: " << channel << " ..." << endl;
         ok = createPort("output" + ofToString(channel), JackPortIsOutput);
-        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
-        ofxLogVerbose() << "Connecting input: " << appModel->getApplicationName() + ":output"+ofToString(channel)
-                        << " to " << "SoundController:input" + ofToString(channel) << " ..." << endl;
-        ok = connect(appModel->getApplicationName() + ":output"+ofToString(channel), "SoundController:input" + ofToString(channel));
-        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
+        ok = connect(getApplicationName() + ":out"+ofToString(channel), "SoundController:input" + ofToString(channel));
         if(!ok) break;
-        ofxLogVerbose() << "Connecting input: " << "SoundController:output" + ofToString(channel)
-                        << " to " << "system:playback_" + ofToString(channel) << " ..." << endl;
         ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
-        ofxLogVerbose() << "..." << (string)(ok ? "ok" : "failed") << endl;
         if(!ok) break;
     }
     
@@ -110,6 +100,17 @@ void SoundController::setAllChannelVolumes(float volume){
 }
 
 //--------------------------------------------------------------
+void SoundController::setAllChannelVolumes(int inChannel, float volume){
+    if(inChannel < getNumInChannels()){
+        for(int outChannel = 0; outChannel < volumes[inChannel].size(); outChannel++){
+            volumes[inChannel][outChannel] = volume;
+        }
+    }else{
+        ofLogError() << "Channel index out of bounds";
+    }
+}
+
+//--------------------------------------------------------------
 bool SoundController::setChannelVolume(int inChannel, int outChannel, float volume){
     if(inChannel < getNumInChannels() && outChannel < getNumOutChannels(inChannel)){
         volumes[inChannel][outChannel] = volume;
@@ -125,6 +126,41 @@ float SoundController::getChannelVolume(int inChannel, int outChannel){
     }else{
         ofLogError() << "Channel index out of bounds";
     }
+}
+
+//--------------------------------------------------------------
+ofPoint SoundController::getPan(float value, float maxValue, int numSpeakers){
+    
+    float p, pt, left, center, right;
+    
+    if(numSpeakers == 3){
+        if(value > maxValue/2.0){
+            p = 1.0 - 2.0 * (value - maxValue/2.0)/(maxValue/2.0);
+            pt = (PI * (p + 1.0) ) / 4.0;
+            right = sin(pt);
+            left = 1.0f;
+        }else{
+            p = 1.0 - 2.0 * value/(maxValue/2.0);
+            pt = (PI * (p + 1.0) ) / 4.0;
+            left = cos(pt);
+            right = 1.0f;
+        }
+        center = 2 - (left + right);
+        return ofPoint(1.0f - left, 1.0f - center, 1.0f - right);
+    }else if(numSpeakers == 2){
+        p = 1.0 - 2.0 * value/maxValue;
+        pt = (PI * (p + 1.0) ) / 4.0;
+        left = cos(pt);
+        right = sin(pt);
+        return ofPoint(1.0f - left, 1.0f - right);
+    }
+    //cout << value << " " << p << " = " << left << " : " << center << " : " <<  right << endl;
+    
+}
+
+//--------------------------------------------------------------
+int SoundController::getChannelLabel(int channel){
+    return kAudioChannelLabel_Discrete_0 + channel;
 }
 
 //--------------------------------------------------------------

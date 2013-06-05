@@ -123,7 +123,7 @@ void LoadController::update(){
         // init the clip so that category, question etc are all generated
         clip.init();
         //clip.setCrop(100, MIN(500, clip.getTotalFrames()));
-        
+        clip.setScale(1.0);
         // no need to check if this clip needs analysis and is not deleted
         if(clip.getAnalyzed() == false && clip.getDeleted() == false){
             
@@ -141,7 +141,10 @@ void LoadController::update(){
             // mark the clip as deleted in case we're just
             // temporarily removing the file
             
-            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos && videoFiles.getFileExists(clip.getName())) continue;
+            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos && videoFiles.getFileExists(clip.getName())){
+                if(videoFiles.getFile(clip.getName()) != clip.getVideoFile()) clip.setVideoFile(videoFiles[clip.getName()]);
+                continue;
+            };
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for DELETION" << endl;
             
@@ -167,8 +170,8 @@ void LoadController::update(){
             clip.setAudioFile(audioFiles[clip.getName()]);
             
             ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
-
-            clip.setAnalyzed(false);
+            
+            clip.setAnalyzed(true);
 
         }
         

@@ -13,6 +13,7 @@
 #include "FileList.h"
 #include "ofxSamplePlayer.h"
 #include "ofxThreadedVideo.h"
+#include "SoundController.h"
 
 static string getTypeFromCode(string code){
     if(code == "F") return "Factual";
@@ -1239,6 +1240,7 @@ inline ostream& operator<<(ostream& os, const ClipGroup &cg){
 struct VideoClip {
     ofxThreadedVideo* video;
     Clip clip;
+    int audioTrack;
 };
     
 class ClipTimeline {
@@ -1266,9 +1268,11 @@ public:
 
 #ifdef VIDEO_TIMECODE
         ofxThreadedVideo * video = new ofxThreadedVideo;
+        video->setAudioDevice("JackRouter");
         video->setPixelFormat(pixelFormat);
         video->setUseAutoPlay(true);
         video->loadMovie(blackPath);
+        
         ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
         
         while(!video->isLoaded()){
@@ -1335,7 +1339,26 @@ public:
                 video->update();
                 
                 if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
-                    ofxLogVerbose() << "Playing " << clip << endl;
+                    ofxLogVerbose() << i << " Playing " << clip << endl;
+                    
+                    video->setAudioTrackToChannel(video->getAudioTrackList(), kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
+                    video->getAudioTrackList();
+                    
+                    ofxLogVerbose() << "Assign audio to: " << videoClip.audioTrack << endl;
+                    
+                    soundController->setAllChannelVolumes(videoClip.audioTrack, 0.0f);
+                    
+                    float clipCenter = (videoClip.clip.getPosition().x + videoClip.clip.getRect().width/2.0f); // use the videoClip.clip not the real clip!
+                    float screenWidth = (clip.getScreen() == 0 ? 1920.0f : 1440.0f);
+                    int numSpeakers = (clip.getScreen() == 0 ? 3 : 2);
+                    int channelStart = (clip.getScreen() == 0 ? 0 : 3);
+                    ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
+                    
+                    for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
+                        soundController->setChannelVolume(videoClip.audioTrack, channel, pan[channel - channelStart]);
+                        cout << pan << " " << pan[channel - channelStart] << endl;
+                    }
+                    
                     if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
                         ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
                         video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
@@ -1413,6 +1436,7 @@ public:
             return videoClips[freeIndex];
         }else{
             ofxThreadedVideo * video = new ofxThreadedVideo;
+            video->setAudioDevice("JackRouter");
             video->setPixelFormat(pixelFormat);
             video->setUseAutoPlay(false);
             video->setUseQueue(true);
@@ -1420,6 +1444,7 @@ public:
             VideoClip vc;
             vc.video = video;
             vc.clip = clip;
+            vc.audioTrack = videoClips.size() - 1;
             videoClips.push_back(vc);
             return videoClips[videoClips.size() - 1];
         }

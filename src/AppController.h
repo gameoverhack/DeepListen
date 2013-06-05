@@ -53,12 +53,13 @@ private:
     LoadController * loadController;
     AnalyzeController * analyzeController;
     PlayController * playController;
-    SoundController * soundController;
     
     AppView * appViews[2];
     DebugView * debugView;
     AnalyzeView * analyzeView;
 
+    int soundTimeout;
+    
 };
 
 #endif
