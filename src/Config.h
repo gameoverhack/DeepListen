@@ -10,7 +10,7 @@
 #define _H_CONFIG
 
 //#define USE_FENSTER
-//#define MINI
+#define MINI
 #define VIDEO_TIMECODE
 #define JPEG
 

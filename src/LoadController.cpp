@@ -58,6 +58,13 @@ void LoadController::update(){
     audioFiles.listDir(appModel->getProperty<string>("AudioPath"), false);
     textFiles.listDir(appModel->getProperty<string>("TextPath"), true);
     
+    Clips clips;
+    
+    if(appModel->getProperty<bool>("ImportClipRects")){
+        ofxLogVerbose() << "Importing RECTS from clips_only file" << endl;
+        clips.load();
+    }
+    
     // iterate through all video assets
     for(int i = 0; i < videoFiles.size(); i++){
         
@@ -122,8 +129,19 @@ void LoadController::update(){
         
         // init the clip so that category, question etc are all generated
         clip.init();
+        
+        if(appModel->getProperty<bool>("ImportClipRects")){
+            map<string, Clip>::iterator it = clips.clips.find(clip.getName());
+            if(it != clips.clips.end()){
+                ofxLogVerbose() << "Changing scale from " << clip.getScale() << " to " << it->second.getScale() << endl;
+                clip.setScale(it->second.getScale());
+                ofxLogVerbose() << "Changing height from " << clip.getRectHeightAdjust() << " to " << it->second.getRectHeightAdjust() << endl;
+                clip.setRectHeightAdjust(it->second.getRectHeightAdjust());
+            }
+        }
+        
         //clip.setCrop(100, MIN(500, clip.getTotalFrames()));
-        clip.setScale(1.0);
+        //clip.setScale(1.0);
         // no need to check if this clip needs analysis and is not deleted
         if(clip.getAnalyzed() == false && clip.getDeleted() == false){
             
@@ -169,17 +187,19 @@ void LoadController::update(){
             clip.setVideoFile(videoFiles[clip.getName()]);
             clip.setAudioFile(audioFiles[clip.getName()]);
             
-            ofxLogNotice() << "Clip " << clip.getName() << " marked for ANALYSIS" << endl;
+            ofxLogNotice() << "Clip " << clip.getName() << (string)(appModel->getProperty<bool>("OverrideVideoPath") ? " OVERRIDE file paths " : " marked for ANALYSIS") << endl;
             
-            clip.setAnalyzed(true);
+            clip.setAnalyzed(!appModel->getProperty<bool>("OverrideVideoPath"));
 
         }
         
     }
     
-    Clips clips;
-    clips.clips = appModel->getClips();
-    clips.save();
+    
+    if(!appModel->getProperty<bool>("ImportClipRects")){
+        clips.clips = appModel->getClips();
+        clips.save();
+    }
     
     if(appModel->getNumClipsForAnalysis() > 0){
         appControllerStates.setState(kAPPCONTROLLER_ANALYZE);

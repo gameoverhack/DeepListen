@@ -739,7 +739,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
     c.clipPosition.cropstart << ":" <<
     c.clipPosition.cropend << "]" << " " <<
     c.clipPosition.isLoading << " " <<
-    c.clipPosition.isStopping;// << " [" <<
+    c.clipPosition.isStopping << " {" <<
+    c.scale << " : " << c.adjustHeight << "}";// << " [" <<
     //            c.frames * c.audioinpct << ":" <<
     //            c.frames * c.audioutpct<< "]" << "  " <<
     //            c.clipPosition.videostart - c.clipPosition.videostart << ", " <<
