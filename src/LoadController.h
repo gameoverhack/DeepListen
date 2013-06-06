@@ -29,7 +29,7 @@ public:
 #ifdef JPEG
         Serializer.loadClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
 #else
-        Serializer.loadClass("clips_only", (*this), ARCHIVE_BINARY);
+        Serializer.loadClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
 #endif
     };
     

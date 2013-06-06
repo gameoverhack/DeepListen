@@ -1262,40 +1262,40 @@ public:
 #endif
         ofxLogNotice() << "Setup timeline" << endl;
         
-        dummyVideoClip.video = NULL;
-        dummyVideoClip.clip = dummyClip;
-        
         pixelFormat = pixelformat;
-
+        
 #ifdef VIDEO_TIMECODE
-        ofxThreadedVideo * video = new ofxThreadedVideo;
-        video->setAudioDevice("JackRouter");
-        video->setPixelFormat(pixelFormat);
-        video->setUseAutoPlay(true);
-        video->loadMovie(blackPath);
-        
-        ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
-        
-        while(!video->isLoaded()){
-            video->update();
+        for(int i = 0; i < 7; i++){
+            ofxThreadedVideo * video = new ofxThreadedVideo;
+            video->setAudioDevice("JackRouter");
+            video->setPixelFormat(pixelFormat);
+            video->setUseAutoPlay(false);
+            video->setUseQueue(true);
+            ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
+            if(i == 0){
+                video->loadMovie(blackPath);
+                while(!video->isLoaded()){
+                    video->update();
+                }
+                video->setVolume(0.0f);
+                video->setLoopState(OF_LOOP_NORMAL);
+                video->play();
+            }
+            VideoClip vc;
+            vc.video = video;
+            vc.clip = dummyClip;
+            vc.audioTrack = videoClips.size() - 1;
+            videoClips.push_back(vc);
         }
-        
-        video->setVolume(0.0f);
-        video->setLoopState(OF_LOOP_NORMAL);
-        
-        VideoClip vc;
-        vc.video = video;
-        vc.clip = dummyClip;
-        
-        videoClips.push_back(vc);
+#else
+        lastTimeMillis = ofGetElapsedTimeMillis();
 #endif
         
-        lastTimeMillis = ofGetElapsedTimeMillis();
         if(pixelFormat == OF_PIXELS_2YUV){
             shader.load(ofToDataPath("yuyvtorgba"));
             renderer.allocate(1920, 1080);
         }
-        
+
     }
     
     void update(){
@@ -1316,6 +1316,9 @@ public:
                     
                     if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
                         ofxLogVerbose() << "Loading " << clip << endl;
+                        
+                        video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack), true);
+                        
                         if(video->loadMovie(clip.getVideoPath())){
                             videoClip.clip.setClipLoading(true);
                             clip.setClipLoading(true);
@@ -1342,8 +1345,12 @@ public:
                 if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
                     ofxLogVerbose() << i << " Playing " << clip << endl;
                     
-                    video->setAudioTrackToChannel(video->getAudioTrackList(), kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
-                    video->getAudioTrackList();
+                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
+                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                    }
+                    video->setLoopState(OF_LOOP_NONE);
+                    video->play();
                     
                     ofxLogVerbose() << "Assign audio to: " << videoClip.audioTrack << endl;
                     
@@ -1357,15 +1364,8 @@ public:
                     
                     for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
                         soundController->setChannelVolume(videoClip.audioTrack, channel, pan[channel - channelStart]);
-                        cout << pan << " " << pan[channel - channelStart] << endl;
                     }
                     
-                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
-                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
-                    }
-                    video->setLoopState(OF_LOOP_NONE);
-                    video->play();
                     clip.setClipLoading(false);
                 }
                 
@@ -1687,12 +1687,11 @@ public:
     void clear(){
         group.clear();
         calculateFrames();
+        stop();
         currentFrame = 0;
-        bPaused = true;
-        if(videoClips.size() > 1){
-            stop();
-            videoClips.erase(videoClips.begin() + 1, videoClips.end());
-        }
+//        if(videoClips.size() > 1){
+//            videoClips.erase(videoClips.begin() + 1, videoClips.end());
+//        }
     };
     
     bool insertClipAt(Clip clip, int frame, int screen = -1, int xMin = -1, int xMax = -1){
@@ -1893,7 +1892,6 @@ protected:
     
     ofPixelFormat pixelFormat;
     vector<VideoClip> videoClips;
-    VideoClip dummyVideoClip;
     
     vector<Clip> currentClips;
     

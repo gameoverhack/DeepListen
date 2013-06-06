@@ -12,6 +12,6 @@
 //#define USE_FENSTER
 #define MINI
 #define VIDEO_TIMECODE
-#define JPEG
+//#define JPEG
 
 #endif

@@ -64,7 +64,7 @@ void LoadController::update(){
         ofxLogVerbose() << "Importing RECTS from clips_only file" << endl;
         clips.load();
     }
-    
+    float maxScale = 0.0f;
     // iterate through all video assets
     for(int i = 0; i < videoFiles.size(); i++){
         
@@ -78,6 +78,8 @@ void LoadController::update(){
             Clip & clip = appModel->getClip(name);
             
             ofxLogNotice() << "CHECK clip: " << clip.getName() << endl;
+            
+            maxScale = MAX(maxScale, clip.getScale());
 //            if(name.rfind("OOOO_00_TITLE") != string::npos){
 //                clip.setAnalyzed(false);
 //            }
@@ -129,6 +131,12 @@ void LoadController::update(){
         
         // init the clip so that category, question etc are all generated
         clip.init();
+        
+        cout << "MAX Scale: " << maxScale << endl;
+        float normalize = 1.0f/maxScale;
+        cout << "Reduce by: " << normalize << " " << maxScale * normalize << endl;
+        
+        clip.setScale(clip.getScale() * normalize);
         
         if(appModel->getProperty<bool>("ImportClipRects")){
             map<string, Clip>::iterator it = clips.clips.find(clip.getName());
@@ -189,7 +197,7 @@ void LoadController::update(){
             
             ofxLogNotice() << "Clip " << clip.getName() << (string)(appModel->getProperty<bool>("OverrideVideoPath") ? " OVERRIDE file paths " : " marked for ANALYSIS") << endl;
             
-            clip.setAnalyzed(!appModel->getProperty<bool>("OverrideVideoPath"));
+            clip.setAnalyzed(appModel->getProperty<bool>("OverrideVideoPath"));
 
         }
         
