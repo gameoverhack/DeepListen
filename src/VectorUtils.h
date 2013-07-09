@@ -220,4 +220,27 @@ inline vector<T> getVecDifference(vector<T> a, vector<T> b, C c){
     return diff;
 };
 
+template<typename T>
+inline vector<T> uniqueRandomVec(vector<T> a){
+    // TODO
+}
+        
+inline void uniqueRandomIndex(vector<int> & vec, int start, int end, int size){
+    
+    int r = (int)ofRandom(start, end + 1);
+    bool bInVec = false;
+    
+    for(int i = 0; i < vec.size(); i++){
+        if(vec[i] == r){
+            bInVec = true;
+            break;
+        }
+    }
+    
+    if(!bInVec) vec.push_back(r);
+    
+    if(vec.size() != size && end - start + 1 >= size) uniqueRandomIndex(vec, start, end, size);
+    
+}
+        
 #endif

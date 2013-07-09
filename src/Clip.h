@@ -141,14 +141,14 @@ static string getStatementQuestionFromCode(string code){
     if(code == "CCIS") return "Connection is...";
 };
 
-static string getSpecialQuestionFromCode(string code){    
+static string getSpecialQuestionFromCode(string code){
     if(code == "DANC") return "Dance";
     if(code == "SONG") return "Song";
     if(code == "SNDN") return "Song and dance";
     if(code == "ITEM") return "Special item";
 };
 
-static string getListenQuestionFromCode(string code){    
+static string getListenQuestionFromCode(string code){
     if(code == "LFPR") return "Left Profile";
     if(code == "LFTR") return "Left Three Quarter";
     if(code == "FRON") return "Front";
@@ -516,7 +516,7 @@ public:
     void setVideoFile(File file){
         videoFile = file;
     }
-
+    
     File getAudioFile(){
         return audioFile;
     }
@@ -564,7 +564,7 @@ public:
     bool setAnalyzed(bool b){
         analyzed = b;
     }
-
+    
     bool getDeleted(){
         return deleted;
     }
@@ -642,8 +642,8 @@ public:
            clipPosition.cropstart != rhs.clipPosition.cropstart ||
            clipPosition.cropend != rhs.clipPosition.cropend ||
            clipPosition.cropframes != rhs.clipPosition.cropframes){
-//           clipPosition.isStopping != rhs.clipPosition.isStopping ||
-//           clipPosition.isLoading != rhs.clipPosition.isLoading){
+            //           clipPosition.isStopping != rhs.clipPosition.isStopping ||
+            //           clipPosition.isLoading != rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -662,8 +662,8 @@ public:
            clipPosition.cropstart == rhs.clipPosition.cropstart &&
            clipPosition.cropend == rhs.clipPosition.cropend &&
            clipPosition.cropframes == rhs.clipPosition.cropframes){
-//           clipPosition.isStopping == rhs.clipPosition.isStopping &&
-//           clipPosition.isLoading == rhs.clipPosition.isLoading){
+            //           clipPosition.isStopping == rhs.clipPosition.isStopping &&
+            //           clipPosition.isLoading == rhs.clipPosition.isLoading){
             return true;
         }else{
             return false;
@@ -709,10 +709,10 @@ protected:
     bool imageAdjust;
     
     friend class boost::serialization::access;
-	template<class Archive>
-	void serialize(Archive & ar, const unsigned int version){
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version){
         ar & BOOST_SERIALIZATION_NVP(name);
-		ar & BOOST_SERIALIZATION_NVP(videoFile);
+        ar & BOOST_SERIALIZATION_NVP(videoFile);
         ar & BOOST_SERIALIZATION_NVP(audioFile);
         ar & BOOST_SERIALIZATION_NVP(textFile);
         ar & BOOST_SERIALIZATION_NVP(analyzed);
@@ -726,19 +726,19 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(height);
         ar & BOOST_SERIALIZATION_NVP(scale);
         ar & BOOST_SERIALIZATION_NVP(adjustHeight);
-	};
+    };
     
 private:
     
 };
 
 inline ostream& operator<<(ostream& os, const Clip &c){
-    os <<   c.name << " :position: " << 
-    c.clipPosition.position.x << ", " << 
-    c.clipPosition.position.y << ", " << 
-    c.clipPosition.position.width << ", " << 
+    os <<   c.name << " :position: " <<
+    c.clipPosition.position.x << ", " <<
+    c.clipPosition.position.y << ", " <<
+    c.clipPosition.position.width << ", " <<
     c.clipPosition.position.height << " (" <<
-    c.clipPosition.screen << ") frames: " << 
+    c.clipPosition.screen << ") frames: " <<
     c.clipPosition.videostart << ", " <<
     c.clipPosition.audiostart << ", " <<
     c.clipPosition.audioend << ", " <<
@@ -756,1271 +756,1289 @@ inline ostream& operator<<(ostream& os, const Clip &c){
     //            c.clipPosition.audioend - c.clipPosition.videostart << ", " <<
     //            c.clipPosition.videoend - c.clipPosition.videostart;
     return os;
-};
-
-class ClipType{
+    };
     
-public:
-    
-    ClipType(){};
-    
-    ~ClipType(){
-        clear();
-    }
-    
-    void push(string value){
-        types[value]++; 
-    }
-    
-    string pop(string value){
-        if(types.find(value) != types.end()){
-            if(types[value] - 1 == 0){
+    class ClipType{
+        
+    public:
+        
+        ClipType(){};
+        
+        ~ClipType(){
+            clear();
+        }
+        
+        void push(string value){
+            types[value]++;
+        }
+        
+        string pop(string value){
+            if(types.find(value) != types.end()){
+                if(types[value] - 1 == 0){
+                    types.erase(types.find(value));
+                }else{
+                    types[value]--;
+                }
+            }
+            return value;
+        }
+        
+        string popall(string value){
+            if(types.find(value) != types.end()){
                 types.erase(types.find(value));
+            }
+            return value;
+        }
+        
+        string getrandom(){
+            string s = "";
+            int r = ofRandom(types.size());
+            int count = 0;
+            for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
+                if(count == r){
+                    s = it->first;
+                    break;
+                }
+            }
+            return s;
+        }
+        
+        string poprandom(){
+            string s = "";
+            int r = ofRandom(types.size());
+            int count = 0;
+            for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
+                if(count == r){
+                    s = it->first;
+                    break;
+                }
+            }
+            popall(s);
+            return s;
+        }
+        
+        int size(string value){
+            if(types.find(value) != types.end()){
+                return types[value];
             }else{
-                types[value]--;
+                return 0;
             }
         }
-        return value;
-    }
-    
-    string popall(string value){
-        if(types.find(value) != types.end()){
-            types.erase(types.find(value));
+        
+        int size(){
+            return types.size();
         }
-        return value;
-    }
-    
-    string getrandom(){
-        string s = "";
-        int r = ofRandom(types.size());
-        int count = 0;
-        for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
-            if(count == r){
-                s = it->first;
-                break;
+        
+        map<string, int> & getTypes(){
+            return types;
+        }
+        
+        int operator[](string type){
+            int count = 0;
+            map<string, int>::iterator it = types.find(type);
+            if(it != types.end()) count = it->second;
+            return count;
+        }
+        
+        string operator[](int i){
+            string s = "";
+            int count = 0;
+            for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
+                if(count == i){
+                    s = it->first;
+                    break;
+                }
             }
+            return s;
         }
-        return s;
-    }
+        
+        void clear(){
+            types.clear();
+        }
+        
+        friend ostream& operator<< (ostream &os, const ClipType &ct);
+        
+        map<string, int> types;
+        
+    protected:
+        
+    };
     
-    string poprandom(){
-        string s = "";
-        int r = ofRandom(types.size());
-        int count = 0;
-        for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
-            if(count == r){
-                s = it->first;
-                break;
+    inline ostream& operator<<(ostream& os, const ClipType &ct){
+        for(map<string, int>::const_iterator it = ct.types.begin(); it != ct.types.end(); it++){
+            os << it->first << " : " << it->second << endl;
+        }
+        return os;
+    };
+    
+    class ClipGroup{
+        
+    public:
+        
+        ClipGroup(){};
+        ~ClipGroup(){
+            clear();
+        }
+        ClipGroup getContains(SortType type, string value){
+            ClipGroup clipGroup;
+            for(int i = 0; i < group.size(); i++){
+                switch (type) {
+                    case NAME:
+                    {
+                        if(group[i].getName() == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case CATEGORY:
+                    {
+                        if(group[i].getClipInfo().category == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case QUESTION:
+                    {
+                        if(group[i].getClipInfo().question == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case TYPE:
+                    {
+                        if(group[i].getClipInfo().type == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case TIME:
+                    {
+                        if(group[i].getClipInfo().time == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case FRAMED:
+                    {
+                        if(group[i].getClipInfo().framed == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case PERSONAL:
+                    {
+                        if(group[i].getClipInfo().personal == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case NUMBER:
+                    {
+                        if(ofToInt(group[i].getClipInfo().number) == ofToInt(value)) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case PERSON:
+                    {
+                        if(group[i].getClipInfo().person == value) clipGroup.push(group[i]);
+                    }
+                        break;
+                }
             }
+            return clipGroup;
         }
-        popall(s);
-        return s;
-    }
-    
-    int size(string value){
-        if(types.find(value) != types.end()){
-            return types[value];
-        }else{
-            return 0;
-        }
-    }
-    
-    int size(){
-        return types.size();
-    }
-    
-    map<string, int> & getTypes(){
-        return types;
-    }
-    
-    int operator[](string type){
-        int count = 0;
-        map<string, int>::iterator it = types.find(type);
-        if(it != types.end()) count = it->second;
-        return count;
-    }
-    
-    string operator[](int i){
-        string s = "";
-        int count = 0;
-        for(map<string, int>::iterator it = types.begin(); it != types.end(); it++, count++){
-            if(count == i){
-                s = it->first;
-                break;
+        
+        ClipGroup getExcludes(SortType type, string value){
+            ClipGroup clipGroup;
+            for(int i = 0; i < group.size(); i++){
+                switch (type) {
+                    case NAME:
+                    {
+                        if(group[i].getName() != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case CATEGORY:
+                    {
+                        if(group[i].getClipInfo().category != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case QUESTION:
+                    {
+                        if(group[i].getClipInfo().question != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case TYPE:
+                    {
+                        if(group[i].getClipInfo().type != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case TIME:
+                    {
+                        if(group[i].getClipInfo().time != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case FRAMED:
+                    {
+                        if(group[i].getClipInfo().framed != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case PERSONAL:
+                    {
+                        if(group[i].getClipInfo().personal != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case NUMBER:
+                    {
+                        if(ofToInt(group[i].getClipInfo().number) != ofToInt(value)) clipGroup.push(group[i]);
+                    }
+                        break;
+                    case PERSON:
+                    {
+                        if(group[i].getClipInfo().person != value) clipGroup.push(group[i]);
+                    }
+                        break;
+                }
             }
+            return clipGroup;
         }
-        return s;
-    }
-    
-    void clear(){
-        types.clear();
-    }
-    
-    friend ostream& operator<< (ostream &os, const ClipType &ct);
-    
-    map<string, int> types;
-    
-protected:
-    
-};
-
-inline ostream& operator<<(ostream& os, const ClipType &ct){
-    for(map<string, int>::const_iterator it = ct.types.begin(); it != ct.types.end(); it++){
-        os << it->first << " : " << it->second << endl;
-    }
-    return os;
-};
-
-class ClipGroup{
-    
-public:
-    
-    ClipGroup(){};
-    ~ClipGroup(){
-        clear();
-    }
-    ClipGroup getContains(SortType type, string value){
-        ClipGroup clipGroup;
-        for(int i = 0; i < group.size(); i++){
+        
+        ClipGroup getStatements(string category){
+            ClipGroup clipGroup;
+            string statementQuestion = getStatementQuestionFromCategory(category);
+            for(int i = 0; i < group.size(); i++){
+                if(group[i].getClipInfo().question == statementQuestion) clipGroup.push(group[i]);
+            }
+            return clipGroup;
+        }
+        
+        
+        ClipGroup getUnique(SortType type){
+            ClipGroup cg;
+            map<string, int> uniquetypes = getClipTypes(type).getTypes();
+            for(map<string, int>::iterator it = uniquetypes.begin(); it != uniquetypes.end(); it++){
+                ClipGroup subGroup = getContains(type, it->first);
+                cg.push(subGroup[ofRandom(subGroup.size())]);
+            }
+            return cg;
+        }
+        
+        ClipGroup getUnique(SortType type, int numClips){
+            ClipGroup cg;
+            ClipGroup clips = getUnique(type);
+            for(int i = 0; i < numClips; i++){
+                if(clips.size() > 0){
+                    Clip clip = clips.poprandom();
+                    cg.push(clip);
+                }
+            }
+            return cg;
+        }
+        
+        ClipType getClipTypes(SortType type){
             switch (type) {
                 case NAME:
                 {
-                    if(group[i].getName() == value) clipGroup.push(group[i]);
+                    return nameTypes;
                 }
                     break;
                 case CATEGORY:
                 {
-                    if(group[i].getClipInfo().category == value) clipGroup.push(group[i]);
+                    return categoryTypes;
                 }
                     break;
                 case QUESTION:
                 {
-                    if(group[i].getClipInfo().question == value) clipGroup.push(group[i]);
+                    return questionTypes;
                 }
                     break;
                 case TYPE:
                 {
-                    if(group[i].getClipInfo().type == value) clipGroup.push(group[i]);
+                    return typeTypes;
                 }
                     break;
                 case TIME:
                 {
-                    if(group[i].getClipInfo().time == value) clipGroup.push(group[i]);
+                    return timeTypes;
                 }
                     break;
                 case FRAMED:
                 {
-                    if(group[i].getClipInfo().framed == value) clipGroup.push(group[i]);
+                    return framedTypes;
                 }
                     break;
                 case PERSONAL:
                 {
-                    if(group[i].getClipInfo().personal == value) clipGroup.push(group[i]);
-                }
-                    break;
-                case NUMBER:
-                {
-                    if(ofToInt(group[i].getClipInfo().number) == ofToInt(value)) clipGroup.push(group[i]);
+                    return personalTypes;
                 }
                     break;
                 case PERSON:
                 {
-                    if(group[i].getClipInfo().person == value) clipGroup.push(group[i]);
+                    return personTypes;
                 }
                     break;
             }
         }
-        return clipGroup;
-    }
-    
-    ClipGroup getExcludes(SortType type, string value){
-        ClipGroup clipGroup;
-        for(int i = 0; i < group.size(); i++){
-            switch (type) {
-                case NAME:
-                {
-                    if(group[i].getName() != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case CATEGORY:
-                {
-                    if(group[i].getClipInfo().category != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case QUESTION:
-                {
-                    if(group[i].getClipInfo().question != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case TYPE:
-                {
-                    if(group[i].getClipInfo().type != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case TIME:
-                {
-                    if(group[i].getClipInfo().time != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case FRAMED:
-                {
-                    if(group[i].getClipInfo().framed != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case PERSONAL:
-                {
-                    if(group[i].getClipInfo().personal != value) clipGroup.push(group[i]);
-                }
-                    break;
-                case NUMBER:
-                {
-                    if(ofToInt(group[i].getClipInfo().number) != ofToInt(value)) clipGroup.push(group[i]);
-                }
-                    break;
-                case PERSON:
-                {
-                    if(group[i].getClipInfo().person != value) clipGroup.push(group[i]);
-                }
-                    break;
+        
+        void push_front(Clip & clip){
+            std::reverse(group.begin(), group.end());
+            group.push_back(clip);
+            std::reverse(group.begin(), group.end());
+            pushCategoryTypes(clip);
+        }
+        
+        void push(Clip & clip){
+            group.push_back(clip);
+            pushCategoryTypes(clip);
+        }
+        
+        void push(string & clipName){
+            Clip clip = Clip(clipName);
+            push(clip);
+        }
+        
+        void push(vector<string> & clipnames){
+            for(int i = 0; i < clipnames.size(); i++){
+                push(clipnames[i]);
             }
         }
-        return clipGroup;
-    }
-    
-    ClipGroup getStatements(string category){
-        ClipGroup clipGroup;
-        string statementQuestion = getStatementQuestionFromCategory(category);
-        for(int i = 0; i < group.size(); i++){
-            if(group[i].getClipInfo().question == statementQuestion) clipGroup.push(group[i]);
+        
+        void push(vector<Clip> & clips){
+            for(int i = 0; i < clips.size(); i++){
+                push(clips[i]);
+            }
         }
-        return clipGroup;
-    }
-    
-    
-    ClipGroup getUnique(SortType type){
-        ClipGroup cg;
-        map<string, int> uniquetypes = getClipTypes(type).getTypes();
-        for(map<string, int>::iterator it = uniquetypes.begin(); it != uniquetypes.end(); it++){
-            ClipGroup subGroup = getContains(type, it->first);
-            cg.push(subGroup[ofRandom(subGroup.size())]);
+        
+        void push(ClipGroup & clips){
+            for(int i = 0; i < clips.size(); i++){
+                push(clips[i]);
+            }
         }
-        return cg;
-    }
-    
-    ClipGroup getUnique(SortType type, int numClips){
-        ClipGroup cg;
-        ClipGroup clips = getUnique(type);
-        for(int i = 0; i < numClips; i++){
-            if(clips.size() > 0){
-                Clip clip = clips.poprandom();
+        
+        Clip pop(Clip clip){
+            for(int i = 0; i < group.size(); i++){
+                if(group[i] == clip){
+                    popCategoryTypes(clip);
+                    group.erase(group.begin()+i, group.begin()+i+1);
+                }
+            }
+            return clip;
+        }
+        
+        Clip pop(string & clipName){
+            Clip clip = Clip(clipName);
+            return pop(clip);
+        }
+        
+        ClipGroup pop(vector<string> & clipnames){
+            ClipGroup cg;
+            for(int i = 0; i < clipnames.size(); i++){
+                Clip clip = pop(clipnames[i]);
                 cg.push(clip);
             }
+            return cg;
         }
-        return cg;
-    }
-    
-    ClipType getClipTypes(SortType type){
-        switch (type) {
-            case NAME:
-            {
-                return nameTypes;
-            }
-                break;
-            case CATEGORY:
-            {
-                return categoryTypes;
-            }
-                break;
-            case QUESTION:
-            {
-                return questionTypes;
-            }
-                break;
-            case TYPE:
-            {
-                return typeTypes;
-            }
-                break;
-            case TIME:
-            {
-                return timeTypes;
-            }
-                break;
-            case FRAMED:
-            {
-                return framedTypes;
-            }
-                break;
-            case PERSONAL:
-            {
-                return personalTypes;
-            }
-                break;
-            case PERSON:
-            {
-                return personTypes;
-            }
-                break;
-        }
-    }
-    
-    void push_front(Clip & clip){
-        std::reverse(group.begin(), group.end());
-        group.push_back(clip);
-        std::reverse(group.begin(), group.end());
-        pushCategoryTypes(clip);
-    }
-    
-    void push(Clip & clip){
-        group.push_back(clip);
-        pushCategoryTypes(clip);
-    }
-    
-    void push(string & clipName){
-        Clip clip = Clip(clipName);
-        push(clip);
-    }
-    
-    void push(vector<string> & clipnames){
-        for(int i = 0; i < clipnames.size(); i++){
-            push(clipnames[i]);
-        }
-    }
-    
-    void push(vector<Clip> & clips){
-        for(int i = 0; i < clips.size(); i++){
-            push(clips[i]);
-        }
-    }
-    
-    void push(ClipGroup & clips){
-        for(int i = 0; i < clips.size(); i++){
-            push(clips[i]);
-        }
-    }
-    
-    Clip pop(Clip clip){
-        for(int i = 0; i < group.size(); i++){
-            if(group[i] == clip){
-                popCategoryTypes(clip);
-                group.erase(group.begin()+i, group.begin()+i+1);
-            }
-        }
-        return clip;
-    }
-    
-    Clip pop(string & clipName){
-        Clip clip = Clip(clipName);
-        return pop(clip);
-    }
-    
-    ClipGroup pop(vector<string> & clipnames){
-        ClipGroup cg;
-        for(int i = 0; i < clipnames.size(); i++){
-            Clip clip = pop(clipnames[i]);
-            cg.push(clip);
-        }
-        return cg;
-    }
-    
-    ClipGroup pop(vector<Clip> & clips){
-        ClipGroup cg;
-        for(int i = 0; i < clips.size(); i++){
-            Clip clip = pop(clips[i]);
-            cg.push(clip);
-        }
-        return cg;
-    }
-    
-    ClipGroup pop(ClipGroup & clipGroup){
-        ClipGroup cg;
-        for(int i = 0; i < clipGroup.size(); i++){
-            Clip clip = pop(clipGroup[i]);
-            cg.push(clip);
-        }
-        return cg;
-    }
-    
-    Clip getrandom(){
-        Clip clip;
-        if(group.size() > 0){
-            clip = group[ofRandom(group.size())];
-        }
-        return clip;
-    }
-    
-    Clip poprandom(){
-        Clip clip;
-        if(group.size() > 0){
-            clip = group[ofRandom(group.size())];
-            pop(clip);
-        }
-        return clip;
-    }
-    
-    void shuffle(){
-        random_shuffle(group.begin(), group.end());
-    }
-    
-    Clip & getClip(string name){
-        for(int j = 0; j < group.size(); j++){
-            if(group[j].getName() == name){
-                return group[j];
-            }
-        }
-        ofxLogError() << "Clip out of bounds with name: " << name;
-        return dummyClip;
-    }
-    
-    int size(){
-        return group.size();
-    }
-    
-    void clear(){
-        group.clear();
-        categoryTypes.clear();
-        questionTypes.clear();
-        typeTypes.clear();
-        timeTypes.clear();
-        framedTypes.clear();
-        personalTypes.clear();
-        personTypes.clear();
-        nameTypes.clear();
-    }
-    
-    Clip at(int i){
-        return group[i];
-    }
-    
-    Clip & operator[](int i){
-        return group[i];
-    }
-    
-    friend ostream& operator<< (ostream &os, const ClipGroup &cg);
-    
-    vector<Clip> group;
-    
-protected:
-    
-    void pushCategoryTypes(Clip & clip){
-        ClipInfo & info = clip.getClipInfo(); 
-        nameTypes.push(clip.getName());
-        categoryTypes.push(info.category);
-        questionTypes.push(info.question);
-        typeTypes.push(info.type);
-        timeTypes.push(info.time);
-        framedTypes.push(info.framed);
-        personalTypes.push(info.personal);
-        personTypes.push(info.person);
-    }
-    
-    void popCategoryTypes(Clip & clip){
-        ClipInfo & info = clip.getClipInfo(); 
-        nameTypes.pop(clip.getName());
-        categoryTypes.pop(info.category);
-        questionTypes.pop(info.question);
-        typeTypes.pop(info.type);
-        timeTypes.pop(info.time);
-        framedTypes.pop(info.framed);
-        personalTypes.pop(info.personal);
-        personTypes.pop(info.person);
-    }
-    
-    Clip dummyClip;
-    
-    ClipType categoryTypes;
-    ClipType questionTypes;
-    ClipType typeTypes;
-    ClipType timeTypes;
-    ClipType framedTypes;
-    ClipType personalTypes;
-    ClipType personTypes;
-    ClipType nameTypes;
-    
-};
-
-inline ostream& operator<<(ostream& os, const ClipGroup &cg){
-    for(int i = 0; i < cg.group.size(); i++){
-        os << cg.group[i] << endl;
-    }
-    return os;
-};
-
-struct VideoClip {
-    ofxThreadedVideo* video;
-    Clip clip;
-    int audioTrack;
-};
-
-struct AudioClip {
-    ofxThreadedVideo* audio;
-    bool isLoading;
-    bool isStopping;
-    int audioTrack;
-};
-    
-class ClipTimeline {
-
-public:
         
-    ClipTimeline(){
-        clear();
-    };
-    
-    ~ClipTimeline(){
-        clear();
-    };
-#ifdef VIDEO_TIMECODE
-    void setup(string blackPath, ofPixelFormat pixelformat){
-#else
-    void setup(ofPixelFormat pixelformat){
-#endif
-        ofxLogNotice() << "Setup timeline" << endl;
+        ClipGroup pop(vector<Clip> & clips){
+            ClipGroup cg;
+            for(int i = 0; i < clips.size(); i++){
+                Clip clip = pop(clips[i]);
+                cg.push(clip);
+            }
+            return cg;
+        }
         
-        pixelFormat = pixelformat;
+        ClipGroup pop(ClipGroup & clipGroup){
+            ClipGroup cg;
+            for(int i = 0; i < clipGroup.size(); i++){
+                Clip clip = pop(clipGroup[i]);
+                cg.push(clip);
+            }
+            return cg;
+        }
         
-#ifdef VIDEO_TIMECODE
-        for(int i = 0; i < 7; i++){
-            ofxThreadedVideo * video = new ofxThreadedVideo;
-            video->setAudioDevice("JackRouter");
-            video->setPixelFormat(pixelFormat);
-            video->setUseAutoPlay(false);
-            video->setUseQueue(true);
-            ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
-            if(i == 0){
-                video->loadMovie(blackPath);
-                while(!video->isLoaded()){
-                    video->update();
+        Clip getrandom(){
+            Clip clip;
+            if(group.size() > 0){
+                clip = group[ofRandom(group.size())];
+            }
+            return clip;
+        }
+        
+        Clip poprandom(){
+            Clip clip;
+            if(group.size() > 0){
+                clip = group[ofRandom(group.size())];
+                pop(clip);
+            }
+            return clip;
+        }
+        
+        void shuffle(){
+            random_shuffle(group.begin(), group.end());
+        }
+        
+        Clip & getClip(string name){
+            for(int j = 0; j < group.size(); j++){
+                if(group[j].getName() == name){
+                    return group[j];
                 }
-                video->setVolume(0.0f);
-                video->setLoopState(OF_LOOP_NORMAL);
-                video->play();
             }
-            VideoClip vc;
-            vc.video = video;
-            vc.clip = dummyClip;
-            vc.audioTrack = videoClips.size() - 1; // is this right?
-            ofxLogVerbose() << "Assigning audio for VIDEO to channel: " << vc.audioTrack << endl;
-            videoClips.push_back(vc);
+            ofxLogError() << "Clip out of bounds with name: " << name;
+            return dummyClip;
         }
-#else
-        lastTimeMillis = ofGetElapsedTimeMillis();
-#endif
         
-        if(pixelFormat == OF_PIXELS_2YUV){
-            shader.load(ofToDataPath("yuyvtorgba"));
-            renderer.allocate(1920, 1080);
+        int size(){
+            return group.size();
         }
-//        
-//        for(int i = 0; i < 2; i++){
-//            ofxThreadedVideo * audio = new ofxThreadedVideo;
-//            audio->setAudioDevice("JackRouter");
-//            audio->setPixelFormat(pixelFormat);
-//            audio->setUseAutoPlay(false);
-//            audio->setUseQueue(true);
-//            //audio->setLoopState(OF_LOOP_NONE);
-//            ofAddListener(audio->threadedVideoEvent, this, &ClipTimeline::threadedAudioEvent);
-//            AudioClip ac;
-//            ac.audio = audio;
-//            ac.audioTrack = 4 + i; // is this right?
-//            ofxLogVerbose() << "Assigning audio for MUSIC to channel: " << ac.audioTrack << endl;
-//            ac.isLoading = false;
-//            ac.isStopping = false;
-//            audioClips.push_back(ac);
-//        }
         
-    }
+        void clear(){
+            group.clear();
+            categoryTypes.clear();
+            questionTypes.clear();
+            typeTypes.clear();
+            timeTypes.clear();
+            framedTypes.clear();
+            personalTypes.clear();
+            personTypes.clear();
+            nameTypes.clear();
+        }
+        
+        Clip at(int i){
+            return group[i];
+        }
+        
+        Clip & operator[](int i){
+            return group[i];
+        }
+        
+        friend ostream& operator<< (ostream &os, const ClipGroup &cg);
+        
+        vector<Clip> group;
+        
+    protected:
+        
+        void pushCategoryTypes(Clip & clip){
+            ClipInfo & info = clip.getClipInfo();
+            nameTypes.push(clip.getName());
+            categoryTypes.push(info.category);
+            questionTypes.push(info.question);
+            typeTypes.push(info.type);
+            timeTypes.push(info.time);
+            framedTypes.push(info.framed);
+            personalTypes.push(info.personal);
+            personTypes.push(info.person);
+        }
+        
+        void popCategoryTypes(Clip & clip){
+            ClipInfo & info = clip.getClipInfo();
+            nameTypes.pop(clip.getName());
+            categoryTypes.pop(info.category);
+            questionTypes.pop(info.question);
+            typeTypes.pop(info.type);
+            timeTypes.pop(info.time);
+            framedTypes.pop(info.framed);
+            personalTypes.pop(info.personal);
+            personTypes.pop(info.person);
+        }
+        
+        Clip dummyClip;
+        
+        ClipType categoryTypes;
+        ClipType questionTypes;
+        ClipType typeTypes;
+        ClipType timeTypes;
+        ClipType framedTypes;
+        ClipType personalTypes;
+        ClipType personTypes;
+        ClipType nameTypes;
+        
+    };
     
-    void update(){
+    inline ostream& operator<<(ostream& os, const ClipGroup &cg){
+        for(int i = 0; i < cg.group.size(); i++){
+            os << cg.group[i] << endl;
+        }
+        return os;
+    };
+    
+    struct VideoClip {
+        ofxThreadedVideo* video;
+        Clip clip;
+        int audioTrack;
+    };
+    
+    struct AudioClip {
+        ofxThreadedVideo* audio;
+        bool isLoading;
+        bool isStopping;
+        int audioTrack;
+    };
+    
+    class ClipTimeline {
         
-        if(!bPaused){
-            
-            currentClips.clear();
-            getClipsFrom(currentFrame, currentFrame, currentClips);
-            
-            if(currentClips.size() > 0){
+    public:
+        
+        ClipTimeline(){
+            clear();
+        };
+        
+        ~ClipTimeline(){
+            clear();
+        };
+#ifdef VIDEO_TIMECODE
+        void setup(string blackPath, ofPixelFormat pixelformat){
+#else
+            void setup(ofPixelFormat pixelformat){
+#endif
+                ofxLogNotice() << "Setup timeline" << endl;
                 
-                for(int i = 0; i < currentClips.size(); i++){
+                pixelFormat = pixelformat;
+                
+#ifdef VIDEO_TIMECODE
+                for(int i = 0; i < 7; i++){
+                    ofxThreadedVideo * video = new ofxThreadedVideo;
+                    video->setAudioDevice("JackRouter");
+                    video->setPixelFormat(pixelFormat);
+                    video->setUseAutoPlay(false);
+                    video->setUseQueue(true);
+                    ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
+                    if(i == 0){
+                        video->loadMovie(blackPath);
+                        while(!video->isLoaded()){
+                            video->update();
+                        }
+                        video->setVolume(0.0f);
+                        video->setLoopState(OF_LOOP_NORMAL);
+                        video->play();
+                    }
+                    VideoClip vc;
+                    vc.video = video;
+                    vc.clip = dummyClip;
+                    vc.audioTrack = 8 + videoClips.size() - 1; // is this right?
+                    ofxLogVerbose() << "Assigning audio for VIDEO to channel: " << vc.audioTrack << endl;
+                    videoClips.push_back(vc);
+                }
+#else
+                lastTimeMillis = ofGetElapsedTimeMillis();
+#endif
+                
+                if(pixelFormat == OF_PIXELS_2YUV){
+                    shader.load(ofToDataPath("yuyvtorgba"));
+                    renderer.allocate(1920, 1080);
+                }
+                
+                for(int i = 0; i < 2; i++){
+                    ofxThreadedVideo * audio = new ofxThreadedVideo;
+                    audio->setAudioDevice("JackRouter");
+                    audio->setPixelFormat(pixelFormat);
+                    audio->setUseAutoPlay(false);
+                    audio->setUseQueue(true);
+                    //audio->setLoopState(OF_LOOP_NONE);
+                    ofAddListener(audio->threadedVideoEvent, this, &ClipTimeline::threadedAudioEvent);
+                    AudioClip ac;
+                    ac.audio = audio;
+                    ac.audioTrack = i*2; // is this right?
+                    ofxLogVerbose() << "Assigning audio for MUSIC to channel: " << ac.audioTrack << endl;
+                    ac.isLoading = false;
+                    ac.isStopping = false;
+                    audioClips.push_back(ac);
+                }
+                
+            }
+            
+            void update(){
+                
+                if(!bPaused){
                     
-                    VideoClip & videoClip = isClipAssigned(currentClips[i]);
+                    currentClips.clear();
+                    getClipsFrom(currentFrame, currentFrame, currentClips);
                     
-                    Clip & clip = getRealClip(videoClip.clip);
-                    ofxThreadedVideo * video = videoClip.video;
-                    
-                    if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
-                        ofxLogVerbose() << "Loading..." << endl;
+                    if(currentClips.size() > 0){
                         
-                        video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack), true);
+                        for(int i = 0; i < currentClips.size(); i++){
+                            
+                            VideoClip & videoClip = isClipAssigned(currentClips[i]);
+                            
+                            Clip & clip = getRealClip(videoClip.clip);
+                            ofxThreadedVideo * video = videoClip.video;
+                            
+                            if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
+                                
+                                ofxLogVerbose() << "Loading..." << endl;
+                                
+                                video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack), true);
+                                
+                                if(video->loadMovie(clip.getVideoPath())){
+                                    
+                                    ofxLogVerbose() << "...loaded normal clip" << clip << endl;
+                                    
+                                    if(videoClip.clip.getIsClipTitle()){
+                                        ofxLogVerbose() << "...loaded title clip..." << clip << endl;
+                                        
+                                        audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[0].audioTrack + 0), true);
+                                        audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[0].audioTrack + 1), false);
+                                        audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[1].audioTrack + 0), true);
+                                        audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[1].audioTrack + 1), false);
+                                        
+                                        if(audioClips[0].audio->loadMovie(getRandomAbstractPath())){
+                                            
+                                            ofxLogVerbose() << "...loaded audio abstract..." << endl;
+                                            
+                                            if(audioClips[1].audio->loadMovie(getRandomAtmospherePath())){
+                                                
+                                                ofxLogVerbose() << "...loaded audio atmos" << endl;
+                                                audioClips[0].isLoading = true;
+                                                audioClips[1].isLoading = true;
+                                                audioClips[0].isStopping = false;
+                                                audioClips[1].isStopping = false;
+                                                videoClip.clip.setClipLoading(true);
+                                                clip.setClipLoading(true);
+                                            }
+                                        }
+                                        
+                                    }else{
+                                        ofxLogVerbose() << "...loaded normal clip" << clip << endl;
+                                        videoClip.clip.setClipLoading(true);
+                                        clip.setClipLoading(true);
+                                    }
+                                }
+                                
+                                
+                            }
+                            
+                        }
+                    }
+                    
+                    for(int i = 0; i < audioClips.size(); i++){
                         
-                        if(video->loadMovie(clip.getVideoPath())){
-                            ofxLogVerbose() << "...loaded normal clip" << clip << endl;
-                            videoClip.clip.setClipLoading(true);
-                            clip.setClipLoading(true);
-//                            if(videoClip.clip.getIsClipTitle()){
-//                                ofxLogVerbose() << "...loaded title clip..." << clip << endl;
-//                                
-//                                audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(audioClips[0].audioTrack), true);
-//                                //audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(1), false);
-//                                audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(audioClips[1].audioTrack), true);
-//                                //audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(2), false);
-//                                
-//                                if(audioClips[0].audio->loadMovie(ofToDataPath("/Volumes/DeepData/ANIME60/STAT_IDIS_EOOA_00_ALFB.mov"))){
-//                                    ofxLogVerbose() << "...loaded audio abstract..." << endl;
-//                                    if(audioClips[1].audio->loadMovie(ofToDataPath("/Volumes/DeepData/ANIME60/INTR_ABOT_ANRS_03_NATHANL.mov"))){
-//                                        ofxLogVerbose() << "...loaded audio atmos" << endl;
-//                                        audioClips[0].isLoading = true;
-//                                        audioClips[1].isLoading = true;
-//                                        audioClips[0].isStopping = false;
-//                                        audioClips[1].isStopping = false;
-//                                        videoClip.clip.setClipLoading(true);
-//                                        clip.setClipLoading(true);
-//                                    }
-//                                };
-////                                ofxLogVerbose() << "...loaded normal clip" << clip << endl;
-////                                videoClip.clip.setClipLoading(true);
-////                                clip.setClipLoading(true);
-//                            }else{
-//                                ofxLogVerbose() << "...loaded normal clip" << clip << endl;
-//                                videoClip.clip.setClipLoading(true);
-//                                clip.setClipLoading(true);
-//                            }
+                        AudioClip & audioClip = audioClips[i];
+                        ofxThreadedVideo * audio = audioClip.audio;
+                        
+                        audio->update();
+                        
+                        if(audio->isLoaded() && !audio->isPlaying() && !audioClip.isStopping){
+                            
+                            ofxLogVerbose() << i << " Audio Playing " << audio->getMovieName() << endl;
+                            
+                            audio->setLoopState(OF_LOOP_NONE);
+                            audio->play();
+                            
+                            ofxLogVerbose() << "Assign music to: " << audioClip.audioTrack << endl;
+                            
+                            soundController->setAllChannelVolumes(audioClips[i].audioTrack + 0, 0.0f);
+                            soundController->setAllChannelVolumes(audioClips[i].audioTrack + 1, 0.0f);
+                            
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 0 + 2, 0.5f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 2 + 2, 0.5f);
+                            
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 3 + 2, 0.5f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 4 + 2, 0.5f);
+                            
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 5 + 2, 0.8f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 7 + 2, 0.8f);
+                            
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 0 + 0, 0.8f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 1 + 0, 0.8f);
+                            
+                            //                    for(int channel = 0; channel < 5; channel++){
+                            //                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.1f);
+                            //                    }
+                            //
+                            //                    for(int channel = 5; channel < 8; channel++){
+                            //                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.5f);
+                            //                    }
+                            
+                            audioClip.isLoading = false;
                         }
                         
-
+                        if(audio->getIsMovieDone()){
+                            ofxLogVerbose() << "Stopping Music " << endl;
+                            audio->stop();
+                            audioClip.isLoading = false;
+                            audioClip.isStopping = true;
+                        }
+                        
+                        if(audio->getIsMovieDone() && audio->isPlaying()){
+                            ofxLogVerbose() << "Force Stopping Music " << endl;
+                            audio->stop();
+                        }
                     }
                     
-                }
-            }
-            
-//            for(int i = 0; i < audioClips.size(); i++){
-//                
-//                AudioClip & audioClip = audioClips[i];
-//                ofxThreadedVideo * audio = audioClip.audio;
-//                
-//                audio->update();
-//                //cout << "hhhh" << audio->getAudioTrackList() << endl;
-//                
-//                if(audio->isLoaded() && !audio->isPlaying() && !audioClip.isStopping){
-//                    ofxLogVerbose() << i << " Audio Playing " << audio->getMovieName() << endl;
-//                    audio->setLoopState(OF_LOOP_NONE);
-//                    audio->play();
-//                    ofxLogVerbose() << "Assign music to: " << audioClip.audioTrack << endl;
-//                    
-//                    soundController->setAllChannelVolumes(audioClips[i].audioTrack, 0.0f);
-//                    audio->setVolume(0.1);
-////                    for(int channel = 0; channel < 5; channel++){
-////                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.1f);
-////                    }
-////
-////                    for(int channel = 0; channel < 8; channel++){
-////                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.5f);
-////                    }
-//                    
-//                    audioClip.isLoading = false;
-//                }
-//                
-//                if(audio->getIsMovieDone()){
-//                    ofxLogVerbose() << "Stopping Music " << endl;
-//                    audio->stop();
-//                    audioClip.isLoading = false;
-//                    audioClip.isStopping = true;
-//                }
-//                
-//                if(audio->getIsMovieDone() && audio->isPlaying()){
-//                    ofxLogVerbose() << "Force Stopping Music " << endl;
-//                    audio->stop();
-//                }
-//            }
-            
-            bool syncAssigned = false;
+                    bool syncAssigned = false;
 #ifdef VIDEO_TIMECODE
-            for(int i = videoClips.size() - 1; i >= 0 ; i--){
+                    for(int i = videoClips.size() - 1; i >= 0 ; i--){
 #else
-            for(int i = 0; i < videoClips.size(); i++){
+                        for(int i = 0; i < videoClips.size(); i++){
 #endif
-                
-                VideoClip & videoClip = videoClips[i];
-                
-                Clip & clip = getRealClip(videoClip.clip);
-                ofxThreadedVideo * video = videoClip.video;
-                
-                video->update();
-                
-                if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
-                    ofxLogVerbose() << i << " Video Playing " << clip << endl;
-                    
-                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
-                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
-                    }
-                    video->setLoopState(OF_LOOP_NONE);
-                    video->play();
-                    
-                    ofxLogVerbose() << "Assign audio to: " << videoClip.audioTrack << endl;
-                    
-                    soundController->setAllChannelVolumes(videoClip.audioTrack, 0.0f);
-                    
-                    float clipCenter = (videoClip.clip.getPosition().x + videoClip.clip.getRect().width/2.0f); // use the videoClip.clip not the real clip!
-                    float screenWidth = (clip.getScreen() == 0 ? 1920.0f : 1440.0f);
-                    int numSpeakers = (clip.getScreen() == 0 ? 3 : 2);
-                    int channelStart = (clip.getScreen() == 0 ? 0 : 3);
-                    ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
-                    
-                    for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
-                        soundController->setChannelVolume(videoClip.audioTrack, channel, pan[channel - channelStart]);
-                    }
-                    
-                    for(int channel = 5; channel < 8; channel++){
-                        soundController->setChannelVolume(videoClip.audioTrack, channel, 0.2f);
-                    }
-                    
-                    clip.setClipLoading(false);
-                }
-                
-                if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
-                    ofxLogVerbose() << "Stopping Video " << clip << endl;
-                    video->stop();
-                    clip.setClipLoading(false);
-                    clip.setClipStopping(true);
-                }
-                
-                if(video->getIsMovieDone() && video->isPlaying()){
-                    ofxLogVerbose() << "Force Stopping Video " << clip << endl;
-                    video->stop();
-                }
-                
+                            
+                            VideoClip & videoClip = videoClips[i];
+                            
+                            Clip & clip = getRealClip(videoClip.clip);
+                            ofxThreadedVideo * video = videoClip.video;
+                            
+                            video->update();
+                            
+                            if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
+                                ofxLogVerbose() << i << " Video Playing " << clip << endl;
+                                
+                                if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                                    ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
+                                    video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                                }
+                                video->setLoopState(OF_LOOP_NONE);
+                                video->play();
+                                
+                                ofxLogVerbose() << "Assign audio to: " << videoClip.audioTrack << endl;
+                                
+                                soundController->setAllChannelVolumes(videoClip.audioTrack, 0.0f);
+                                
+                                float clipCenter = (videoClip.clip.getPosition().x + videoClip.clip.getRect().width/2.0f); // use the videoClip.clip not the real clip!
+                                float screenWidth = (clip.getScreen() == 0 ? 1920.0f : 1440.0f);
+                                int numSpeakers = (clip.getScreen() == 0 ? 3 : 2);
+                                int channelStart = (clip.getScreen() == 0 ? 0 : 3);
+                                ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
+                                
+                                for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
+                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 2, pan[channel - channelStart]);
+                                }
+                                
+                                for(int channel = 5; channel < 8; channel++){
+                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 2, 0.2f);
+                                }
+                                
+                                pan = soundController->getPan(clipCenter + 1920.0f * clip.getScreen(), 1920.0f + 1440.0f, 2);
+                                
+                                soundController->setChannelVolume(videoClip.audioTrack, 0 + 0, pan[0]);
+                                soundController->setChannelVolume(videoClip.audioTrack, 1 + 0, pan[1]);
+                                
+                                clip.setClipLoading(false);
+                            }
+                            
+                            if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
+                                ofxLogVerbose() << "Stopping Video " << clip << endl;
+                                video->stop();
+                                clip.setClipLoading(false);
+                                clip.setClipStopping(true);
+                            }
+                            
+                            if(video->getIsMovieDone() && video->isPlaying()){
+                                ofxLogVerbose() << "Force Stopping Video " << clip << endl;
+                                video->stop();
+                            }
+                            
 #ifdef VIDEO_TIMECODE
-                if(video->isPlaying() && !syncAssigned){
-                    if(i == 0){
+                            if(video->isPlaying() && !syncAssigned){
+                                if(i == 0){
+                                    ofxLogVerbose() << "Black timestamp" << endl;
+                                    if(video->isFrameNew()) currentFrame++;
+                                    syncAssigned = true;
+                                }else{
+                                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+                                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
+                                    syncClipName = clip.getName();
+                                    syncAssigned = true;
+                                }
+                            }
+                            
+                        }
+#else
+                        if(video->isPlaying() && !syncAssigned){
+                            if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+                            currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
+                            syncClipName = clip.getName();
+                            syncAssigned = true;
+                        }
+                    }
+                    if(!syncAssigned){
                         ofxLogVerbose() << "Black timestamp" << endl;
-                        if(video->isFrameNew()) currentFrame++;
-                        syncAssigned = true;
+                        if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
+                            currentFrame++;
+                            lastTimeMillis = ofGetElapsedTimeMillis();
+                        }
+                        
+                    }
+#endif
+                    
+                }
+            }
+            
+            void threadedVideoEvent(ofxThreadedVideoEvent & e){
+                ofxLogVerbose() << "Video Event: " << e << endl;
+            }
+            
+            void threadedAudioEvent(ofxThreadedVideoEvent & e){
+                ofxLogVerbose() << "Audio Event: " << e << endl;
+            }
+            
+            VideoClip& assignVideoClip(Clip & clip){
+                int freeIndex = -1;
+#ifdef VIDEO_TIMECODE
+                for(int i = 1; i < videoClips.size(); i++){
+#else
+                    for(int i = 0; i < videoClips.size(); i++){
+#endif
+                        if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
+                            freeIndex = i;
+                            break;
+                        }
+                    }
+                    if(freeIndex != -1){
+                        videoClips[freeIndex].clip = clip;
+                        return videoClips[freeIndex];
                     }else{
-                        if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                        currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                        syncClipName = clip.getName();
-                        syncAssigned = true;
+                        ofxThreadedVideo * video = new ofxThreadedVideo;
+                        video->setAudioDevice("JackRouter");
+                        video->setPixelFormat(pixelFormat);
+                        video->setUseAutoPlay(false);
+                        video->setUseQueue(true);
+                        ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
+                        VideoClip vc;
+                        vc.video = video;
+                        vc.clip = clip;
+                        vc.audioTrack = videoClips.size() - 1;
+                        videoClips.push_back(vc);
+                        return videoClips[videoClips.size() - 1];
                     }
                 }
                 
-            }
+                VideoClip& isClipAssigned(Clip & clip){
+#ifdef VIDEO_TIMECODE
+                    for(int i = 1; i < videoClips.size(); i++){
 #else
-                if(video->isPlaying() && !syncAssigned){
-                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                    syncClipName = clip.getName();
-                    syncAssigned = true;
-                }
-            }
-                if(!syncAssigned){
-                    ofxLogVerbose() << "Black timestamp" << endl;
-                    if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
-                        currentFrame++;
-                        lastTimeMillis = ofGetElapsedTimeMillis();
+                        for(int i = 0; i < videoClips.size(); i++){
+#endif
+                            if(videoClips[i].clip == clip &&
+                               (videoClips[i].video->getMoviePath() == clip.getVideoPath() ||
+                                videoClips[i].video->isQueued(clip.getVideoPath()))){
+                                   return videoClips[i];
+                               }
+                        }
+                        return assignVideoClip(clip);
                     }
                     
-                }
-#endif
-            
-        }
-    }
-    
-    void threadedVideoEvent(ofxThreadedVideoEvent & e){
-        ofxLogVerbose() << "Video Event: " << e << endl;
-    }
-        
-    void threadedAudioEvent(ofxThreadedVideoEvent & e){
-        ofxLogVerbose() << "Audio Event: " << e << endl;
-    }
-    
-   VideoClip& assignVideoClip(Clip & clip){
-        int freeIndex = -1;
-#ifdef VIDEO_TIMECODE
-        for(int i = 1; i < videoClips.size(); i++){
-#else
-        for(int i = 0; i < videoClips.size(); i++){
-#endif
-            if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
-                freeIndex = i;
-                break;
-            }
-        }
-        if(freeIndex != -1){
-            videoClips[freeIndex].clip = clip;
-            return videoClips[freeIndex];
-        }else{
-            ofxThreadedVideo * video = new ofxThreadedVideo;
-            video->setAudioDevice("JackRouter");
-            video->setPixelFormat(pixelFormat);
-            video->setUseAutoPlay(false);
-            video->setUseQueue(true);
-            ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
-            VideoClip vc;
-            vc.video = video;
-            vc.clip = clip;
-            vc.audioTrack = videoClips.size() - 1;
-            videoClips.push_back(vc);
-            return videoClips[videoClips.size() - 1];
-        }
-    }
-    
-    VideoClip& isClipAssigned(Clip & clip){
-#ifdef VIDEO_TIMECODE
-        for(int i = 1; i < videoClips.size(); i++){
-#else
-        for(int i = 0; i < videoClips.size(); i++){
-#endif
-            if(videoClips[i].clip == clip &&
-               (videoClips[i].video->getMoviePath() == clip.getVideoPath() ||
-                videoClips[i].video->isQueued(clip.getVideoPath()))){
-                return videoClips[i];
-            }
-        }
-        return assignVideoClip(clip);
-    }
-    
-    void previousClip(){
-//        int previousClipFrame = currentFrame;
-//        vector<Clip> clipsNow;
-//        getClipsFrom(previousClipFrame, previousClipFrame, clipsNow);
-//        int numDiffs = 0;
-//        for(int i = previousClipFrame; i >= 0; i--){
-//            vector<Clip> clipsThen;
-//            getClipsFrom(i, i, clipsThen);
-//            if(clipsThen != clipsNow){
-//                if(numDiffs == 1){
-//                    previousClipFrame = i;
-//                    break;
-//                }else{
-//                    numDiffs++;
-//                    clipsNow = clipsThen;
-//                }
-//            }
-//        }
-//        setFrame(previousClipFrame);
-        setFrame(currentFrame - 1000);
-    }
-    
-    void nextClip(){
-//        int nextClipFrame = currentFrame;
-//        vector<Clip> clipsNow;
-//        getClipsFrom(nextClipFrame, nextClipFrame, clipsNow);
-//        for(int i = nextClipFrame; i < getTotalFrames(); i++){
-//            vector<Clip> clipsThen;
-//            getClipsFrom(i, i, clipsThen);
-//            if(clipsThen.size() != clipsNow.size()){
-//                nextClipFrame = i;
-//                break;
-//            }
-//            bool isDiff = false;
-//            for(int j = 0; j < clipsThen.size(); j++){
-//                if(clipsThen[j] != clipsNow[j]){
-//                    nextClipFrame = i;
-//                    isDiff = true;
-//                    break;
-//                }
-//            }
-//            if(isDiff) break;
-//        }
-//        //cout << "MOFO2: " << nextClipFrame << endl;
-        setFrame(currentFrame + 1000);
-    }
-    
-    void setFrame(int frame){
-        bool cPaused = bPaused;
-        stop();
-        currentFrame = frame;
-        setPaused(cPaused);
-    }
-    
-    void stop(){
-#ifdef VIDEO_TIMECODE
-        for(int i = 1; i < videoClips.size(); i++){
-#else
-        for(int i = 0; i < videoClips.size(); i++){
-#endif
-            videoClips[i].video->stop();
-        }
-        for(int i = 0; i < group.size(); i++){
-            Clip & clip = group[i];
-            clip.setClipLoading(false);
-        }
-        setPaused(true);
-    }
-    
-    void play(){
-        setPaused(false);
-        if(group.size() > 0) currentFrame = group[0].getVideoStart();
-    }
-    
-    void setPaused(bool b){
-        bPaused = b;
-        if(bPaused){
-            for(int i = 0; i < videoClips.size(); i++){
-                videoClips[i].video->setPaused(true);
-            }
-        }else{
-            for(int i = 0; i < videoClips.size(); i++){
-                videoClips[i].video->setPaused(false);
-            }
-        }
-    }
-    
-    void togglePaused(){
-        setPaused(!bPaused);
-    }
-    
-    void draw(int screen){
-        
-        for(int i = 0; i < videoClips.size(); i++){
-            
-            Clip & clip = videoClips[i].clip;
-            ofxThreadedVideo * video = videoClips[i].video;
-            
-#ifdef VIDEO_TIMECODE
-            if(i == 0){
-                video->draw(0, 0, 0, 0);
-                continue;
-            }
-#endif
-            
-            if(video->isPlaying()){
-                
-                if(clip.getScreen() == screen){
-                    
-                    float fade = 1.0f;
-                    int fadeInSeconds = 3;
-                    int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
-                    
-                    if(video->getCurrentFrame() < clip.getCropStart()) continue;
-                    
-                    if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
-                        fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
-                    }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
-                        fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
-                    }else if(currentFadeFrame >= clip.getTotalFrames()){
-                        fade = 0.0f;
+                    void previousClip(){
+                        setFrame(currentFrame - 500);
                     }
                     
-                    glPushMatrix();
-                    
-                    glTranslatef(clip.getPosition().x - clip.getRect().x, clip.getPosition().y, 0.0f);
-                    glScalef(clip.getScale(), clip.getScale(), 1.0f);
-                    
-                    
-                    if(video->getPixelFormat() == OF_PIXELS_2YUV){
-                        
-                        renderer.begin();
-                        ofClear(0.0f, 0.0f, 0.0f, 1.0f);
-                        renderer.end();
-                        shader.begin();
-                        shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
-                        shader.setUniform1i("conversionType", (false ? 709 : 601));
-                        shader.setUniform1f("fade", fade);
-                        renderer.draw(0, 0);
-                        shader.end();
-                        
-                    }else{
-                        
-                        ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
-                        video->draw(0, 0);
-                        
+                    void nextClip(){
+                        setFrame(currentFrame + 500);
                     }
-                    glPopMatrix();
-                    ofSetColor(255, 255, 255, 255);
-                }
-            }
-            
-        }
-    }
-    
-    void drawTimeline(){
-        drawTimeline(0, 0, ofGetWidth(), ofGetHeight());
-    };
-    
-    void drawTimeline(float x, float y, float width, float height){
-        
-        glPushMatrix();
-        float framescale = (1.0/(float)getTotalFrames()) * width * 16;
-        float pixelscale = (height/(2 * 1920.0f));
-        
-        glScalef(framescale, pixelscale, 1.0f);
-        
-        ofNoFill();
-        ofSetColor(0, 255, 0);
-        ofLine(2000, 0, 2000, 1920 + 1440);
-        ofRect(0, 0, (float)getTotalFrames(), 1920.0f);
-        ofRect(0, 1919.0f, (float)getTotalFrames(), 1440.0f);
-        ofTranslate(2000 - getCurrentFrame(), 0.0f, 0.0f);
-        
-        for(int i = 0; i < group.size(); i++){
-            
-            Clip & clip = group[i];
-            
-            ofFill();
-            glPushMatrix();
-            ofTranslate(0.0f, 1920.0f * (clip.getScreen()), 0.0f);
-            if(clip.getName() == syncClipName){
-                ofSetColor(64, 64, 128, 64);
-                ofRect(clip.getVideoStart(),
-                       clip.getPosition().x,
-                       clip.getTotalFrames(),
-                       clip.getPosition().width);
-                ofSetColor(0, 0, 255);
-            }else{
-                ofSetColor(64 * clip.getScreen(), 64, 64, 32);
-                ofRect(clip.getVideoStart(),
-                       clip.getPosition().x,
-                       clip.getTotalFrames(),
-                       clip.getPosition().width);
-                ofSetColor(255, 255, 255);
-                
-            }
-            
-            ofNoFill();
-            ofRect(clip.getVideoStart(),
-                   clip.getPosition().x,
-                   clip.getTotalFrames(),
-                   clip.getPosition().width);
-            ofSetColor(255, 0, 0);
-            ofRect(clip.getAudioStart(),
-                   clip.getPosition().x + 1,
-                   clip.getAudioEnd() - clip.getAudioStart(),
-                   clip.getPosition().width - 2);
-            ofSetColor(255, 255, 255);
-            
-            glPopMatrix();
-            
-        }
-        
-        glPopMatrix();
-        
-    };
-    
-    void clear(){
-        group.clear();
-        calculateFrames();
-        stop();
-        currentFrame = 0;
-//        if(videoClips.size() > 1){
-//            videoClips.erase(videoClips.begin() + 1, videoClips.end());
-//        }
-    };
-    
-    bool insertClipAt(Clip clip, int frame, int screen = -1, int xMin = -1, int xMax = -1){
-        
-        int tries = 0;
-        bool fitted = false;
-        bool possible = true;
-        
-        float x, y, width;
-        
-        while(!fitted && possible){
-            
-            tries++;
-            
-            if(screen == -1) screen = getRandomDistribution(2, 0.7f, 0.3f);
-            
-            ofRectangle & scaledRect = clip.getRect();
-            
-            if(xMin == -1) xMin = 0;
-            if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
-            
-            x = ofRandom(xMin, xMax - scaledRect.width);
-            
-            if(clip.getIsClipTitle()){
-                y = (1080.0 - 300.0f) - (scaledRect.height + scaledRect.y);
-            }else{
-                y = (1080.0 - 100.0f) - (scaledRect.height + scaledRect.y);
-            }
-            
-            width = scaledRect.width;
-            
-            fitted = !getAnyClipAt(frame,
-                                   x,
-                                   frame + clip.getTotalFrames(),
-                                   width,
-                                   screen);
-            
-            if(!fitted && tries > 44){
-                possible = false;
-                fitted = true;
-            }
-            
-        }
-        
-        if(fitted && possible){
-            clip.setFrame(frame);
-            clip.setPosition(x, y, screen);
-            group.push(clip);
-            calculateFrames();
-            return true;
-        }else{
-            return false;
-        }
-        
-        
-    };
-    
-    Clip getClipAt(float x, float y, float width, float height){
-        
-        float framescale = (1.0/(float)getTotalFrames()) * width * 16;
-        float pixelscale = (height/(2 * 1920.0f));
-
-        for(int i = 0; i < group.size(); i++){
-            
-            Clip clip = group[i];
-            
-            ofRectangle r = ofRectangle((clip.getVideoStart() + 2000 - getCurrentFrame()) * framescale,
-                                        (clip.getPosition().x * pixelscale) + (clip.getScreen() * 1920.0f * pixelscale),
-                                        clip.getTotalFrames() * framescale,
-                                        clip.getPosition().width * pixelscale);
-            
-            ofPoint p = ofPoint(x, y);
-            
-            if(r.inside(p)){
-                return clip;
-            }
-            
-        }
-        
-        return dummyClip;
-    }
-    
-    void getClipsFrom(int startFrame, int endFrame, vector<Clip> & clips){
-        
-        ofRectangle f = ofRectangle(startFrame,
-                                    0,
-                                    endFrame - startFrame,
-                                    1);
-        
-        for(int i = 0; i < group.size(); i++){
-            
-            Clip & clip = group[i];
-            
-            ofRectangle r = ofRectangle(clip.getVideoStart(),
-                                        0,
-                                        clip.getTotalFrames(),
-                                        1);
-            
-            if(r.intersects(f)){
-                clips.push_back(clip);
-            }
-        }
-    };
-    
-    void getClipsFrom(int startFrame, float x, int endFrame, float width, int screen, vector<Clip> & clips){
-        
-        ofRectangle f = ofRectangle(startFrame,
-                                    x,
-                                    endFrame - startFrame,
-                                    width);
-        
-        for(int i = 0; i < group.size(); i++){
-            
-            Clip & clip = group[i];
-            
-            if(clip.getScreen() != screen) continue;
-            
-            ofRectangle r = ofRectangle(clip.getVideoStart(),
-                                        clip.getPosition().x,
-                                        clip.getTotalFrames(),
-                                        clip.getPosition().width);
-            
-            if(r.intersects(f)){
-                clips.push_back(clip);
-            }
-        }
-    };
-    
-    bool getAnyClipAt(int startFrame, float x, int endFrame, float width, int screen){
-        
-        ofRectangle f = ofRectangle(startFrame,
-                                    x,
-                                    endFrame - startFrame,
-                                    width);
-        
-        for(int i = 0; i < group.size(); i++){
-            
-            Clip & clip = group[i];
-            
-            if(clip.getScreen() != screen) continue;
-            
-            ofRectangle r = ofRectangle(clip.getVideoStart(),
-                                        clip.getPosition().x,
-                                        clip.getTotalFrames(),
-                                        clip.getPosition().width);
-            
-            if(r.intersects(f)){
-                return true;
-            }
-        }
-        return false;
-    };
-    
-    int getCurrentFrame(){
-        return currentFrame;
-    }
-    
-    int getTotalFrames(){
-        return totalFrames;
-    }
-    
-    void calculateFrames(){
-        totalFrames = 0;
-        for(int i = 0; i < group.size(); i++){
-            totalFrames = MAX(totalFrames, group[i].getVideoEnd());
-        }
-    };
-    
-    vector<VideoClip>& getVideoClips(){
-        return videoClips;
-    }
-        
-    vector<AudioClip>& getAudioClips(){
-        return audioClips;
-    }
-        
-    vector<Clip>& getCurrentClips(){
-        return currentClips;
-    }
-
-    Clip& getRealClip(Clip & clip){
-        for(int i = 0; i < group.size(); i++){
-            if(group[i] == clip) return group[i];
-        }
-        return dummyClip;
-    }
-    
-    ClipGroup& getGroup(){
-        return group;
-    }
-    
-    Clip getLastClip(){
-        return group[group.size() - 1];
-    }
-    
-protected:
-        
-    ClipGroup group;
-    Clip dummyClip;
-    
-    bool bPaused;
-    
-    int currentFrame;
-    int totalFrames;
-    
-    int lastTimeMillis;
-    string syncClipName;
-    
-    ofPixelFormat pixelFormat;
-    vector<VideoClip> videoClips;
-    vector<AudioClip> audioClips;
-    
-    vector<Clip> currentClips;
-    
-    ofShader shader;
-    ofFbo renderer;
-};
-
+                    
+                    void setFrame(int frame){
+                        bool cPaused = bPaused;
+                        stop();
+                        currentFrame = frame;
+                        setPaused(cPaused);
+                    }
+                    
+                    void stop(){
+#ifdef VIDEO_TIMECODE
+                        for(int i = 1; i < videoClips.size(); i++){
+#else
+                            for(int i = 0; i < videoClips.size(); i++){
+#endif
+                                videoClips[i].video->stop();
+                            }
+                            for(int i = 0; i < group.size(); i++){
+                                Clip & clip = group[i];
+                                clip.setClipLoading(false);
+                            }
+                            setPaused(true);
+                        }
+                        
+                        void play(){
+                            setPaused(false);
+                            if(group.size() > 0) currentFrame = group[0].getVideoStart();
+                        }
+                        
+                        void setPaused(bool b){
+                            bPaused = b;
+                            if(bPaused){
+                                for(int i = 0; i < videoClips.size(); i++){
+                                    videoClips[i].video->setPaused(true);
+                                }
+                            }else{
+                                for(int i = 0; i < videoClips.size(); i++){
+                                    videoClips[i].video->setPaused(false);
+                                }
+                            }
+                        }
+                        
+                        void togglePaused(){
+                            setPaused(!bPaused);
+                        }
+                        
+                        void draw(int screen){
+                            
+                            for(int i = 0; i < videoClips.size(); i++){
+                                
+                                Clip & clip = videoClips[i].clip;
+                                ofxThreadedVideo * video = videoClips[i].video;
+                                
+#ifdef VIDEO_TIMECODE
+                                if(i == 0){
+                                    video->draw(0, 0, 0, 0);
+                                    continue;
+                                }
+#endif
+                                
+                                if(video->isPlaying()){
+                                    
+                                    if(clip.getScreen() == screen){
+                                        
+                                        float fade = 1.0f;
+                                        int fadeInSeconds = 3;
+                                        int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
+                                        
+                                        if(video->getCurrentFrame() < clip.getCropStart()) continue;
+                                        
+                                        if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
+                                            fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
+                                        }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
+                                            fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
+                                        }else if(currentFadeFrame >= clip.getTotalFrames()){
+                                            fade = 0.0f;
+                                        }
+                                        
+                                        glPushMatrix();
+                                        
+                                        glTranslatef(clip.getPosition().x - clip.getRect().x, clip.getPosition().y, 0.0f);
+                                        glScalef(clip.getScale(), clip.getScale(), 1.0f);
+                                        
+                                        
+                                        if(video->getPixelFormat() == OF_PIXELS_2YUV){
+                                            
+                                            renderer.begin();
+                                            ofClear(0.0f, 0.0f, 0.0f, 1.0f);
+                                            renderer.end();
+                                            shader.begin();
+                                            shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
+                                            shader.setUniform1i("conversionType", (false ? 709 : 601));
+                                            shader.setUniform1f("fade", fade);
+                                            renderer.draw(0, 0);
+                                            shader.end();
+                                            
+                                        }else{
+                                            
+                                            ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
+                                            video->draw(0, 0);
+                                            
+                                        }
+                                        glPopMatrix();
+                                        ofSetColor(255, 255, 255, 255);
+                                    }
+                                }
+                                
+                            }
+                        }
+                        
+                        void drawTimeline(){
+                            drawTimeline(0, 0, ofGetWidth(), ofGetHeight());
+                        };
+                        
+                        void drawTimeline(float x, float y, float width, float height){
+                            
+                            glPushMatrix();
+                            float framescale = (1.0/(float)getTotalFrames()) * width * 16;
+                            float pixelscale = (height/(2 * 1920.0f));
+                            
+                            glScalef(framescale, pixelscale, 1.0f);
+                            
+                            ofNoFill();
+                            ofSetColor(0, 255, 0);
+                            ofLine(2000, 0, 2000, 1920 + 1440);
+                            ofRect(0, 0, (float)getTotalFrames(), 1920.0f);
+                            ofRect(0, 1919.0f, (float)getTotalFrames(), 1440.0f);
+                            ofTranslate(2000 - getCurrentFrame(), 0.0f, 0.0f);
+                            
+                            for(int i = 0; i < group.size(); i++){
+                                
+                                Clip & clip = group[i];
+                                
+                                ofFill();
+                                glPushMatrix();
+                                ofTranslate(0.0f, 1920.0f * (clip.getScreen()), 0.0f);
+                                if(clip.getName() == syncClipName){
+                                    ofSetColor(64, 64, 128, 64);
+                                    ofRect(clip.getVideoStart(),
+                                           clip.getPosition().x,
+                                           clip.getTotalFrames(),
+                                           clip.getPosition().width);
+                                    ofSetColor(0, 0, 255);
+                                }else{
+                                    ofSetColor(64 * clip.getScreen(), 64, 64, 32);
+                                    ofRect(clip.getVideoStart(),
+                                           clip.getPosition().x,
+                                           clip.getTotalFrames(),
+                                           clip.getPosition().width);
+                                    ofSetColor(255, 255, 255);
+                                    
+                                }
+                                
+                                ofNoFill();
+                                ofRect(clip.getVideoStart(),
+                                       clip.getPosition().x,
+                                       clip.getTotalFrames(),
+                                       clip.getPosition().width);
+                                ofSetColor(255, 0, 0);
+                                ofRect(clip.getAudioStart(),
+                                       clip.getPosition().x + 1,
+                                       clip.getAudioEnd() - clip.getAudioStart(),
+                                       clip.getPosition().width - 2);
+                                ofSetColor(255, 255, 255);
+                                
+                                glPopMatrix();
+                                
+                            }
+                            
+                            glPopMatrix();
+                            
+                        };
+                        
+                        void clear(){
+                            group.clear();
+                            calculateFrames();
+                            stop();
+                            currentFrame = 0;
+                        };
+                        
+                        bool insertClipAt(Clip clip, int frame, int screen = -1, int xMin = -1, int xMax = -1){
+                            
+                            int tries = 0;
+                            bool fitted = false;
+                            bool possible = true;
+                            
+                            float x, y, width;
+                            
+                            while(!fitted && possible){
+                                
+                                tries++;
+                                
+                                if(screen == -1) screen = getRandomDistribution(2, 0.7f, 0.3f);
+                                
+                                ofRectangle & scaledRect = clip.getRect();
+                                
+                                if(xMin == -1) xMin = 0;
+                                if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
+                                
+                                x = ofRandom(xMin, xMax - scaledRect.width);
+                                
+                                if(clip.getIsClipTitle()){
+                                    y = (1080.0 - 300.0f) - (scaledRect.height + scaledRect.y);
+                                }else{
+                                    y = (1080.0 - 100.0f) - (scaledRect.height + scaledRect.y);
+                                }
+                                
+                                width = scaledRect.width;
+                                
+                                fitted = !getAnyClipAt(frame,
+                                                       x,
+                                                       frame + clip.getTotalFrames(),
+                                                       width,
+                                                       screen);
+                                
+                                if(!fitted && tries > 44){
+                                    possible = false;
+                                    fitted = true;
+                                }
+                                
+                            }
+                            
+                            if(fitted && possible){
+                                clip.setFrame(frame);
+                                clip.setPosition(x, y, screen);
+                                group.push(clip);
+                                calculateFrames();
+                                return true;
+                            }else{
+                                return false;
+                            }
+                            
+                            
+                        };
+                        
+                        Clip getClipAt(float x, float y, float width, float height){
+                            
+                            float framescale = (1.0/(float)getTotalFrames()) * width * 16;
+                            float pixelscale = (height/(2 * 1920.0f));
+                            
+                            for(int i = 0; i < group.size(); i++){
+                                
+                                Clip clip = group[i];
+                                
+                                ofRectangle r = ofRectangle((clip.getVideoStart() + 2000 - getCurrentFrame()) * framescale,
+                                                            (clip.getPosition().x * pixelscale) + (clip.getScreen() * 1920.0f * pixelscale),
+                                                            clip.getTotalFrames() * framescale,
+                                                            clip.getPosition().width * pixelscale);
+                                
+                                ofPoint p = ofPoint(x, y);
+                                
+                                if(r.inside(p)){
+                                    return clip;
+                                }
+                                
+                            }
+                            
+                            return dummyClip;
+                        }
+                        
+                        void getClipsFrom(int startFrame, int endFrame, vector<Clip> & clips){
+                            
+                            ofRectangle f = ofRectangle(startFrame,
+                                                        0,
+                                                        endFrame - startFrame,
+                                                        1);
+                            
+                            for(int i = 0; i < group.size(); i++){
+                                
+                                Clip & clip = group[i];
+                                
+                                ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                                            0,
+                                                            clip.getTotalFrames(),
+                                                            1);
+                                
+                                if(r.intersects(f)){
+                                    clips.push_back(clip);
+                                }
+                            }
+                        };
+                        
+                        void getClipsFrom(int startFrame, float x, int endFrame, float width, int screen, vector<Clip> & clips){
+                            
+                            ofRectangle f = ofRectangle(startFrame,
+                                                        x,
+                                                        endFrame - startFrame,
+                                                        width);
+                            
+                            for(int i = 0; i < group.size(); i++){
+                                
+                                Clip & clip = group[i];
+                                
+                                if(clip.getScreen() != screen) continue;
+                                
+                                ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                                            clip.getPosition().x,
+                                                            clip.getTotalFrames(),
+                                                            clip.getPosition().width);
+                                
+                                if(r.intersects(f)){
+                                    clips.push_back(clip);
+                                }
+                            }
+                        };
+                        
+                        bool getAnyClipAt(int startFrame, float x, int endFrame, float width, int screen){
+                            
+                            ofRectangle f = ofRectangle(startFrame,
+                                                        x,
+                                                        endFrame - startFrame,
+                                                        width);
+                            
+                            for(int i = 0; i < group.size(); i++){
+                                
+                                Clip & clip = group[i];
+                                
+                                if(clip.getScreen() != screen) continue;
+                                
+                                ofRectangle r = ofRectangle(clip.getVideoStart(),
+                                                            clip.getPosition().x,
+                                                            clip.getTotalFrames(),
+                                                            clip.getPosition().width);
+                                
+                                if(r.intersects(f)){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        };
+                        
+                        int getCurrentFrame(){
+                            return currentFrame;
+                        }
+                        
+                        int getTotalFrames(){
+                            return totalFrames;
+                        }
+                        
+                        void calculateFrames(){
+                            totalFrames = 0;
+                            for(int i = 0; i < group.size(); i++){
+                                totalFrames = MAX(totalFrames, group[i].getVideoEnd());
+                            }
+                        };
+                        
+                        vector<VideoClip>& getVideoClips(){
+                            return videoClips;
+                        }
+                        
+                        vector<AudioClip>& getAudioClips(){
+                            return audioClips;
+                        }
+                        
+                        vector<Clip>& getCurrentClips(){
+                            return currentClips;
+                        }
+                        
+                        Clip& getRealClip(Clip & clip){
+                            for(int i = 0; i < group.size(); i++){
+                                if(group[i] == clip) return group[i];
+                            }
+                            return dummyClip;
+                        }
+                        
+                        ClipGroup& getGroup(){
+                            return group;
+                        }
+                        
+                        Clip getLastClip(){
+                            return group[group.size() - 1];
+                        }
+                        
+                        void setMusicAssets(FileList & fileList){
+                            musicAssets = fileList;
+                        }
+                        
+                        string getRandomAbstractPath(){
+                            if(randomAbstract.size() == 0){
+                                for(int i = 0; i < musicAssets.size(); i++){
+                                    if(musicAssets.getFile(i).name.find("Abstract") != string::npos){
+                                        randomAbstract.push_back(musicAssets.getFile(i).path);
+                                    }
+                                }
+                                std::random_shuffle(randomAbstract.begin(), randomAbstract.end());
+                            }
+                            assert(randomAbstract.size() > 0);
+                            string path = randomAbstract[0];
+                            randomAbstract.pop_front();
+                            return path;
+                        }
+                        
+                        string getRandomAtmospherePath(){
+                            if(randomAtmosphere.size() == 0){
+                                for(int i = 0; i < musicAssets.size(); i++){
+                                    if(musicAssets.getFile(i).name.find("Atmosphere") != string::npos){
+                                        randomAtmosphere.push_back(musicAssets.getFile(i).path);
+                                    }
+                                }
+                                std::random_shuffle(randomAtmosphere.begin(), randomAtmosphere.end());
+                            }
+                            assert(randomAtmosphere.size() > 0);
+                            string path = randomAtmosphere[0];
+                            randomAtmosphere.pop_front();
+                            return path;
+                        }
+                        
+                    protected:
+                        
+                        FileList musicAssets;
+                        deque<string> randomAbstract;
+                        deque<string> randomAtmosphere;
+                        
+                        ClipGroup group;
+                        Clip dummyClip;
+                        
+                        bool bPaused;
+                        
+                        int currentFrame;
+                        int totalFrames;
+                        
+                        int lastTimeMillis;
+                        string syncClipName;
+                        
+                        ofPixelFormat pixelFormat;
+                        vector<VideoClip> videoClips;
+                        vector<AudioClip> audioClips;
+                        
+                        vector<Clip> currentClips;
+                        
+                        ofShader shader;
+                        ofFbo renderer;
+                    };
+                    
 #endif

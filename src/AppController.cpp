@@ -224,7 +224,7 @@ void AppController::setup(){
     playController = new PlayController();
     playController->setup();
     
-    soundController->setup();
+    soundController->setup(16, 10);
     
     
     

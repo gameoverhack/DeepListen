@@ -46,6 +46,7 @@ void PlayController::update(){
         {
             ClipTimeline & clipTimeline = appModel->getClipTimeline();
             clipTimeline.clear();
+            clipTimeline.setMusicAssets(appModel->getMusicAssetLoader());
             resetClipGroups();
             playControllerStates.setState(kPLAYCONTROLLER_MAKE);
         }
