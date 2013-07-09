@@ -1252,10 +1252,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         int audioTrack;
     };
     
+    struct FadeTime {
+        int time;
+        float fade;
+    };
+    
     struct AudioClip {
         ofxThreadedVideo* audio;
         bool isLoading;
         bool isStopping;
+        float fadeTarget;
+        float fadeCurrent;
+        float fadeTime;
+        float fadeLast;
+        deque<FadeTime> fades;
         int audioTrack;
     };
     
@@ -1372,10 +1382,34 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                             if(audioClips[1].audio->loadMovie(getRandomAtmospherePath())){
                                                 
                                                 ofxLogVerbose() << "...loaded audio atmos" << endl;
-                                                audioClips[0].isLoading = true;
-                                                audioClips[1].isLoading = true;
-                                                audioClips[0].isStopping = false;
-                                                audioClips[1].isStopping = false;
+                                                
+                                                for(int j = 0; j < audioClips.size(); j++){
+                                                    audioClips[j].fadeTarget = 0.0f;
+                                                    audioClips[j].fadeCurrent = 0.0f;
+                                                    audioClips[j].fadeLast = 0.0f;
+                                                    audioClips[j].fadeTime = ofGetElapsedTimeMillis();
+                                                    
+                                                    audioClips[j].fades.clear();
+                                                    
+                                                    FadeTime a;
+                                                    a.time = 15000;
+                                                    a.fade = 1.0f;
+                                                    audioClips[j].fades.push_back(a);
+                                                    
+                                                    FadeTime b;
+                                                    b.time = 10000;
+                                                    b.fade = 1.0f;
+                                                    audioClips[j].fades.push_back(b);
+                                                    
+                                                    FadeTime c;
+                                                    c.time = 15000;
+                                                    c.fade = 0.0f;
+                                                    audioClips[j].fades.push_back(c);
+                                                    
+                                                    audioClips[j].isLoading = true;
+                                                    audioClips[j].isStopping = false;
+                                                }
+
                                                 videoClip.clip.setClipLoading(true);
                                                 clip.setClipLoading(true);
                                             }
@@ -1413,18 +1447,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             soundController->setAllChannelVolumes(audioClips[i].audioTrack + 0, 0.0f);
                             soundController->setAllChannelVolumes(audioClips[i].audioTrack + 1, 0.0f);
                             
-                            soundController->setChannelVolume(audioClip.audioTrack + 0, 0 + 2, 0.5f);
-                            soundController->setChannelVolume(audioClip.audioTrack + 1, 2 + 2, 0.5f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 0 + 2, 0.8f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 2 + 2, 0.8f);
                             
-                            soundController->setChannelVolume(audioClip.audioTrack + 0, 3 + 2, 0.5f);
-                            soundController->setChannelVolume(audioClip.audioTrack + 1, 4 + 2, 0.5f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 3 + 2, 0.8f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 4 + 2, 0.8f);
                             
-                            soundController->setChannelVolume(audioClip.audioTrack + 0, 5 + 2, 0.8f);
-                            soundController->setChannelVolume(audioClip.audioTrack + 1, 7 + 2, 0.8f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 0, 5 + 2, 0.5f);
+                            soundController->setChannelVolume(audioClip.audioTrack + 1, 7 + 2, 0.5f);
                             
                             soundController->setChannelVolume(audioClip.audioTrack + 0, 0 + 0, 0.8f);
                             soundController->setChannelVolume(audioClip.audioTrack + 1, 1 + 0, 0.8f);
                             
+                            audio->setVolume(audioClip.fadeCurrent);
+                            audioClip.fadeTime = ofGetElapsedTimeMillis();
                             //                    for(int channel = 0; channel < 5; channel++){
                             //                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.1f);
                             //                    }
@@ -1434,6 +1470,29 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             //                    }
                             
                             audioClip.isLoading = false;
+                        }
+                        
+                        if(audio->isLoaded() && audio->isPlaying() && !audioClip.isStopping){
+                            
+                            if(audioClip.fades.size() > 0){
+                                FadeTime f = audioClip.fades[0];
+                                audioClip.fadeTarget = f.fade;
+                                int timeDiff = ofGetElapsedTimeMillis() - audioClip.fadeTime;
+                                if(timeDiff <= f.time){
+                                    float pct = (float)timeDiff/(float)f.time;
+                                    //cout << audio->getVolume() << " " << pct << " " << timeDiff << " " << audioClip.fadeCurrent << endl;
+                                    audioClip.fadeCurrent = audioClip.fadeLast + (audioClip.fadeTarget - audioClip.fadeLast) * pct;
+                                }else{
+                                    audioClip.fadeLast = audioClip.fadeCurrent = audioClip.fadeTarget;
+                                    audioClip.fades.pop_front();
+                                    audioClip.fadeTime = ofGetElapsedTimeMillis();
+                                }
+                                if(audioClip.fadeCurrent != audioClip.fadeTarget){
+                                    audio->setVolume(audioClip.fadeCurrent);
+                                }
+                            }
+                            
+                            
                         }
                         
                         if(audio->getIsMovieDone()){
