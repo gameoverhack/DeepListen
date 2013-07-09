@@ -1366,6 +1366,10 @@ public:
                         soundController->setChannelVolume(videoClip.audioTrack, channel, pan[channel - channelStart]);
                     }
                     
+                    for(int channel = 5; channel < 8; channel++){
+                        soundController->setChannelVolume(videoClip.audioTrack, channel, 0.3f);
+                    }
+                    
                     clip.setClipLoading(false);
                 }
                 
@@ -1714,7 +1718,7 @@ public:
             if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
             
             x = ofRandom(xMin, xMax - scaledRect.width);
-            y = (1080.0 - 200.0f) - (scaledRect.height + scaledRect.y);
+            y = (1080.0 - 100.0f) - (scaledRect.height + scaledRect.y);
             width = scaledRect.width;
             
             fitted = !getAnyClipAt(frame,

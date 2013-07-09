@@ -136,7 +136,7 @@ void LoadController::update(){
         float normalize = 1.0f/maxScale;
         cout << "Reduce by: " << normalize << " " << maxScale * normalize << endl;
         
-        clip.setScale(clip.getScale() * normalize);
+        clip.setScale(clip.getScale() * normalize * 1.20);
         
         if(appModel->getProperty<bool>("ImportClipRects")){
             map<string, Clip>::iterator it = clips.clips.find(clip.getName());

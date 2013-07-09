@@ -50,6 +50,11 @@ protected:
 	
 private:
 	
+    float w0x, w0y, w1x, w1y;
+    
+    float mouseDownX;
+    float mouseDownY;
+    
     LoadController * loadController;
     AnalyzeController * analyzeController;
     PlayController * playController;

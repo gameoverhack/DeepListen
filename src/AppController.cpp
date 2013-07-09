@@ -77,8 +77,18 @@ void AppController::setup(){
     appModel->setProperty("mouseX", 0);
     appModel->setProperty("mouseY", 0);
     
-#ifdef MINI
-    // set properties here (can comment once saved)
+//    appModel->setProperty("warp0_x", 0.0f);
+//    appModel->setProperty("warp0_y", 0.0f);
+    
+//    appModel->setProperty("warp1_x", 0.0f);
+//    appModel->setProperty("warp1_y", 0.0f);
+    
+    w0x = appModel->getProperty<float>("warp0_x");
+    w0y = appModel->getProperty<float>("warp0_y");
+    w1x = appModel->getProperty<float>("warp1_x");
+    w1y = appModel->getProperty<float>("warp1_y");
+    
+#if defined(MINI)
     appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
 #ifdef JPEG
     appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/JPEG60/");
@@ -87,6 +97,15 @@ void AppController::setup(){
 #endif
     appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
     appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
+#elif defined(RETINA)
+    appModel->setProperty("TextPath", (string)"/Users/gameover/Desktop/DeepDataTest/TEXT/");
+#ifdef JPEG
+    appModel->setProperty("VideoPath", (string)"/Users/gameover/Desktop/DeepDataTest/JPEG60/");
+#else
+    appModel->setProperty("VideoPath", (string)"/Users/gameover/Desktop/DeepDataTest/ANIME60/");
+#endif
+    appModel->setProperty("AudioPath", (string)"/Users/gameover/Desktop/DeepDataTest/WAVE/");
+    appModel->setProperty("BlackPath", (string)"/Users/gameover/Desktop/DeepDataTest/black.mov");
 #else
     appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
     appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
@@ -94,7 +113,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
 #endif
     
-    appModel->setProperty("OverrideVideoPath", false);
+    appModel->setProperty("OverrideVideoPath", true);
     appModel->setProperty("ImportClipRects", false);
     
     appModel->setProperty("ContourMinArea", 10);
@@ -114,7 +133,7 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth_1", 1440.0f);
     appModel->setProperty("OutputHeight_1", 1080.0f);
     
-#ifdef MINI
+#if defined(MINI) || defined(RETINA)
 #ifdef JPEG
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #else
@@ -276,8 +295,15 @@ void AppController::draw(){
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
 //            appViews[0]->draw(0, 0, 1920, 1080);
 //            appViews[1]->draw(1920, 0, 1440, 1080);
-            appViews[0]->draw(0, 0, 1920.0f * (ofGetWidth()/2.0f) / 1920.0f, 1920.0f * (ofGetWidth()/2.0f) / 1920.0f / 16.0 * 9.0);
-            appViews[1]->draw(1920.0f * (ofGetWidth()/2.0f) / 1920.0f, 0, 1440.0f * (ofGetWidth()/2.0f) / 1920.0f, (1440.0f * (ofGetWidth()/2.0f) / 1920.0f) / 4.0 * 3.0);
+            appViews[0]->draw(w0x,
+                              w0y,
+                              1920.0f * (ofGetWidth()/2.0f) / 1920.0f,
+                              1920.0f * (ofGetWidth()/2.0f) / 1920.0f / 16.0 * 9.0);
+            
+            appViews[1]->draw(w1x + 1920.0f * (ofGetWidth()/2.0f) / 1920.0f,
+                              w1y,
+                              1440.0f * (ofGetWidth()/2.0f) / 1920.0f,
+                              (1440.0f * (ofGetWidth()/2.0f) / 1920.0f) / 4.0 * 3.0);
 #endif
         }
             break;
@@ -348,8 +374,20 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             warp1.toggleDoWarp();
             break;
         case 'r':
-            if(appViewStates.getState(kAPPVIEW_SHOWWARP_0)) warp0.resetWarpGrid();
-            if(appViewStates.getState(kAPPVIEW_SHOWWARP_1)) warp1.resetWarpGrid();
+            if(appViewStates.getState(kAPPVIEW_SHOWWARP_0)){
+                warp0.resetWarpGrid();
+                appModel->setProperty("warp0_x", 0.0f);
+                appModel->setProperty("warp0_y", 0.0f);
+                w0x = appModel->getProperty<float>("warp0_x");
+                w0y = appModel->getProperty<float>("warp0_y");
+            }
+            if(appViewStates.getState(kAPPVIEW_SHOWWARP_1)){
+                warp1.resetWarpGrid();
+                appModel->setProperty("warp1_x", 0.0f);
+                appModel->setProperty("warp1_y", 0.0f);
+                w1x = appModel->getProperty<float>("warp1_x");
+                w1y = appModel->getProperty<float>("warp1_y");
+            }
             break;
         case '`':
             appModel->setProperty("warpPoints_0", warp0.getControlPoints());
@@ -412,6 +450,27 @@ void AppController::mouseMoved(ofMouseEventArgs & e){
 //--------------------------------------------------------------
 void AppController::mouseDragged(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
+    
+    if(e.button != 2) return;
+    
+    float diffX = e.x - mouseDownX;
+    float diffY = e.y - mouseDownY;
+    
+    BezierWarp & warp0 = appViews[0]->getWarp<BezierWarp>();
+    BezierWarp & warp1 = appViews[1]->getWarp<BezierWarp>();
+    
+    if(warp0.getShowWarpGrid()){
+        w0x = appModel->getProperty<float>("warp0_x") + diffX;
+        w0y = appModel->getProperty<float>("warp0_y") + diffY;
+        warp0.setWarpGridPosition(w0x, w0y, warp0.getWidth(), warp0.getHeight());
+    }
+    
+    if(warp1.getShowWarpGrid()){
+        w1x = appModel->getProperty<float>("warp1_x") + diffX;
+        w1y = appModel->getProperty<float>("warp1_y") + diffY;
+        warp1.setWarpGridPosition(w1x + 1920.0f * (ofGetWidth()/2.0f) / 1920.0f, w1y, warp1.getWidth(), warp1.getHeight());
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -419,9 +478,28 @@ void AppController::mousePressed(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
     ClipTimeline & timeline = appModel->getClipTimeline();
     cout << timeline.getClipAt(e.x, e.y, ofGetWidth() / 2.0f, ofGetHeight()) << endl;
+    
+    mouseDownX = e.x;
+    mouseDownY = e.y;
 }
 
 //--------------------------------------------------------------
 void AppController::mouseReleased(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
+    if(e.button != 2) return;
+
+    BezierWarp & warp0 = appViews[0]->getWarp<BezierWarp>();
+    BezierWarp & warp1 = appViews[1]->getWarp<BezierWarp>();
+    
+    if(warp0.getShowWarpGrid()){
+        appModel->setProperty("warp0_x", w0x);
+        appModel->setProperty("warp0_y", w0y);
+    }
+    
+    if(warp1.getShowWarpGrid()){
+        appModel->setProperty("warp1_x", w1x);
+        appModel->setProperty("warp1_y", w1y);
+    }
+    
+    mouseDownX = mouseDownY = 0;
 }
