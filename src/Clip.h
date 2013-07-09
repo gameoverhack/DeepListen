@@ -622,6 +622,14 @@ public:
         return imageAdjust;
     }
     
+    bool getIsClipTitle(){
+        if(getName().rfind("OOOO_00_TITLE") != string::npos){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     bool operator!=(const Clip &rhs) {
         if(name != rhs.name ||
            clipPosition.position != rhs.clipPosition.position ||
@@ -1243,6 +1251,13 @@ struct VideoClip {
     Clip clip;
     int audioTrack;
 };
+
+struct AudioClip {
+    ofxThreadedVideo* audio;
+    bool isLoading;
+    bool isStopping;
+    int audioTrack;
+};
     
 class ClipTimeline {
 
@@ -1284,7 +1299,8 @@ public:
             VideoClip vc;
             vc.video = video;
             vc.clip = dummyClip;
-            vc.audioTrack = videoClips.size() - 1;
+            vc.audioTrack = videoClips.size() - 1; // is this right?
+            ofxLogVerbose() << "Assigning audio for VIDEO to channel: " << vc.audioTrack << endl;
             videoClips.push_back(vc);
         }
 #else
@@ -1295,7 +1311,24 @@ public:
             shader.load(ofToDataPath("yuyvtorgba"));
             renderer.allocate(1920, 1080);
         }
-
+//        
+//        for(int i = 0; i < 2; i++){
+//            ofxThreadedVideo * audio = new ofxThreadedVideo;
+//            audio->setAudioDevice("JackRouter");
+//            audio->setPixelFormat(pixelFormat);
+//            audio->setUseAutoPlay(false);
+//            audio->setUseQueue(true);
+//            //audio->setLoopState(OF_LOOP_NONE);
+//            ofAddListener(audio->threadedVideoEvent, this, &ClipTimeline::threadedAudioEvent);
+//            AudioClip ac;
+//            ac.audio = audio;
+//            ac.audioTrack = 4 + i; // is this right?
+//            ofxLogVerbose() << "Assigning audio for MUSIC to channel: " << ac.audioTrack << endl;
+//            ac.isLoading = false;
+//            ac.isStopping = false;
+//            audioClips.push_back(ac);
+//        }
+        
     }
     
     void update(){
@@ -1315,18 +1348,89 @@ public:
                     ofxThreadedVideo * video = videoClip.video;
                     
                     if(!video->isLoaded() && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
-                        ofxLogVerbose() << "Loading " << clip << endl;
+                        ofxLogVerbose() << "Loading..." << endl;
                         
                         video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack), true);
                         
                         if(video->loadMovie(clip.getVideoPath())){
+                            ofxLogVerbose() << "...loaded normal clip" << clip << endl;
                             videoClip.clip.setClipLoading(true);
                             clip.setClipLoading(true);
+//                            if(videoClip.clip.getIsClipTitle()){
+//                                ofxLogVerbose() << "...loaded title clip..." << clip << endl;
+//                                
+//                                audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(audioClips[0].audioTrack), true);
+//                                //audioClips[0].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(1), false);
+//                                audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(audioClips[1].audioTrack), true);
+//                                //audioClips[1].audio->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(2), false);
+//                                
+//                                if(audioClips[0].audio->loadMovie(ofToDataPath("/Volumes/DeepData/ANIME60/STAT_IDIS_EOOA_00_ALFB.mov"))){
+//                                    ofxLogVerbose() << "...loaded audio abstract..." << endl;
+//                                    if(audioClips[1].audio->loadMovie(ofToDataPath("/Volumes/DeepData/ANIME60/INTR_ABOT_ANRS_03_NATHANL.mov"))){
+//                                        ofxLogVerbose() << "...loaded audio atmos" << endl;
+//                                        audioClips[0].isLoading = true;
+//                                        audioClips[1].isLoading = true;
+//                                        audioClips[0].isStopping = false;
+//                                        audioClips[1].isStopping = false;
+//                                        videoClip.clip.setClipLoading(true);
+//                                        clip.setClipLoading(true);
+//                                    }
+//                                };
+////                                ofxLogVerbose() << "...loaded normal clip" << clip << endl;
+////                                videoClip.clip.setClipLoading(true);
+////                                clip.setClipLoading(true);
+//                            }else{
+//                                ofxLogVerbose() << "...loaded normal clip" << clip << endl;
+//                                videoClip.clip.setClipLoading(true);
+//                                clip.setClipLoading(true);
+//                            }
                         }
+                        
+
                     }
                     
                 }
             }
+            
+//            for(int i = 0; i < audioClips.size(); i++){
+//                
+//                AudioClip & audioClip = audioClips[i];
+//                ofxThreadedVideo * audio = audioClip.audio;
+//                
+//                audio->update();
+//                //cout << "hhhh" << audio->getAudioTrackList() << endl;
+//                
+//                if(audio->isLoaded() && !audio->isPlaying() && !audioClip.isStopping){
+//                    ofxLogVerbose() << i << " Audio Playing " << audio->getMovieName() << endl;
+//                    audio->setLoopState(OF_LOOP_NONE);
+//                    audio->play();
+//                    ofxLogVerbose() << "Assign music to: " << audioClip.audioTrack << endl;
+//                    
+//                    soundController->setAllChannelVolumes(audioClips[i].audioTrack, 0.0f);
+//                    audio->setVolume(0.1);
+////                    for(int channel = 0; channel < 5; channel++){
+////                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.1f);
+////                    }
+////
+////                    for(int channel = 0; channel < 8; channel++){
+////                        soundController->setChannelVolume(audioClip.audioTrack, channel, 0.5f);
+////                    }
+//                    
+//                    audioClip.isLoading = false;
+//                }
+//                
+//                if(audio->getIsMovieDone()){
+//                    ofxLogVerbose() << "Stopping Music " << endl;
+//                    audio->stop();
+//                    audioClip.isLoading = false;
+//                    audioClip.isStopping = true;
+//                }
+//                
+//                if(audio->getIsMovieDone() && audio->isPlaying()){
+//                    ofxLogVerbose() << "Force Stopping Music " << endl;
+//                    audio->stop();
+//                }
+//            }
             
             bool syncAssigned = false;
 #ifdef VIDEO_TIMECODE
@@ -1343,7 +1447,7 @@ public:
                 video->update();
                 
                 if(video->isLoaded() && !video->isPlaying() && !clip.getClipStopping()){
-                    ofxLogVerbose() << i << " Playing " << clip << endl;
+                    ofxLogVerbose() << i << " Video Playing " << clip << endl;
                     
                     if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
                         ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
@@ -1367,21 +1471,21 @@ public:
                     }
                     
                     for(int channel = 5; channel < 8; channel++){
-                        soundController->setChannelVolume(videoClip.audioTrack, channel, 0.3f);
+                        soundController->setChannelVolume(videoClip.audioTrack, channel, 0.2f);
                     }
                     
                     clip.setClipLoading(false);
                 }
                 
                 if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
-                    ofxLogVerbose() << "Stopping " << clip << endl;
+                    ofxLogVerbose() << "Stopping Video " << clip << endl;
                     video->stop();
                     clip.setClipLoading(false);
                     clip.setClipStopping(true);
                 }
                 
                 if(video->getIsMovieDone() && video->isPlaying()){
-                    ofxLogVerbose() << "Force Stopping " << clip << endl;
+                    ofxLogVerbose() << "Force Stopping Video " << clip << endl;
                     video->stop();
                 }
                 
@@ -1417,11 +1521,16 @@ public:
                     
                 }
 #endif
+            
         }
     }
     
     void threadedVideoEvent(ofxThreadedVideoEvent & e){
-        ofxLogVerbose() << e << endl;
+        ofxLogVerbose() << "Video Event: " << e << endl;
+    }
+        
+    void threadedAudioEvent(ofxThreadedVideoEvent & e){
+        ofxLogVerbose() << "Audio Event: " << e << endl;
     }
     
    VideoClip& assignVideoClip(Clip & clip){
@@ -1718,7 +1827,13 @@ public:
             if(xMax == -1) xMax = (screen == 0 ? 1920.0f : 1440.0f);
             
             x = ofRandom(xMin, xMax - scaledRect.width);
-            y = (1080.0 - 100.0f) - (scaledRect.height + scaledRect.y);
+            
+            if(clip.getIsClipTitle()){
+                y = (1080.0 - 300.0f) - (scaledRect.height + scaledRect.y);
+            }else{
+                y = (1080.0 - 100.0f) - (scaledRect.height + scaledRect.y);
+            }
+            
             width = scaledRect.width;
             
             fitted = !getAnyClipAt(frame,
@@ -1861,7 +1976,11 @@ public:
     vector<VideoClip>& getVideoClips(){
         return videoClips;
     }
-    
+        
+    vector<AudioClip>& getAudioClips(){
+        return audioClips;
+    }
+        
     vector<Clip>& getCurrentClips(){
         return currentClips;
     }
@@ -1896,6 +2015,7 @@ protected:
     
     ofPixelFormat pixelFormat;
     vector<VideoClip> videoClips;
+    vector<AudioClip> audioClips;
     
     vector<Clip> currentClips;
     

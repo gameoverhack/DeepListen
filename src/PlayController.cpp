@@ -85,7 +85,15 @@ void PlayController::update(){
                     ofxThreadedVideo * video = videoClips[i].video;
                     ostringstream os;
                     os << ofToString(video->isLoading()) << " " << ofToString(video->isPlaying()) << " " << ofToString(video->getIsMovieDone()) << " " << ofToString(video->getFrameRate()) << " " << videoClips[i].clip;
-                    appModel->setProperty("PlayState_"+ofToString(i), os.str());
+                    appModel->setProperty("PlayStateV_"+ofToString(i), os.str());
+                }
+                
+                vector<AudioClip>& audioClips = clipTimeline.getAudioClips();
+                for(int i = 0; i < audioClips.size(); i++){
+                    ofxThreadedVideo * audio = audioClips[i].audio;
+                    ostringstream os;
+                    os << ofToString(audio->isLoading()) << " " << ofToString(audio->isPlaying()) << " " << ofToString(audio->getIsMovieDone()) << " " << ofToString(audio->getFrameRate()) << " " << audio->getMovieName();
+                    appModel->setProperty("PlayStateA_"+ofToString(i), os.str());
                 }
                 
                 ostringstream os;
@@ -488,9 +496,14 @@ void PlayController::resetClipGroups(){
         // iterate through all clips and add to an "all" clips ClipGroup
         for(int i = 0; i < appModel->getClips().size(); i++){
             Clip & clip = appModel->getClip(i);
-            if(!clip.getDeleted()) originalClips.push(clip);
+            if(!clip.getDeleted()){
+                cout << "USING    : " << clip << endl; 
+                originalClips.push(clip);
+            }else{
+                cout << "NOT USING: " << clip << endl; 
+            }
         }
-        
+
         // get all the title clips and delete them from the original list
         allTitleClips = originalClips.getContains(QUESTION, "TTLE");
         originalClips.pop(allTitleClips);

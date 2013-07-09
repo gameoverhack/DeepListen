@@ -49,14 +49,17 @@ void LoadController::update(){
     FileList & videoFiles = appModel->getVideoAssetLoader();
     FileList & audioFiles = appModel->getAudioAssetLoader();
     FileList & textFiles = appModel->getTextAssetLoader();
+    FileList & musicFiles = appModel->getMusicAssetLoader();
     
     videoFiles.allowExt(".mov");
     audioFiles.allowExt(".wav");
     textFiles.allowExt(".txt");
+    musicFiles.allowExt(".wav");
     
     videoFiles.listDir(appModel->getProperty<string>("VideoPath"), false);
     audioFiles.listDir(appModel->getProperty<string>("AudioPath"), false);
     textFiles.listDir(appModel->getProperty<string>("TextPath"), true);
+    musicFiles.listDir(appModel->getProperty<string>("MusicPath"), true);
     
     Clips clips;
     
@@ -80,6 +83,9 @@ void LoadController::update(){
             ofxLogNotice() << "CHECK clip: " << clip.getName() << endl;
             
             maxScale = MAX(maxScale, clip.getScale());
+            
+            if(clip.getDeleted()) clip.setDeleted(false); // force recheck deleted clips every time
+            
 //            if(name.rfind("OOOO_00_TITLE") != string::npos){
 //                clip.setAnalyzed(false);
 //            }
@@ -93,6 +99,7 @@ void LoadController::update(){
             // both an audio and a text file for this video
             
             if(name.rfind("OOOO_00_TITLE") != string::npos){
+                ofxLogNotice() << "Adding title clip: " << name << endl;
                 Clip clip = Clip(name);
                 clip.setVideoFile(videoFiles[name]);
                 clip.setAnalyzed(false);
@@ -167,8 +174,9 @@ void LoadController::update(){
             // mark the clip as deleted in case we're just
             // temporarily removing the file
             
-            if(clip.getName().rfind("OOOO_00_TITLE") != string::npos && videoFiles.getFileExists(clip.getName())){
+            if(clip.getIsClipTitle() && videoFiles.getFileExists(clip.getName())){
                 if(videoFiles.getFile(clip.getName()) != clip.getVideoFile()) clip.setVideoFile(videoFiles[clip.getName()]);
+                ofxLogNotice() << "Don't delete title clip: " << clip.getName() << endl;
                 continue;
             };
             
@@ -202,7 +210,7 @@ void LoadController::update(){
         }
         
     }
-    
+
     
     if(!appModel->getProperty<bool>("ImportClipRects")){
         clips.clips = appModel->getClips();

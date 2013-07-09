@@ -58,6 +58,7 @@ public:
     FileList& getAudioAssetLoader();
     FileList& getVideoAssetLoader();
     FileList& getTextAssetLoader();
+    FileList& getMusicAssetLoader();
     
     bool save(string filname, ArchiveType archiveType);
     bool load(string filname, ArchiveType archiveType);
@@ -81,6 +82,7 @@ protected:
     FileList audioAssets;
     FileList videoAssets;
     FileList textAssets;
+    FileList musicAssets;
     
     friend class boost::serialization::access;
 	template<class Archive>

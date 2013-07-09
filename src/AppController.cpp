@@ -90,6 +90,7 @@ void AppController::setup(){
     
 #if defined(MINI)
     appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
+    appModel->setProperty("MusicPath", (string)"/Volumes/DeepData/MUSIC/");
 #ifdef JPEG
     appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/JPEG60/");
 #else
@@ -99,6 +100,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
 #elif defined(RETINA)
     appModel->setProperty("TextPath", (string)"/Users/gameover/Desktop/DeepDataTest/TEXT/");
+    appModel->setProperty("MusicPath", (string)"/Users/gameover/Desktop/DeepDataTest/MUSIC/");
 #ifdef JPEG
     appModel->setProperty("VideoPath", (string)"/Users/gameover/Desktop/DeepDataTest/JPEG60/");
 #else
@@ -108,6 +110,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Users/gameover/Desktop/DeepDataTest/black.mov");
 #else
     appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
+    appModel->setProperty("MusicPath", (string)"/Volumes/Ersatz/CODECTESTS/MUSIC/");
     appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
     appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
@@ -178,6 +181,13 @@ void AppController::setup(){
         
     }
     
+//    appModel->removeAllProperties();
+//    appModel->setProperty("warpPoints_0", appViews[0]->getWarp<BezierWarp>().getControlPoints());
+//    appModel->setProperty("warpPoints_1", appViews[1]->getWarp<BezierWarp>().getControlPoints());
+//    appModel->setProperty("warp0_x", w0x);
+//    appModel->setProperty("warp0_y", w0y);
+//    appModel->setProperty("warp1_x", w1x);
+//    appModel->setProperty("warp1_y", w1y);
     
     // make a debug window
     debugView = new DebugView();
@@ -215,6 +225,8 @@ void AppController::setup(){
     playController->setup();
     
     soundController->setup();
+    
+    
     
 }
 

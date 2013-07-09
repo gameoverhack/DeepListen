@@ -1,0 +1,4 @@
+#!/bin/sh
+#!sudo kextunload "/System/Library/Extensions/PromisePegasusJ4.kext"
+sudo rm -rf "/System/Library/Extensions/PromisePegasusJ4.kext"
+

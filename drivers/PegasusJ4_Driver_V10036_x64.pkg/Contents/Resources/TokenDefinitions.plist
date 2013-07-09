@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>pkmk-token-20</key>
+	<array>
+		<dict>
+			<key>identifier</key>
+			<string>com.promise.driver.pegasusj4</string>
+			<key>path</key>
+			<string>/System/Library/Extensions/PromisePegasusJ4.kext</string>
+			<key>searchPlugin</key>
+			<string>CommonAppSearch</string>
+		</dict>
+	</array>
+</dict>
+</plist>

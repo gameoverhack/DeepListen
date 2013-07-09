@@ -59,6 +59,20 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     
     bool ok = false;
     
+//    for(int channel = 1; channel < inChannels + 1; channel++){
+//        ok = createPort("input" + ofToString(channel), JackPortIsInput);
+//        if(!ok) break;
+//        ok = connect(getApplicationName() + ":out"+ofToString(channel), "SoundController:input" + ofToString(channel));
+//        if(!ok) break;
+//    }
+//    
+//    for(int channel = 1; channel < outChannels + 1; channel++){
+//        ok = createPort("output" + ofToString(channel), JackPortIsOutput);
+//        if(!ok) break;
+//        ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
+//        if(!ok) break;
+//    }
+    
     for(int channel = 1; channel < outChannels + 1; channel++){
         ok = createPort("input" + ofToString(channel), JackPortIsInput);
         if(!ok) break;

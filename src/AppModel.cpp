@@ -222,3 +222,8 @@ FileList& AppModel::getVideoAssetLoader(){
 FileList& AppModel::getTextAssetLoader(){
     return textAssets;
 };
+
+//--------------------------------------------------------------
+FileList& AppModel::getMusicAssetLoader(){
+    return musicAssets;
+};
