@@ -54,7 +54,7 @@ public:
     void update();
     
 protected:
-	
+    
 private:
 	
 };

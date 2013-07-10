@@ -61,6 +61,15 @@ void LoadController::update(){
     textFiles.listDir(appModel->getProperty<string>("TextPath"), true);
     musicFiles.listDir(appModel->getProperty<string>("MusicPath"), true);
     
+    set<string> excludeSet;
+    ofFile excludeList = ofFile(ofToDataPath("ExcludeList.txt"));
+    ofBuffer buffer = excludeList.readToBuffer();
+    while (!buffer.isLastLine()) {
+        string line = buffer.getNextLine();
+        excludeSet.insert(line);
+        ofxLogVerbose() << "Adding " << line << " to exclude list" << endl;
+    }
+    
     Clips clips;
     
     if(appModel->getProperty<bool>("ImportClipRects")){
@@ -86,12 +95,10 @@ void LoadController::update(){
             
             if(clip.getDeleted()) clip.setDeleted(false); // force recheck deleted clips every time
             
-//            if(name.rfind("OOOO_00_TITLE") != string::npos){
-//                clip.setAnalyzed(false);
-//            }
-            // TODO: check if clip has been temporarily removed (ie., deleted == true)
-            // TODO: check dates and sizes or overide dates and sizes
-            // actually maybe this just happens in the next check ??
+            if((excludeSet.find(clip.getName()) != excludeSet.end())){
+                ofxLogNotice() << "Excluding clip: " << clip << endl;
+                clip.setDeleted(true);
+            }
             
         }else{
             
