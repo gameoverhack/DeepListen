@@ -116,7 +116,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
 #endif
     
-    appModel->setProperty("OverrideVideoPath", true);
+    appModel->setProperty("OverrideVideoPath", false);
     appModel->setProperty("ImportClipRects", false);
     
     appModel->setProperty("ContourMinArea", 10);

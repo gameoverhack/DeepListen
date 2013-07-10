@@ -141,8 +141,7 @@ void PlayController::makeClipGroup(){
     
     string category = "";
     string question = "";
-    int flip;
-    int lastAudioFreeFrame = 0;
+    lastAudioFreeFrame = 0;
     
 //    ClipTimeline & timeline = appModel->getClipTimeline();
 //    
@@ -160,13 +159,53 @@ void PlayController::makeClipGroup(){
     int statMax = 0;
     int respMin = 20;
     int statMin = 20;
+    int maxAttempts = 20;
+    int attempts;
+    
+    int specialCount = 0;
+    int introCount = 4;
+    lastPerson = "";
+    
+    ClipTimeline & timeline = appModel->getClipTimeline();
     
     while(true){
 
-        // flip for inserting a special or inserting a category
-        flip = getRandomDistribution(2, 0.8f, 0.2f);
-        
-        if(true){//flip == 0){ // do a category
+        if(introCount == 4){
+            
+            ofxLogNotice() << "INTRO CLIP INSERT" << endl;
+            
+            introCount = 0;
+            
+            // insert a TITLE here
+            Clip title = allTitleClips.getContains(CATEGORY, "CONN").getrandom();
+            
+            int titleInsertFrame;
+            if(timeline.getGroup().size() > 0){
+                Clip lastClip = timeline.getLastClip();
+                titleInsertFrame = lastClip.getAudioEnd() - (12 * 25);
+            }else{
+                titleInsertFrame = 0;
+                //title.setCrop(12 * 25, title.getTotalFrames());
+            }
+            
+            if(timeline.insertClipAt(title, titleInsertFrame)){
+                ofxLogVerbose() << "Inserted title: " << timeline.getLastClip() << endl;
+                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + (27 * 25);
+            }else{
+                ofxLogWarning() << "Rejected title: " << title << endl;
+            }
+            
+            // insert intros
+            int numberOfIntros = floor((int)ofRandom(3)) + 2;
+            ClipGroup introGroup = allIntroClips;
+            ClipGroup theseIntroPeople = getGroupSelectionFrom(introGroup, numberOfIntros, 3);
+            
+        }else if(specialCount == 7){
+            ofxLogNotice() << "SPECIAL CLIP INSERT" << endl;
+            specialCount = 0;
+        }else{// do a category
+            
+            ofxLogNotice() << "CATEGORY CLIP INSERT" << endl;
             
             ClipType allCategoryTypes = allClips.getClipTypes(CATEGORY);
             
@@ -195,9 +234,6 @@ void PlayController::makeClipGroup(){
             
             cout << "Response min: " << respMin << " Statement min: " << statMin << endl;
             cout << "Response max: " << respMax << " Statement max: " << statMax << endl;
-
-            int maxAttempts = 20;
-            int attempts;
             
             attempts = 0;
             bool categoryOk = false;
@@ -251,9 +287,7 @@ void PlayController::makeClipGroup(){
                 }
                 attempts++;
             }
-            
-            ClipTimeline & timeline = appModel->getClipTimeline();
-            
+
             // insert a TITLE here
             Clip title = allTitleClips.getContains(CATEGORY, category).getrandom();
             
@@ -275,115 +309,17 @@ void PlayController::makeClipGroup(){
             
             // insert statements
             ClipGroup statementGroup = allStatClips.getStatements(category);
-            ClipGroup theseStatementPeople;
-            string lastPerson = "";
-            
-            for(int j = 0; j < MIN(statementGroup.size(), numberOfStatements); j++){ // make sure we don't exceed statementGroup size!
-                
-                bool personOk = false;
-                attempts = 0;
-                while(!personOk && attempts < maxAttempts){
-                    Clip clip = statementGroup.getrandom();
-                    string person = clip.getClipInfo().person;
-                    ofxLogVerbose() << "Checking person for statement type: " << getStatementQuestionFromCategory(category) << endl;
-                    if(appModel->getTimer(person, framesToMillis(lastAudioFreeFrame), minutesToMillis(5)) || attempts == maxAttempts - 1){
-                        if(attempts == maxAttempts - 1){
-                            ofxLogVerbose() << "Attempt fail statement: " << attempts << " " << maxAttempts << endl;
-                            int maxDifference = -INFINITY;
-                            map<int, Clip> differences;
-                            for(int k = 0; k < statementGroup.size(); k++){
-                                clip = statementGroup.at(k);
-                                person = clip.getClipInfo().person;
-                                int difference = appModel->getTimerDifference(person, framesToMillis(lastAudioFreeFrame));
-                                differences[difference] = clip;
-                                maxDifference = MAX(maxDifference, difference);
-                            }
-                            clip = differences[maxDifference];
-                            person = clip.getClipInfo().person;
-                            ofxLogVerbose() << "Choose max difference for statement: " << person << " " << millisToMinutes(maxDifference) << endl;
-                            if(person == lastPerson){
-                                ofxLogVerbose() << "Same last person: " << clip << endl;
-                                break;
-                            }
-                        }
-                        int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
-                        ofxLogVerbose() << "Attempting to insert clip at: " << insertFrame << endl;
-                        if(timeline.insertClipAt(clip, insertFrame)){
-                            ofxLogVerbose() << "Inserted: " << timeline.getLastClip() << endl;
-                            lastAudioFreeFrame = timeline.getLastClip().getAudioEnd();
-                            appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
-                            statementGroup.pop(clip);
-                            theseStatementPeople.push(clip);
-                            lastPerson = person;
-                            personOk = true;
-                        }else{
-                            ofxLogWarning() << "Rejected: " << clip << endl;
-                            statementGroup.pop(clip);
-                        }
-                    }
-                    attempts++;
-                    cout << "attempts: " << attempts << endl;
-                }
-            }
+            ClipGroup theseStatementPeople = getGroupSelectionFrom(statementGroup, numberOfStatements, 5);
             
             // insert responses
             ClipGroup questionGroup = categoryGroup.getContains(QUESTION, question);
-            ClipGroup theseResponsePeople;
             
             for(int j = 0; j < theseStatementPeople.size(); j++){
                 questionGroup = questionGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
             }
             
-            for(int j = 0; j < MIN(questionGroup.size(), numberOfResponses); j++){ // make sure we don't exceed questionGroup size!
-                
-                bool personOk = false;
-                attempts = 0;
-                while(!personOk && attempts < maxAttempts){
-                    Clip clip = questionGroup.getrandom();
-                    string person = clip.getClipInfo().person;
-                    ofxLogVerbose() << "Checking person for response type: " << question << endl;
-                    if(appModel->getTimer(person, framesToMillis(lastAudioFreeFrame), minutesToMillis(5)) || attempts == maxAttempts - 1){
-                        if(attempts == maxAttempts - 1){
-                            ofxLogVerbose() << "Attempt fail response: " << attempts << " " << maxAttempts << endl;
-                            int maxDifference = -INFINITY;
-                            map<int, Clip> differences;
-                            for(int k = 0; k < questionGroup.size(); k++){
-                                clip = questionGroup.at(k);
-                                person = clip.getClipInfo().person;
-                                int difference = appModel->getTimerDifference(person, framesToMillis(lastAudioFreeFrame));
-                                differences[difference] = clip;
-                                maxDifference = MAX(maxDifference, difference);
-                            }
-                            clip = differences[maxDifference];
-                            person = clip.getClipInfo().person;
-                            ofxLogVerbose() << "Choose max difference for response: " << person << " " << millisToMinutes(maxDifference) << endl;
-                            if(person == lastPerson){
-                                ofxLogVerbose() << "Same last person: " << clip << endl;
-                                break;
-                            }
-                        }
-
-                        int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
-                        ofxLogVerbose() << "Attempting to insert clip at: " << insertFrame << endl;
-                        if(timeline.insertClipAt(clip, insertFrame)){
-                            Clip lastClip = timeline.getLastClip();
-                            ofxLogVerbose() << "Inserted: " << lastClip << endl;
-                            lastAudioFreeFrame = lastClip.getAudioEnd();
-                            appModel->setTimer(person, framesToMillis(lastClip.getVideoEnd()));
-                            questionGroup.pop(clip);
-                            allClips.pop(clip);
-                            theseResponsePeople.push(lastClip);
-                            lastPerson = person;
-                            personOk = true;
-                        }else{
-                            ofxLogWarning() << "Rejected: " << clip << endl;
-                            questionGroup.pop(clip);
-                        }
-                    }
-                    attempts++;
-                    cout << "attempts: " << attempts << endl;
-                }
-            }
+            ClipGroup theseResponsePeople = getGroupSelectionFrom(questionGroup, numberOfResponses, 5);
+            allClips.pop(theseResponsePeople);
             
             int responseCount = theseResponsePeople.size();
             if(responseCount > 0){
@@ -468,11 +404,69 @@ void PlayController::makeClipGroup(){
             appModel->setTimer(category, framesToMillis(timeline.getLastClip().getVideoEnd()));
             appModel->setTimer(question, framesToMillis(timeline.getLastClip().getVideoEnd()));
             
-        }else{ // do a special
+            introCount++;
+            specialCount++;
             
         }
     }
 
+}
+
+//--------------------------------------------------------------
+ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips, int targetMinsBetweenPeeps){
+    
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    ClipGroup thisSelection;
+    
+    for(int j = 0; j < MIN(group.size(), maxNumClips); j++){ // make sure we don't exceed statementGroup size!
+        
+        bool personOk = false;
+        int attempts = 0;
+        int maxAttempts = 20;
+        while(!personOk && attempts < maxAttempts){
+            Clip clip = group.getrandom();
+            string person = clip.getClipInfo().person;
+            ofxLogVerbose() << "Checking person: " << person << endl;
+            if(appModel->getTimer(person, framesToMillis(lastAudioFreeFrame), minutesToMillis(targetMinsBetweenPeeps)) || attempts == maxAttempts - 1){
+                if(attempts == maxAttempts - 1){
+                    ofxLogVerbose() << "Attempt fail statement: " << attempts << " " << maxAttempts << endl;
+                    int maxDifference = -INFINITY;
+                    map<int, Clip> differences;
+                    for(int k = 0; k < group.size(); k++){
+                        clip = group.at(k);
+                        person = clip.getClipInfo().person;
+                        int difference = appModel->getTimerDifference(person, framesToMillis(lastAudioFreeFrame));
+                        differences[difference] = clip;
+                        maxDifference = MAX(maxDifference, difference);
+                    }
+                    clip = differences[maxDifference];
+                    person = clip.getClipInfo().person;
+                    ofxLogVerbose() << "Choose max difference for person: " << person << " " << millisToMinutes(maxDifference) << endl;
+                    if(person == lastPerson){
+                        ofxLogVerbose() << "Same last person: " << clip << endl;
+                        break;
+                    }
+                }
+                int insertFrame = lastAudioFreeFrame - clip.getAudioInFrameOffset();
+                ofxLogVerbose() << "Attempting to insert clip at: " << insertFrame << endl;
+                if(timeline.insertClipAt(clip, insertFrame)){
+                    ofxLogVerbose() << "Inserted: " << timeline.getLastClip() << endl;
+                    lastAudioFreeFrame = timeline.getLastClip().getAudioEnd();
+                    appModel->setTimer(person, framesToMillis(timeline.getLastClip().getVideoEnd()));
+                    group.pop(clip);
+                    thisSelection.push(clip);
+                    lastPerson = person;
+                    personOk = true;
+                }else{
+                    ofxLogWarning() << "Rejected: " << clip << endl;
+                    group.pop(clip);
+                }
+            }
+            attempts++;
+            cout << "attempts: " << attempts << endl;
+        }
+    }
+    return thisSelection;
 }
 
 //--------------------------------------------------------------

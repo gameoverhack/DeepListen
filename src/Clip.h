@@ -55,6 +55,7 @@ static string getPersonalFromCode(string code){
 };
 
 static string getCategoryFromCode(string code){
+    if(code == "CONN") return "Intro";
     if(code == "INTR") return "Intro";
     if(code == "CNTY") return "Country";
     if(code == "IDEN") return "Identity";
