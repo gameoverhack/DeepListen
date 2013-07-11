@@ -1367,8 +1367,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 
                                 if(video->loadMovie(clip.getVideoPath())){
                                     
-                                    ofxLogVerbose() << "...loaded normal clip" << clip << endl;
-                                    
                                     if(videoClip.clip.getIsClipTitle()){
                                         ofxLogVerbose() << "...loaded title clip..." << clip << endl;
                                         
@@ -1634,8 +1632,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                         ofxThreadedVideo * video = new ofxThreadedVideo;
                         video->setAudioDevice("JackRouter");
                         video->setPixelFormat(pixelFormat);
-                        video->setUseAutoPlay(false);
+                        video->setUseAutoPlay(true);
                         video->setUseQueue(true);
+                        video->setLoopState(OF_LOOP_NONE);
                         ofAddListener(video->threadedVideoEvent, this, &ClipTimeline::threadedVideoEvent);
                         VideoClip vc;
                         vc.video = video;
@@ -1670,10 +1669,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     }
                     
                     void setFrame(int frame){
-                        bool cPaused = bPaused;
-                        stop();
+                        //bool cPaused = bPaused;
+                        //stop();
                         currentFrame = frame;
-                        setPaused(cPaused);
+                        for(int i = 1; i < videoClips.size(); i++){
+                            VideoClip & videoClip = videoClips[i];
+                            
+                            Clip & clip = getRealClip(videoClip.clip);
+                            ofxThreadedVideo * video = videoClip.video;
+                            if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
+                                ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
+                                video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
+                            }
+                        }
+                        //setPaused(cPaused);
                     }
                     
                     void stop(){
