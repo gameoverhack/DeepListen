@@ -63,11 +63,19 @@ void LoadController::update(){
     
     set<string> excludeSet;
     ofFile excludeList = ofFile(ofToDataPath("ExcludeList.txt"));
-    ofBuffer buffer = excludeList.readToBuffer();
-    while (!buffer.isLastLine()) {
-        string line = buffer.getNextLine();
+    ofBuffer excludeBuffer = excludeList.readToBuffer();
+    while (!excludeBuffer.isLastLine()) {
+        string line = excludeBuffer.getNextLine();
         excludeSet.insert(line);
         ofxLogVerbose() << "Adding " << line << " to exclude list" << endl;
+    }
+    
+    ofFile renameList = ofFile(ofToDataPath("RenameList.txt"));
+    ofBuffer renameBuffer = renameList.readToBuffer();
+    while (!renameBuffer.isLastLine()) {
+        string line = ofSplitString(renameBuffer.getNextLine(), ":")[0];
+        excludeSet.insert(line);
+        ofxLogVerbose() << "RENAME not implemented so adding " << line << " to exclude list" << endl;
     }
     
     Clips clips;
@@ -93,12 +101,16 @@ void LoadController::update(){
             
             maxScale = MAX(maxScale, clip.getScale());
             
-            if(clip.getDeleted()) clip.setDeleted(false); // force recheck deleted clips every time
+            if(clip.getDeleted()){
+                clip.setDeleted(false); // force recheck deleted clips every time
+            }
             
             if((excludeSet.find(clip.getName()) != excludeSet.end())){
                 ofxLogNotice() << "Excluding clip: " << clip << endl;
                 clip.setDeleted(true);
             }
+            
+//            if(name.rfind("OOOO_00_TITLE") != string::npos) clip.setAnalyzed(false);
             
         }else{
             

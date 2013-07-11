@@ -27,6 +27,7 @@ void AppController::setup(){
     
     // set veryical sync (does this work on all windows?)
     ofSetVerticalSync(true);
+//    ofSetFrameRate(30);
     
 #ifdef USE_FENSTER
     // set name of the primary window
@@ -193,7 +194,7 @@ void AppController::setup(){
     debugView = new DebugView();
     debugView->setup(ofGetWidth(), 
                      ofGetHeight(), 
-                     ViewOption(VIEW_USE_FBO),
+                     ViewOption(),
                      (string)"debug");
     
     analyzeView = new AnalyzeView();
@@ -203,7 +204,7 @@ void AppController::setup(){
 #ifdef USE_FENSTER
                        ViewOption(VIEW_USE_FBO | VIEW_USE_WINDOW),
 #else
-                       ViewOption(VIEW_USE_FBO),
+                       ViewOption(),
 #endif
                        (string)"analyze");
     
@@ -224,9 +225,9 @@ void AppController::setup(){
     playController = new PlayController();
     playController->setup();
     
-    soundController->setup(16, 10);
+    soundController->setup(16, 8);
     
-    
+    bShowCursor = true;
     
 }
 
@@ -434,6 +435,14 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 'f':
             ofToggleFullscreen();
+            break;
+        case 'h':
+            bShowCursor = !bShowCursor;
+            if(bShowCursor){
+                ofShowCursor();
+            }else{
+                ofHideCursor();
+            }
             break;
         case OF_KEY_RIGHT:
             timeline.nextClip();

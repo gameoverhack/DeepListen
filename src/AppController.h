@@ -65,6 +65,8 @@ private:
 
     int soundTimeout;
     
+    bool bShowCursor;
+    
 };
 
 #endif

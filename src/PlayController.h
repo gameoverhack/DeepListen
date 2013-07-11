@@ -28,7 +28,7 @@ public:
     
 protected:
 	
-    ClipGroup getGroupSelectionFrom(ClipGroup group, int maxNumClips, int targetMinsBetweenPeeps);
+    ClipGroup getGroupSelectionFrom(ClipGroup group, int maxNumClips, int targetMinsBetweenPeeps, int targetMaxMins = -1);
     
     ClipGroup dummyClipGroup;
     int lastAudioFreeFrame;

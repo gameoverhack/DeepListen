@@ -135,6 +135,7 @@ void PlayController::makeClipGroup(){
     ClipGroup & allListenClips = appModel->getClipGroupReference("allListenClips");
     ClipGroup & allStatClips = appModel->getClipGroupReference("allStatClips");
     ClipGroup & allIntroClips = appModel->getClipGroupReference("allIntroClips");
+    ClipGroup & allSpecClips = appModel->getClipGroupReference("allSpecClips");
     
     ClipGroup & allTitleClips = appModel->getClipGroupReference("allTitleClips");
     ClipGroup & statistics = appModel->getClipGroupReference("statistics");
@@ -196,13 +197,21 @@ void PlayController::makeClipGroup(){
             }
             
             // insert intros
-            int numberOfIntros = floor((int)ofRandom(3)) + 2;
-            ClipGroup introGroup = allIntroClips;
-            ClipGroup theseIntroPeople = getGroupSelectionFrom(introGroup, numberOfIntros, 3);
+//            int numberOfIntros = floor((int)ofRandom(3)) + 4;
+//            ClipGroup introGroup = allIntroClips;
+//            ClipGroup theseIntroPeople = getGroupSelectionFrom(introGroup, numberOfIntros, 5);
+            
+            int numberOfStatements = floor((int)ofRandom(3)) + 2;
+            ClipGroup statementGroup = allStatClips;
+            ClipGroup theseStatementPeople = getGroupSelectionFrom(statementGroup, numberOfStatements, 5);
             
         }else if(specialCount == 7){
             ofxLogNotice() << "SPECIAL CLIP INSERT" << endl;
             specialCount = 0;
+            
+            ClipGroup specialGroup = allSpecClips;
+            ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 30);
+            
         }else{// do a category
             
             ofxLogNotice() << "CATEGORY CLIP INSERT" << endl;
@@ -318,22 +327,22 @@ void PlayController::makeClipGroup(){
                 questionGroup = questionGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
             }
             
-            ClipGroup theseResponsePeople = getGroupSelectionFrom(questionGroup, numberOfResponses, 5);
+            ClipGroup theseResponsePeople = getGroupSelectionFrom(questionGroup, numberOfResponses, 5, 3);
             allClips.pop(theseResponsePeople);
             
-            int responseCount = theseResponsePeople.size();
-            if(responseCount > 0){
-                
-                int responseLength = theseResponsePeople[responseCount - 1].getVideoEnd() - theseResponsePeople[0].getVideoStart();
-                
-                // insert LISTENERS here
-                ofxLogVerbose() << "Response count: " << responseCount << " " << framesToMinutes(responseLength) << endl;
-                if(framesToMinutes(responseLength) > 3.0){
-                    
-                    ClipGroup listenerGroup = allListenClips;
-                    
-                    ofxLogVerbose() << "Insert listeners from: " << listenerGroup.size() << endl;
-                    
+//            int responseCount = theseResponsePeople.size();
+//            if(responseCount > 0){
+//                
+//                int responseLength = theseResponsePeople[responseCount - 1].getVideoEnd() - theseResponsePeople[0].getVideoStart();
+//                
+//                // insert LISTENERS here
+//                ofxLogVerbose() << "Response count: " << responseCount << " " << framesToMinutes(responseLength) << endl;
+//                if(framesToMinutes(responseLength) > 3.0){
+//                    
+//                    ClipGroup listenerGroup = allListenClips;
+//                    
+//                    ofxLogVerbose() << "Insert listeners from: " << listenerGroup.size() << endl;
+//                    
 //                    for(int j = 0; j < theseStatementPeople.size(); j++){
 //                        listenerGroup = listenerGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
 //                    }
@@ -371,17 +380,21 @@ void PlayController::makeClipGroup(){
 //                        ofxLogVerbose() << "Clip is on " << (clip.getScreen() == LEFT ? "LEFT" : "RIGHT") << " screen" << endl;
 //                        ofxLogVerbose() << "Clip is on " << (clip.getSide() == LEFT ? "LEFT" : "RIGHT") << " side" << endl;
 //                        int tryScreen = (clip.getScreen() == LEFT ? RIGHT : LEFT);
-//                        int xMin, xMax;
+//                        int xMin = -1;
+//                        int xMax = -1;
 //                        Clip listener;
-//                        if((clip.getSide() == LEFT && tryScreen == clip.getScreen()) || (tryScreen == RIGHT && clip.getScreen() == LEFT)){
-//                            xMin = clip.getPosition().x + clip.getPosition().width;
-//                            xMax = -1;
+//                        if((clip.getSide() == LEFT)){
 //                            listener = leftListeners.getrandom();
-//                        }else if((clip.getSide() == RIGHT && tryScreen == clip.getScreen()) || (tryScreen == LEFT && clip.getScreen() == RIGHT)){
-//                            xMin = -1;
-//                            xMax = clip.getPosition().x;
+//                        }else if((clip.getSide() == RIGHT)){
 //                            listener = rightListeners.getrandom();
 //                        }
+//                        
+//                        if((clip.getSide() == LEFT && tryScreen == clip.getScreen())){
+//                            xMin = clip.getPosition().x + clip.getPosition().width;
+//                        }else if((clip.getSide() == RIGHT && tryScreen == clip.getScreen())){
+//                            xMax = clip.getPosition().x;
+//                        }
+//                        
 //                        ofxLogVerbose() << "Listener attempt: " << xMin << " " << xMax << " " << listener << endl;
 //                        cout << theseResponsePeople[j].getTotalFrames() << " " << lastListenerFrame << " " << listener.getTotalFrames() << endl;
 //                        listener.setCrop(0, MIN(theseResponsePeople[j].getTotalFrames() + lastListenerFrame, listener.getTotalFrames()));
@@ -395,12 +408,11 @@ void PlayController::makeClipGroup(){
 //                            break;
 //                        }
 //                    }
-//                    
-                }
-            }else{
-                ofxLogVerbose() << "No respondents" << endl;
-            }
-                        
+//                }
+//            }else{
+//                ofxLogVerbose() << "No respondents" << endl;
+//            }
+            
             appModel->setTimer(category, framesToMillis(timeline.getLastClip().getVideoEnd()));
             appModel->setTimer(question, framesToMillis(timeline.getLastClip().getVideoEnd()));
             
@@ -413,16 +425,26 @@ void PlayController::makeClipGroup(){
 }
 
 //--------------------------------------------------------------
-ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips, int targetMinsBetweenPeeps){
+ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips, int targetMinsBetweenPeeps, int targetMaxMins){
     
     ClipTimeline & timeline = appModel->getClipTimeline();
     ClipGroup thisSelection;
+    int startAudioFreeFrame = lastAudioFreeFrame;
     
     for(int j = 0; j < MIN(group.size(), maxNumClips); j++){ // make sure we don't exceed statementGroup size!
         
         bool personOk = false;
         int attempts = 0;
         int maxAttempts = 20;
+        
+        if(targetMaxMins != -1){
+            ofxLogVerbose() << "Check target minutes" << endl;
+            if(framesToMinutes(lastAudioFreeFrame - startAudioFreeFrame) > targetMaxMins){
+                ofxLogVerbose() << "Aborting selection as we're over target minutes: " << targetMaxMins << endl;
+                break;
+            }
+        }
+        
         while(!personOk && attempts < maxAttempts){
             Clip clip = group.getrandom();
             string person = clip.getClipInfo().person;
@@ -462,8 +484,10 @@ ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips
                     group.pop(clip);
                 }
             }
+            
             attempts++;
-            cout << "attempts: " << attempts << endl;
+            ofxLogVerbose() << "Selection attempts: " << attempts << endl;
+            
         }
     }
     return thisSelection;
