@@ -90,6 +90,7 @@
 		777C0EFC172CE0FC00006E29 /* Tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 777C0E1A172CE0F800006E29 /* Tracker.cpp */; };
 		777C0EFD172CE0FC00006E29 /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 777C0E1B172CE0F800006E29 /* Utilities.cpp */; };
 		777C0EFE172CE0FC00006E29 /* Wrappers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 777C0E1C172CE0F800006E29 /* Wrappers.cpp */; };
+		77E337C1178ED0FE0047CE5B /* NetworkController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 77E337BF178ED0FE0047CE5B /* NetworkController.cpp */; };
 		77ECE4381711A4EA00EA0EAB /* yuyvtorgba.frag in Sources */ = {isa = PBXBuildFile; fileRef = 77ECE4361711A4EA00EA0EAB /* yuyvtorgba.frag */; };
 		77ECE4391711A4EA00EA0EAB /* yuyvtorgba.vert in Sources */ = {isa = PBXBuildFile; fileRef = 77ECE4371711A4EA00EA0EAB /* yuyvtorgba.vert */; };
 		7c531f297a6c5ee64ecee297ed4fbb6f /* hTabBoxItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4091b73657ae5b8d2bf19f7d4977c6a0 /* hTabBoxItem.cpp */; };
@@ -362,6 +363,8 @@
 		777C0F54172CE13E00006E29 /* Tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tracker.h; sourceTree = "<group>"; };
 		777C0F55172CE13E00006E29 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		777C0F56172CE13E00006E29 /* Wrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wrappers.h; sourceTree = "<group>"; };
+		77E337BF178ED0FE0047CE5B /* NetworkController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkController.cpp; sourceTree = "<group>"; };
+		77E337C0178ED0FE0047CE5B /* NetworkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
 		77ECE4361711A4EA00EA0EAB /* yuyvtorgba.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = yuyvtorgba.frag; path = bin/data/yuyvtorgba.frag; sourceTree = SOURCE_ROOT; };
 		77ECE4371711A4EA00EA0EAB /* yuyvtorgba.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = yuyvtorgba.vert; path = bin/data/yuyvtorgba.vert; sourceTree = SOURCE_ROOT; };
 		7876592db6b0b796f0d7fc1fcab6ebe4 /* hCounterLabel.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = hCounterLabel.h; path = ../../../addons/ofxhGui/src/hCounterLabel.h; sourceTree = SOURCE_ROOT; };
@@ -1016,6 +1019,8 @@
 				776E107E170BE6F200DF5AB4 /* PlayController.h */,
 				771BBB76174E039E00D77F11 /* SoundController.cpp */,
 				771BBB77174E039E00D77F11 /* SoundController.h */,
+				77E337BF178ED0FE0047CE5B /* NetworkController.cpp */,
+				77E337C0178ED0FE0047CE5B /* NetworkController.h */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -1665,6 +1670,7 @@
 				777C0EFD172CE0FC00006E29 /* Utilities.cpp in Sources */,
 				777C0EFE172CE0FC00006E29 /* Wrappers.cpp in Sources */,
 				771BBB78174E039E00D77F11 /* SoundController.cpp in Sources */,
+				77E337C1178ED0FE0047CE5B /* NetworkController.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

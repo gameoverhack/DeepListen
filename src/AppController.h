@@ -17,6 +17,7 @@
 #include "AnalyzeController.h"
 #include "PlayController.h"
 #include "SoundController.h"
+#include "NetworkController.h"
 
 class AppController : public BaseController {
     
@@ -62,6 +63,7 @@ private:
     AppView * appViews[2];
     DebugView * debugView;
     AnalyzeView * analyzeView;
+    NetworkController * networkController;
 
     int soundTimeout;
     

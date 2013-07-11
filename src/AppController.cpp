@@ -26,7 +26,7 @@ void AppController::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     
     // set veryical sync (does this work on all windows?)
-    ofSetVerticalSync(true);
+//    ofSetVerticalSync(true);
 //    ofSetFrameRate(30);
     
 #ifdef USE_FENSTER
@@ -190,6 +190,12 @@ void AppController::setup(){
 //    appModel->setProperty("warp1_x", w1x);
 //    appModel->setProperty("warp1_y", w1y);
     
+    
+    for(int i = 0; i < 8; i++){
+        appModel->removeProperty<string>("PlayStateA_"+ofToString(i));
+        appModel->removeProperty<string>("PlayStateV_"+ofToString(i));
+    }
+    
     // make a debug window
     debugView = new DebugView();
     debugView->setup(ofGetWidth(), 
@@ -227,6 +233,9 @@ void AppController::setup(){
     
     soundController->setup(16, 8);
     
+    networkController = new NetworkController();
+    networkController->setup();
+    
     bShowCursor = true;
     
 }
@@ -236,7 +245,10 @@ void AppController::update(){
     
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
     
+    networkController->update();
+    
     switch (appControllerStates.getState()) {
+        
         case kAPPCONTROLLER_INIT:
         {
             appControllerStates.setState(kAPPCONTROLLER_LOAD);
