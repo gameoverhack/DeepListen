@@ -11,6 +11,7 @@
 #define _H_NETWORKCONTROLLER
 
 #include "BaseController.h"
+#include "SoundController.h"
 #include "AppModel.h"
 
 #include "ofxNetwork.h"

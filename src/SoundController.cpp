@@ -34,6 +34,7 @@ bool SoundController::setup(int inChannels, int outChannels){
             ofxLogVerbose() << "Created " << inChannels << " inChannels and " << outChannels << " outChannels" << endl;
             
             setAllChannelVolumes(1.0f);
+            masterVolume = 1.0f;
             
             return true;
         }else{
@@ -178,6 +179,16 @@ int SoundController::getChannelLabel(int channel){
 }
 
 //--------------------------------------------------------------
+void SoundController::setMasterVolume(float volume){
+    masterVolume = volume;
+}
+
+//--------------------------------------------------------------
+float SoundController::getMasterVolume(){
+    return masterVolume;
+}
+
+//--------------------------------------------------------------
 int SoundController::process(jack_nframes_t nframes){
     
     for (int inChannel = 0; inChannel < volumes.size(); inChannel++) {
@@ -191,7 +202,7 @@ int SoundController::process(jack_nframes_t nframes){
             out = (jack_default_audio_sample_t *)jack_port_get_buffer(outPorts[outChannel], nframes);
             
             for(jack_nframes_t i = 0; i < nframes; i++){
-                out[i] = (out[i] + in[i] * volumes[inChannel][outChannel]) / 1.2; // magic number!
+                out[i] = ((out[i] + in[i] * volumes[inChannel][outChannel]) / 1.2) * masterVolume; // magic number!
             }
         }
     }

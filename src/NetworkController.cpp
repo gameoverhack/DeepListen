@@ -29,6 +29,8 @@ void NetworkController::setup(){
 //--------------------------------------------------------------
 void NetworkController::update(){
     
+    StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
+    
     for(int i = 0; i < server.getLastID(); i++){
         
         if(!server.isClientConnected(i)) continue;
@@ -44,17 +46,21 @@ void NetworkController::update(){
             
             if(command[0] == "start"){
                 ofxLogVerbose() << "start" << endl;
+                playControllerStates.setState(kPLAYCONTROLLER_INIT);
                 send(i, command[0]);
             }
             
             if(command[0] == "stop"){
                 ofxLogVerbose() << "stop" << endl;
+                playControllerStates.setState(kPLAYCONTROLLER_STOP);
                 send(i, command[0]);
             }
             
             if(command[0] == "volume" && command.size() > 1){
                 ofxLogVerbose() << "volume:" << command[1] << endl;
-                send(i, command[0] + ":" + command[1]);
+                float volume = CLAMP(ofToFloat(command[1]), 0.0f, 100.0f);
+                soundController->setMasterVolume(volume/100.0f);
+                send(i, command[0] + ":" + ofToString((int)soundController->getMasterVolume() * 100.0f));
             }
             
             if(command[0] == "log" && command.size() > 1){

@@ -38,9 +38,14 @@ public:
     ofPoint getPan(float value, float maxValue, int numSpeakers);
     int getChannelLabel(int channel);
     
+    void setMasterVolume(float volume);
+    float getMasterVolume();
+    
 protected:
 	
     vector< vector<float> > volumes;
+    
+    float masterVolume;
     
 private:
 	

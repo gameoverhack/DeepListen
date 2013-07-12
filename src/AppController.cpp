@@ -191,7 +191,7 @@ void AppController::setup(){
 //    appModel->setProperty("warp1_y", w1y);
     
     
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 16; i++){
         appModel->removeProperty<string>("PlayStateA_"+ofToString(i));
         appModel->removeProperty<string>("PlayStateV_"+ofToString(i));
     }
@@ -373,6 +373,15 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     switch (key) {
         case ' ':
             playControllerStates.setState(kPLAYCONTROLLER_INIT);
+            break;
+        case 'z':
+            playControllerStates.setState(kPLAYCONTROLLER_STOP);
+            break;
+        case 'm':
+            soundController->setMasterVolume(0.0f);
+            break;
+        case 'n':
+            soundController->setMasterVolume(1.0f);
             break;
         case 'd':
             debugViewStates.toggleState(kDEBUGVIEW_SHOWINFO);
