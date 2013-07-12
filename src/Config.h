@@ -11,7 +11,7 @@
 
 //#define USE_FENSTER
 #define MINI
-#define RETINA
+//#define RETINA
 #define VIDEO_TIMECODE
 //#define NO_SOUND
 //#define JPEG
