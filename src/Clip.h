@@ -1284,7 +1284,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         
         ofxThreadedVideo * setupThreadedVideo(bool bIsMusic = false, string blackPath = ""){
             ofxThreadedVideo * threadedVideo = new ofxThreadedVideo;
+#ifndef NO_SOUND
             threadedVideo->setAudioDevice("JackRouter");
+#endif
             threadedVideo->setPixelFormat(pixelFormat);
             threadedVideo->setUseAutoPlay(false);
             threadedVideo->setUseQueue(true);
@@ -1389,11 +1391,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                         
                                         int audioClipIndex = 0;
                                         if(audioClips[0].isLoading || audioClips[0].isStopping || audioClips[0].music->isLoading() || audioClips[0].music->isPlaying()) audioClipIndex = 2;
-                                        
+#ifndef NO_SOUND
                                         for(int k = 0; k < 2; k++){
                                             audioClips[audioClipIndex + k].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + k].audioTrack + 0), true);
                                             audioClips[audioClipIndex + k].music->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[audioClipIndex + k].audioTrack + 1), false);
                                         }
+#endif
 //                                        audioClips[audioClipIndex + 0].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + 0].audioTrack + 0), true);
 //                                        audioClips[audioClipIndex + 0].music->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[audioClipIndex + 0].audioTrack + 1), false);
 //                                        audioClips[audioClipIndex + 1].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + 1].audioTrack + 0), true);
@@ -1464,10 +1467,10 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             musicVideo->setPosition(0.3f);
                             
                             ofxLogVerbose() << "Assign music to: " << audioClip.audioTrack << endl;
-                            
+#ifndef NO_SOUND
                             soundController->setAllChannelVolumes(audioClip.audioTrack + 0, 1.0f);
                             soundController->setAllChannelVolumes(audioClip.audioTrack + 1, 1.0f);
-                            
+#endif
                             musicVideo->setVolume(audioClip.fadeCurrent);
                             audioClip.fadeTime = ofGetElapsedTimeMillis();
                             
@@ -1542,7 +1545,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 int numSpeakers = (clip.getScreen() == 0 ? 3 : 2);
                                 int channelStart = (clip.getScreen() == 0 ? 0 : 3);
                                 ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
-                                
+#ifndef NO_SOUND
                                 for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
                                     soundController->setChannelVolume(videoClip.audioTrack, channel + 0, pan[channel - channelStart]);
                                 }
@@ -1550,7 +1553,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 for(int channel = 5; channel < 8; channel++){
                                     soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f);
                                 }
-                                
+#endif
                                 clip.setClipLoading(false);
                             }
                             

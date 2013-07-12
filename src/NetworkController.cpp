@@ -20,7 +20,7 @@ NetworkController::~NetworkController(){
 
 //--------------------------------------------------------------
 void NetworkController::setup(){
-    server.setup(66666);
+    server.setup(6666);
     server.setMessageDelimiter("\n");
     heartBeatLast = ofGetElapsedTimeMillis();
     heartBeatTime = 2000;
@@ -60,11 +60,17 @@ void NetworkController::update(){
                 ofxLogVerbose() << "volume:" << command[1] << endl;
                 float volume = CLAMP(ofToFloat(command[1]), 0.0f, 100.0f);
                 soundController->setMasterVolume(volume/100.0f);
-                send(i, command[0] + ":" + ofToString((int)soundController->getMasterVolume() * 100.0f));
+                send(i, command[0] + ":" + command[1]);
             }
             
             if(command[0] == "log" && command.size() > 1){
                 ofxLogVerbose() << "log:" << command[1] << endl;
+                if(command[1] == "file"){
+                    appModel->setProperty("LogToFile", true);
+                }else{
+                    appModel->setProperty("LogToFile", false);
+                }
+                ofxLogSetLogToFile(appModel->getProperty<bool>("LogToFile"), ofToDataPath("log_" + ofGetTimestampString() + ".txt"));
                 send(i, command[0] + ":" + command[1]);
             }
             
@@ -83,7 +89,7 @@ void NetworkController::send(int client, string msg){
 string NetworkController::recieve(int client){
     string msg = server.receive(client);
     if(msg.length() > 0){
-        //ofxLogVerbose() << "Recieve: " << msg << " from " << server.getClientIP(client) << ":" << server.getClientPort(client) << endl;
+        ofxLogVerbose() << "Recieve: " << msg << " from " << server.getClientIP(client) << ":" << server.getClientPort(client) << endl;
         return msg;
     }else{
         return "";

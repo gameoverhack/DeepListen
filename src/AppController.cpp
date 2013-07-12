@@ -75,6 +75,9 @@ void AppController::setup(){
     appModel->load("config", ARCHIVE_BINARY);
 #endif
     
+//    appModel->setProperty("LogToFile", false);
+    ofxLogSetLogToFile(appModel->getProperty<bool>("LogToFile"), ofToDataPath("log_" + ofGetTimestampString() + ".txt"));
+    
     appModel->setProperty("mouseX", 0);
     appModel->setProperty("mouseY", 0);
     
@@ -117,7 +120,7 @@ void AppController::setup(){
     appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
 #endif
     
-    appModel->setProperty("OverrideVideoPath", false);
+    appModel->setProperty("OverrideVideoPath", true);
     appModel->setProperty("ImportClipRects", false);
     
     appModel->setProperty("ContourMinArea", 10);
@@ -230,13 +233,22 @@ void AppController::setup(){
     
     playController = new PlayController();
     playController->setup();
-    
+
+#ifndef NO_SOUND
     soundController->setup(16, 8);
+#endif
     
     networkController = new NetworkController();
     networkController->setup();
     
-    bShowCursor = true;
+    ofHideCursor();
+    ofSetFullscreen(true);
+    StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
+    StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
+    debugViewStates.setState(kDEBUGVIEW_SHOWINFO, 0);
+    analyzeViewStates.setState(kANALYZEVIEW_SHOW, 0);
+    
+    bShowCursor = false;
     
 }
 
