@@ -1300,6 +1300,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                 threadedVideo->setLoopState(OF_LOOP_NORMAL);
                 threadedVideo->play();
             }else{
+                threadedVideo->setFixedTextureSize(1920.0f, 1080.0f);
+                threadedVideo->setUseFixedTextureSize(true);
                 threadedVideo->setLoopState(OF_LOOP_NONE);
             }
             

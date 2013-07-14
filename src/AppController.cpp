@@ -25,14 +25,13 @@ void AppController::setup(){
     ofxLogSetLogLevel(LOG_VERBOSE);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-//    ofxLogSetLogToFile(true);
-    
+#ifndef NO_SOUND
     system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
-    
     ofSleepMillis(10000);
+#endif
     
     // set veryical sync (does this work on all windows?)
-    ofSetVerticalSync(true);
+//    ofSetVerticalSync(true);
 //    ofSetFrameRate(30);
     
 #ifdef USE_FENSTER
