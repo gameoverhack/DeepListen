@@ -11,7 +11,7 @@
 
 #include "ofxLogger.h"
 #include "BaseController.h"
-#include "ofxJackC  lient.h"
+#include "ofxJackClient.h"
 
 class SoundController : public BaseController, public ofxJackClient {
     

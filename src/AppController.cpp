@@ -25,8 +25,14 @@ void AppController::setup(){
     ofxLogSetLogLevel(LOG_VERBOSE);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
+//    ofxLogSetLogToFile(true);
+    
+    system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
+    
+    ofSleepMillis(10000);
+    
     // set veryical sync (does this work on all windows?)
-//    ofSetVerticalSync(true);
+    ofSetVerticalSync(true);
 //    ofSetFrameRate(30);
     
 #ifdef USE_FENSTER
@@ -249,6 +255,8 @@ void AppController::setup(){
     analyzeViewStates.setState(kANALYZEVIEW_SHOW, 0);
     
     bShowCursor = false;
+    
+    system("./../../../data/Hide.sh \"TotalMix FX\"");
     
 }
 
