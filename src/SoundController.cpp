@@ -8,6 +8,8 @@
 
 #include "SoundController.h"
 
+static bool isSetup = false;
+
 //--------------------------------------------------------------
 SoundController::SoundController(){
     //ofxLogVerbose() << "Creating AppController" << endl;
@@ -35,7 +37,7 @@ bool SoundController::setup(int inChannels, int outChannels){
             
             setAllChannelVolumes(1.0f);
             masterVolume = 1.0f;
-            
+            isSetup = true;
             return true;
         }else{
             
@@ -67,10 +69,16 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
         if(!ok) break;
     }
     
+    if(!ok) return false;
+    
     for(int channel = 1; channel < outChannels + 1; channel++){
         ok = createPort("output" + ofToString(channel), JackPortIsOutput);
         if(!ok) break;
+#ifdef NO_SOUND
+        ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 1 : 2)));
+#else
         ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
+#endif
         if(!ok) break;
     }
     
@@ -190,7 +198,7 @@ float SoundController::getMasterVolume(){
 
 //--------------------------------------------------------------
 int SoundController::process(jack_nframes_t nframes){
-    
+    if(!isSetup) return;
     for (int inChannel = 0; inChannel < volumes.size(); inChannel++) {
         
         jack_default_audio_sample_t *in;
@@ -206,6 +214,5 @@ int SoundController::process(jack_nframes_t nframes){
             }
         }
     }
-    
     return 0;
 }

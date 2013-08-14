@@ -28,11 +28,10 @@ void AppController::setup(){
 #ifndef NO_SOUND
     system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
     ofSleepMillis(10000);
+#else
+    system("~/../../usr/local/bin/jackd -R -d coreaudio -p 512 -r 48000 'JackRouter' -i 2 -o 2 &");
+    ofSleepMillis(2000);
 #endif
-    
-    // set veryical sync (does this work on all windows?)
-//    ofSetVerticalSync(true);
-//    ofSetFrameRate(30);
     
 #ifdef USE_FENSTER
     // set name of the primary window
@@ -80,6 +79,9 @@ void AppController::setup(){
     appModel->load("config", ARCHIVE_BINARY);
 #endif
     
+//    appModel->setProperty("VerticalSync", false);
+    ofSetVerticalSync(appModel->getProperty<bool>("VerticalSync"));
+    
 //    appModel->setProperty("LogToFile", false);
     ofxLogSetLogToFile(appModel->getProperty<bool>("LogToFile"), ofToDataPath("log_" + ofGetTimestampString() + ".txt"));
     
@@ -97,32 +99,26 @@ void AppController::setup(){
     w1x = appModel->getProperty<float>("warp1_x");
     w1y = appModel->getProperty<float>("warp1_y");
     
+    string rootPath = "";
+    
 #if defined(MINI)
-    appModel->setProperty("TextPath", (string)"/Volumes/DeepData/TEXT/");
-    appModel->setProperty("MusicPath", (string)"/Volumes/DeepData/MUSIC/");
-#ifdef JPEG
-    appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/JPEG60/");
-#else
-    appModel->setProperty("VideoPath", (string)"/Volumes/DeepData/ANIME60/");
-#endif
-    appModel->setProperty("AudioPath", (string)"/Volumes/DeepData/WAVE/");
-    appModel->setProperty("BlackPath", (string)"/Volumes/DeepData/black.mov");
+    rootPath = "/Volumes/DeepData/";
 #elif defined(RETINA)
-    appModel->setProperty("TextPath", (string)"/Users/gameover/Desktop/DeepDataTest/TEXT/");
-    appModel->setProperty("MusicPath", (string)"/Users/gameover/Desktop/DeepDataTest/MUSIC/");
-#ifdef JPEG
-    appModel->setProperty("VideoPath", (string)"/Users/gameover/Desktop/DeepDataTest/JPEG60/");
+    rootPath = "/Users/gameover/Desktop/DeepDataTest/";
+#elif defined(BLACKCAVIAR)
+    rootPath = "/Volumes/Love/DeepData/";
 #else
-    appModel->setProperty("VideoPath", (string)"/Users/gameover/Desktop/DeepDataTest/ANIME60/");
+    rootPath = "/Volumes/Ersatz/CODECTESTS/";
 #endif
-    appModel->setProperty("AudioPath", (string)"/Users/gameover/Desktop/DeepDataTest/WAVE/");
-    appModel->setProperty("BlackPath", (string)"/Users/gameover/Desktop/DeepDataTest/black.mov");
+    
+    appModel->setProperty("TextPath", (string)rootPath + "TEXT/");
+    appModel->setProperty("MusicPath", (string)rootPath + "MUSIC/");
+    appModel->setProperty("AudioPath", (string)rootPath + "WAVE/");
+    appModel->setProperty("BlackPath", (string)rootPath + "black.mov");
+#ifdef JPEG
+    appModel->setProperty("VideoPath", (string)rootPath + "JPEG60/");
 #else
-    appModel->setProperty("TextPath", (string)"/Volumes/Ersatz/CODECTESTS/TEXT/");
-    appModel->setProperty("MusicPath", (string)"/Volumes/Ersatz/CODECTESTS/MUSIC/");
-    appModel->setProperty("VideoPath", (string)"/Volumes/Ersatz/CODECTESTS/JPEG60/");
-    appModel->setProperty("AudioPath", (string)"/Volumes/Ersatz/CODECTESTS/WAVE/");
-    appModel->setProperty("BlackPath", (string)"/Volumes/Ersatz/CODECTESTS/black.mov");
+    appModel->setProperty("VideoPath", (string)rootPath + "ANIME60/");
 #endif
     
     appModel->setProperty("OverrideVideoPath", true);
@@ -145,7 +141,7 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth_1", 1440.0f);
     appModel->setProperty("OutputHeight_1", 1080.0f);
     
-#if defined(MINI) || defined(RETINA)
+#if defined(MINI) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #else
@@ -199,7 +195,7 @@ void AppController::setup(){
 //    appModel->setProperty("warp1_y", w1y);
     
     
-    for(int i = 0; i < 16; i++){
+    for(int i = 0; i < 50; i++){
         appModel->removeProperty<string>("PlayStateA_"+ofToString(i));
         appModel->removeProperty<string>("PlayStateV_"+ofToString(i));
     }
@@ -239,15 +235,17 @@ void AppController::setup(){
     playController = new PlayController();
     playController->setup();
 
-#ifndef NO_SOUND
-    soundController->setup(16, 8);
-#endif
+//#ifndef NO_SOUND
+//    soundController->setup(16, 8);
+//#else
+//    soundController->setup(16, 8);
+//#endif
     
     networkController = new NetworkController();
     networkController->setup();
     
     ofHideCursor();
-    ofSetFullscreen(true);
+    //ofSetFullscreen(true);
     StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     debugViewStates.setState(kDEBUGVIEW_SHOWINFO, 0);
@@ -372,6 +370,8 @@ void AppController::exit(){
 #else
     appModel->save("config", ARCHIVE_BINARY);
 #endif
+    system("pkill jackdmp");
+    system("pkill jackd");
 }
 
 //--------------------------------------------------------------
@@ -390,6 +390,9 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     int key = e.key;
     
     switch (key) {
+        case 'y':
+            soundController->setup(16, 8);
+            break;
         case ' ':
             playControllerStates.setState(kPLAYCONTROLLER_INIT);
             break;
@@ -401,6 +404,14 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 'n':
             soundController->setMasterVolume(1.0f);
+            break;
+        case 'v':
+            appModel->setProperty("VerticalSync", !appModel->getProperty<bool>("VerticalSync"));
+            ofSetVerticalSync(appModel->getProperty<bool>("VerticalSync"));
+            break;
+        case 't':
+            appModel->setProperty("LogToFile", !appModel->getProperty<bool>("LogToFile"));
+            ofxLogSetLogToFile(appModel->getProperty<bool>("LogToFile"), ofToDataPath("log_" + ofGetTimestampString() + ".txt"));
             break;
         case 'd':
             debugViewStates.toggleState(kDEBUGVIEW_SHOWINFO);
@@ -538,7 +549,9 @@ void AppController::mouseDragged(ofMouseEventArgs & e){
 void AppController::mousePressed(ofMouseEventArgs & e){
 //    ofxLogVerbose() << e.x << " " << e.y << " " << e.button << endl;
     ClipTimeline & timeline = appModel->getClipTimeline();
-    cout << timeline.getClipAt(e.x, e.y, ofGetWidth() / 2.0f, ofGetHeight()) << endl;
+    string clipMouse = timeline.getClipAt(e.x, e.y, ofGetWidth() / 2.0f, ofGetHeight()).getName();
+    appModel->setProperty("ClipMouse", clipMouse);
+    cout << clipMouse << endl;
     
     mouseDownX = e.x;
     mouseDownY = e.y;
