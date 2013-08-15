@@ -1284,27 +1284,13 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         
         ofxThreadedVideo * setupThreadedVideo(bool bIsMusic = false, string blackPath = ""){
             ofxThreadedVideo * threadedVideo = new ofxThreadedVideo;
-//#ifndef NO_SOUND
-//            threadedVideo->setAudioDevice("JackRouter");
-//#endif
             threadedVideo->setPixelFormat(pixelFormat);
-//            threadedVideo->setUseAutoPlay(false);
-//            threadedVideo->setUseQueue(true);
-            
             if(blackPath != ""){
                 threadedVideo->loadMovie(blackPath);
-//                while(!threadedVideo->isLoaded()){
-//                    threadedVideo->update();
-//                }
                 threadedVideo->setAudioDevice("JackRouter");
                 threadedVideo->setVolume(0.0f);
                 threadedVideo->setLoopState(OF_LOOP_NORMAL);
                 threadedVideo->play();
-                
-            }else{
-//                threadedVideo->setFixedTextureSize(1920.0f, 1080.0f);
-//                threadedVideo->setUseFixedTextureSize(true);
-                threadedVideo->setLoopState(OF_LOOP_NONE);
             }
             
             if(bIsMusic){
@@ -1384,14 +1370,17 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             
                             //cout << "Check: " << video->isLoaded() << video->isLoading(clip.getVideoPath()) << video->isPlaying() << clip.getClipLoading() << clip.getClipStopping() << video->isLoading(clip.getName()) << clip << endl;
                             
-                            if(!video->isLoaded() && !video->isLoading(clip.getVideoPath()) && !video->isPlaying() && !clip.getClipLoading() && !clip.getClipStopping()){
+                            if(!video->isLoaded() && !video->isLoading(clip.getVideoPath()) && !video->isPlaying() && !videoClip.clip.getClipStopping()){
                                 
                                 ofxLogVerbose() << "Loading..." << endl;
                                 
                                 video->loadMovie(clip.getVideoPath());
+                                video->setLoopState(OF_LOOP_NONE);
                                 video->setAudioDevice("JackRouter");
                                 video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
                                 video->play();
+                                
+                                clip.setClipStopping(false);
                                 
                                 if(videoClip.clip.getIsClipTitle()){
                                     ofxLogVerbose() << "...loaded title clip..." << clip << endl;
@@ -1399,7 +1388,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                     int audioClipIndex = 0;
                                     if(audioClips[0].isLoading || audioClips[0].isStopping || audioClips[0].music->isLoading() || audioClips[0].music->isPlaying()) audioClipIndex = 2;
                                     
-                                    //#endif
                                     //                                        audioClips[audioClipIndex + 0].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + 0].audioTrack + 0), true);
                                     //                                        audioClips[audioClipIndex + 0].music->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[audioClipIndex + 0].audioTrack + 1), false);
                                     //                                        audioClips[audioClipIndex + 1].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + 1].audioTrack + 0), true);
@@ -1407,22 +1395,32 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                     
                                     ofxLogVerbose() << "...loading audio abstract..." << endl;
                                     audioClips[audioClipIndex + 0].music->loadMovie(getRandomAbstractPath());
-                                    audioClips[audioClipIndex + 0].music->setAudioDevice("JackRouter");
-                                    audioClips[audioClipIndex + 0].music->play();
+//                                    video->setLoopState(OF_LOOP_NONE);
+//                                    audioClips[audioClipIndex + 0].music->setAudioDevice("JackRouter");
+//                                    audioClips[audioClipIndex + 0].music->play();
                                     
                                     ofxLogVerbose() << "...loading audio atmos" << endl;
                                     audioClips[audioClipIndex + 1].music->loadMovie(getRandomAtmospherePath());
-                                    audioClips[audioClipIndex + 1].music->setAudioDevice("JackRouter");
-                                    audioClips[audioClipIndex + 1].music->play();
+//                                    audioClips[audioClipIndex + 1]->setLoopState(OF_LOOP_NONE);
+//                                    audioClips[audioClipIndex + 1].music->setAudioDevice("JackRouter");
+//                                    audioClips[audioClipIndex + 1].music->play();
                                     
-
-                                    //#ifndef NO_SOUND
+                    
+                                    
                                     for(int k = 0; k < 2; k++){
+                                        audioClips[audioClipIndex + k].music->setLoopState(OF_LOOP_NONE);
+                                        audioClips[audioClipIndex + k].music->setAudioDevice("JackRouter");
+                                        audioClips[audioClipIndex + k].music->setPosition(0.3f);
+                                        audioClips[audioClipIndex + k].music->setVolume(0.7);
+                                        audioClips[audioClipIndex + k].music->play();
+                                        
+                                        soundController->setAllChannelVolumes(audioClips[audioClipIndex + k].audioTrack + k, 1.0f);
+                                        
+                                        ofxLogVerbose() << "Assign (music) audio to: " << audioClips[audioClipIndex + k].audioTrack + 0 << endl;
                                         audioClips[audioClipIndex + k].music->setAudioTrackToChannel(1, kAudioChannelLabel_Left, soundController->getChannelLabel(audioClips[audioClipIndex + k].audioTrack + 0));
+                                        ofxLogVerbose() << "Assign (music) audio to: " << audioClips[audioClipIndex + k].audioTrack + 1 << endl;
                                         audioClips[audioClipIndex + k].music->setAudioTrackToChannel(1, kAudioChannelLabel_Right, soundController->getChannelLabel(audioClips[audioClipIndex + k].audioTrack + 1));
-                                    }
                                     
-                                    for(int k = 0; k < 2; k++){
                                         audioClips[audioClipIndex + k].fadeTarget = 0.0f;
                                         audioClips[audioClipIndex + k].fadeCurrent = 0.0f;
                                         audioClips[audioClipIndex + k].fadeLast = 0.0f;
@@ -1445,26 +1443,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                         c.fade = 0.0f;
                                         audioClips[audioClipIndex + k].fades.push_back(c);
                                         
-                                        audioClips[audioClipIndex + k].isLoading = true;
-                                        audioClips[audioClipIndex + k].isStopping = false;
+                                        
                                     }
                                     
-                                    videoClip.clip.setClipLoading(true);
-                                    clip.setClipLoading(true);
+//                                    videoClip.clip.setClipLoading(true);
+//                                    clip.setClipLoading(true);
                                 }else{
                                     ofxLogVerbose() << "...loaded normal clip: " << clip << endl;
                                     
-//                                    if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
-//                                        ofxLogVerbose() << "Setting frame: " << clip.getCropStart() + currentFrame - clip.getVideoStart() << endl;
-//                                        video->setFrame(clip.getCropStart() + currentFrame - clip.getVideoStart());
-//                                    }
-                                    
-                                    ofxLogVerbose() << "Assign audio to: " << videoClip.audioTrack << endl;
+                                    ofxLogVerbose() << "Assign (video) audio to: " << videoClip.audioTrack << endl;
                                     
                                     soundController->setAllChannelVolumes(videoClip.audioTrack, 0.0f);
                                     
                                     float clipCenter = (videoClip.clip.getPosition().x + videoClip.clip.getRect().width/2.0f); // use the videoClip.clip not the real clip!
-//#ifndef NO_SOUND
+
                                     float screenWidth = (clip.getScreen() == 0 ? 1920.0f : 1440.0f);
                                     int numSpeakers = (clip.getScreen() == 0 ? 3 : 2);
                                     int channelStart = (clip.getScreen() == 0 ? 0 : 3);
@@ -1477,25 +1469,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                     for(int channel = 5; channel < 8; channel++){
                                         soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f);
                                     }
-//#else
-//                                    float screenWidth = 1920.0f + 1440.0f;
-//                                    int numSpeakers = 2;
-//                                    int channelStart = 0;
-//                                    ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
-//                                    
-//                                    for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
-//                                        soundController->setChannelVolume(videoClip.audioTrack, channel + 0, pan[channel - channelStart]);
-//                                    }
-//                                    
-//                                    //                                for(int channel = 5; channel < 8; channel++){
-//                                    //                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f);
-//                                    //                                }
-//                                    
-//#endif
-
-                                    
-                                    videoClip.clip.setClipLoading(true);
-                                    clip.setClipLoading(true);
                                 }
                                 
                             }
@@ -1509,25 +1482,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                         
                         musicVideo->update();
                         
-                        if(musicVideo->isLoaded() && !musicVideo->isPlaying() && !audioClip.isStopping){
-                            
-                            ofxLogVerbose() << " Audio Playing: " << musicVideo->getMovieName() << endl;
-                            
-                            musicVideo->play();
-                            musicVideo->setPosition(0.3f);
-                            
-                            ofxLogVerbose() << "Assign music to: " << audioClip.audioTrack << endl;
-//#ifndef NO_SOUND
-                            soundController->setAllChannelVolumes(audioClip.audioTrack + 0, 1.0f);
-                            soundController->setAllChannelVolumes(audioClip.audioTrack + 1, 1.0f);
-//#endif
-                            musicVideo->setVolume(audioClip.fadeCurrent);
-                            audioClip.fadeTime = ofGetElapsedTimeMillis();
-                            
-                            audioClip.isLoading = false;
-                        }
-                        
-                        if(musicVideo->isLoaded() && musicVideo->isPlaying() && !audioClip.isStopping){
+                        if(musicVideo->isLoaded() && musicVideo->isPlaying()){
                             
                             if(audioClip.fades.size() > 0){
                                 FadeTime f = audioClip.fades[0];
@@ -1535,24 +1490,25 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 int timeDiff = ofGetElapsedTimeMillis() - audioClip.fadeTime;
                                 if(timeDiff <= f.time){
                                     float pct = (float)timeDiff/(float)f.time;
-                                    //cout << audio->getVolume() << " " << pct << " " << timeDiff << " " << audioClip.fadeCurrent << endl;
+                                    cout << audioClip.audioTrack + 0 << " " << audioClip.audioTrack + 1 << " " << musicVideo->getVolume() << " " << pct << " " << timeDiff << " " << audioClip.fadeCurrent << endl;
                                     audioClip.fadeCurrent = audioClip.fadeLast + (audioClip.fadeTarget - audioClip.fadeLast) * pct;
                                 }else{
                                     audioClip.fadeLast = audioClip.fadeCurrent = audioClip.fadeTarget;
                                     audioClip.fades.pop_front();
                                     audioClip.fadeTime = ofGetElapsedTimeMillis();
                                 }
-                                if(audioClip.fadeCurrent != audioClip.fadeTarget){
-                                    musicVideo->setVolume(audioClip.fadeCurrent);
-                                }
+                                soundController->setAllChannelVolumes(audioClip.audioTrack + 0, audioClip.fadeCurrent);
+                                soundController->setAllChannelVolumes(audioClip.audioTrack + 1, audioClip.fadeCurrent);
+//                                if(audioClip.fadeCurrent != audioClip.fadeTarget){
+//                                    musicVideo->setVolume(audioClip.fadeCurrent);
+//                                }
                             }
                             
                         }
                         
-                        if(musicVideo->getIsMovieDone() && !audioClip.isStopping){
+                        if(musicVideo->getIsMovieDone()){
                             ofxLogVerbose() << "Stopping Music " << endl;
                             musicVideo->stop();
-                            audioClip.isLoading = false;
                             audioClip.isStopping = true;
                         }
                         
@@ -1576,56 +1532,27 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             
                             video->update();
                             
-                            if(video->isLoaded() && video->isPlaying() && !clip.getClipStopping() && clip.getClipLoading()){
-                                ofxLogVerbose() << i << " Video Playing " << clip << endl;
-                                
-                                clip.setClipLoading(false);
-                            }
-                            
                             if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
                                 ofxLogVerbose() << "Stopping Video " << clip << endl;
                                 video->stop();
-                                clip.setClipLoading(false);
-                                clip.setClipStopping(true);
+                                videoClip.clip.setClipStopping(true);
                             }
                             
-//                            if(video->getIsMovieDone() && video->isPlaying()){
-//                                ofxLogVerbose() << "Force Stopping Video " << clip << endl;
-//                                video->stop();
-//                            }
-                            
-#ifdef VIDEO_TIMECODE
                             if(video->isPlaying() && !syncAssigned){
-                                if(i == 0){
-                                    ofxLogVerbose() << "Black timestamp" << endl;
+//                                if(i == 0){
+//                                    ofxLogVerbose() << "Black timestamp" << endl;
                                     if(video->isFrameNew()) currentFrame++;
                                     syncAssigned = true;
-                                }else{
-                                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                                    syncClipName = clip.getName();
-                                    syncAssigned = true;
-                                }
+//                                }else{
+//                                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
+//                                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
+//                                    syncClipName = clip.getName();
+//                                    syncAssigned = true;
+//                                }
                             }
                             
                         }
-#else
-                        if(video->isPlaying() && !syncAssigned){
-                            if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                            currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                            syncClipName = clip.getName();
-                            syncAssigned = true;
-                        }
-                    }
-                    if(!syncAssigned){
-                        ofxLogVerbose() << "Black timestamp" << endl;
-                        if(ofGetElapsedTimeMillis() - lastTimeMillis > 1000.0f/25.0f){
-                            currentFrame++;
-                            lastTimeMillis = ofGetElapsedTimeMillis();
-                        }
-                        
-                    }
-#endif
+
                     
                 }
             }
