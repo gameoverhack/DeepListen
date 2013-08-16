@@ -25,19 +25,11 @@ void LoadController::setup(){
 
     ClipTimeline & clipTimeline = appModel->getClipTimeline();
     
-#ifdef VIDEO_TIMECODE
     if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
         clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_2YUV);
     }else{
         clipTimeline.setup(appModel->getProperty<string>("BlackPath"), OF_PIXELS_BGRA);
     }
-#else
-    if(appModel->getProperty<string>("PixelFormat") == "JPEG"){
-        clipTimeline.setup(OF_PIXELS_2YUV);
-    }else{
-        clipTimeline.setup(OF_PIXELS_BGRA);
-    }
-#endif
     
 }
 
@@ -54,7 +46,7 @@ void LoadController::update(){
     videoFiles.allowExt(".mov");
     audioFiles.allowExt(".wav");
     textFiles.allowExt(".txt");
-    musicFiles.allowExt(".wav");
+    musicFiles.allowExt(".mov");
     
     videoFiles.listDir(appModel->getProperty<string>("VideoPath"), false);
     audioFiles.listDir(appModel->getProperty<string>("AudioPath"), false);
@@ -240,7 +232,7 @@ void LoadController::update(){
         appControllerStates.setState(kAPPCONTROLLER_ANALYZE);
         return;
     }else{
-        appControllerStates.setState(kAPPCONTROLLER_PLAY);
+        appControllerStates.setState(kAPPCONTROLLER_SOUND);
     }
     
 }

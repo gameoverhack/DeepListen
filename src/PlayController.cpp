@@ -87,7 +87,7 @@ void PlayController::update(){
                 for(int i = 0; i < videoClips.size(); i++){
                     ofxThreadedVideo * video = videoClips[i].video;
                     ostringstream os;
-                    os << ofToString(video->isLoading()) << " " << ofToString(video->isPlaying()) << " " << ofToString(video->getIsMovieDone()) << " " << ofToString(video->getFrameRate()) << " " << video->getQueueSize() << " "  << videoClips[i].clip;
+                    os << ofToString(video->isLoading()) << " " << ofToString(video->isPlaying()) << " " << ofToString(video->getIsMovieDone()) << " " << ofToString(video->getFrameRate()) << " " << video->getCurrentFrame() << "/" << video->getTotalNumFrames() << " " << video->getQueueSize() << " "  << videoClips[i].clip;
                     appModel->setProperty("PlayStateV_"+ofToString(i), os.str());
                 }
                 
@@ -95,7 +95,7 @@ void PlayController::update(){
                 for(int i = 0; i < audioClips.size(); i++){
                     ofxThreadedVideo * musicVideo = audioClips[i].music;
                     ostringstream os;
-                    os << ofToString(musicVideo->isLoading()) << " " << ofToString(musicVideo->isPlaying()) << " " << ofToString(musicVideo->getIsMovieDone()) << " " << ofToString(musicVideo->getFrameRate()) << " " << musicVideo->getMovieName() << " " << ofToString(musicVideo->getCurrentFrame()) << " " << ofToString(musicVideo->getVolume()) << " " << musicVideo->getQueueSize();
+                    os << ofToString(musicVideo->isLoading()) << " " << ofToString(musicVideo->isPlaying()) << " " << ofToString(musicVideo->getIsMovieDone()) << " " << ofToString(musicVideo->getFrameRate()) << " " << musicVideo->getMovieName() << " " << musicVideo->getCurrentFrame() << "/" << musicVideo->getTotalNumFrames() << " " << ofToString(musicVideo->getVolume()) << " " << musicVideo->getQueueSize();
                     appModel->setProperty("PlayStateA_"+ofToString(i), os.str());
                 }
                 
@@ -103,7 +103,7 @@ void PlayController::update(){
                 vector<Clip> & currentClips = timeline.getCurrentClips();
                 for(int i = 0; i < currentClips.size(); i++){
                     Clip & clip = currentClips[i];
-                    os << clip.getName() << " " << clip.getClipLoading() << " " << (i == currentClips.size() - 1 ? "" : ", ");
+                    os << clip.getName() << " " << clip.getClipStopping() << " " << (i == currentClips.size() - 1 ? "" : ", ");
                 }
                 
                 appModel->setProperty("Clips", os.str());

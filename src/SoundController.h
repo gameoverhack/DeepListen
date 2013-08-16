@@ -9,6 +9,7 @@
 #ifndef _H_SOUNDCONTROLLER
 #define _H_SOUNDCONTROLLER
 
+#include "Config.h"
 #include "ofxLogger.h"
 #include "BaseController.h"
 #include "ofxJackClient.h"

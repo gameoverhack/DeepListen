@@ -142,7 +142,7 @@ void AnalyzeController::update(){
     }else{
     
         ofxLogNotice() << "All analysis is done!" << endl;
-        appControllerStates.setState(kAPPCONTROLLER_PLAY);
+        appControllerStates.setState(kAPPCONTROLLER_SOUND);
    
     }
     

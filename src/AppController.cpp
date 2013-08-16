@@ -48,7 +48,7 @@ void AppController::setup(){
     StateGroup newAppControllerStates("AppControllerStates");
     newAppControllerStates.addState(State(kAPPCONTROLLER_INIT, "kAPPCONTROLLER_INIT"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_LOAD, "kAPPCONTROLLER_LOAD"));
-//    newAppControllerStates.addState(State(kAPPCONTROLLER_SOUND, "kAPPCONTROLLER_SOUND"));
+    newAppControllerStates.addState(State(kAPPCONTROLLER_SOUND, "kAPPCONTROLLER_SOUND"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_ANALYZE, "kAPPCONTROLLER_ANALYZE"));
     newAppControllerStates.addState(State(kAPPCONTROLLER_PLAY, "kAPPCONTROLLER_PLAY"));
     
@@ -276,11 +276,12 @@ void AppController::update(){
             loadController->update();
         }
             break;
-//        case kAPPCONTROLLER_SOUND:
-//        {
-//
-//        }
-//            break;
+        case kAPPCONTROLLER_SOUND:
+        {
+            soundController->setup(16,8);
+            appControllerStates.setState(kAPPCONTROLLER_PLAY);
+        }
+            break;
         case kAPPCONTROLLER_ANALYZE:
         {
             analyzeController->update();
@@ -475,12 +476,6 @@ void AppController::keyPressed(ofKeyEventArgs & e){
         case 'l':
             appModel->setProperty("ContourThreshold", appModel->getProperty<int>("ContourThreshold") - 1);
             break;
-        case ',':
-            timeline.previousClip();
-            break;
-        case '.':
-            timeline.nextClip();
-            break;
         case '/':
             timeline.togglePaused();
             break;
@@ -496,10 +491,10 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             }
             break;
         case OF_KEY_RIGHT:
-            timeline.nextClip();
+            timeline.forward();
             break;
         case OF_KEY_LEFT:
-            timeline.previousClip();
+            timeline.rewind();
             break;
     }
 
