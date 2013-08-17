@@ -392,6 +392,7 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     
     switch (key) {
         case 'y':
+            soundController->stop();
             soundController->setup(16, 8);
             break;
         case ' ':

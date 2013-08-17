@@ -1357,7 +1357,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             video->loadMovie(clip.getVideoPath());
                             video->setLoopState(OF_LOOP_NONE);
                             video->setAudioDevice("JackRouter");
-                            video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
                             video->play();
                             
                             clip.setClipStopping(false);
@@ -1422,6 +1421,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 ofxLogVerbose() << "...loaded normal clip: " << clip << endl;
                                 
                                 ofxLogVerbose() << "Assign (video) audio to: " << videoClip.audioTrack << endl;
+                                video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
                                 
                                 soundController->setAllChannelVolumes(videoClip.audioTrack, 0.0f);
                                 
