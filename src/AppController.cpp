@@ -94,7 +94,7 @@ void AppController::setup(){
     string rootPath = "";
     
 #if defined(MINI)
-    rootPath = "/Volumes/DeepData/";
+    rootPath = "/Users/deeplistening/Desktop/DeepData/";
 #elif defined(RETINA)
     rootPath = "/Users/gameover/Desktop/DeepDataTest/";
 #elif defined(BLACKCAVIAR)
