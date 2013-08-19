@@ -1420,6 +1420,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 
                                 ofxLogVerbose() << "...loaded normal clip: " << clip << endl;
                                 
+                                video->setFade(0.0f);
+                                video->setFade(0, 0, 0.0f);
+                                video->setFade(0, 3000, 1.0f);
+                                video->setFade(-1, 3000, 0.0f);
+                                
                                 ofxLogVerbose() << "Assign (video) audio to: " << videoClip.audioTrack << endl;
                                 video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
                                 
@@ -1651,19 +1656,19 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     
                     if(clip.getScreen() == screen){
                         
-                        float fade = 1.0f;
-                        int fadeInSeconds = 3;
-                        int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
-                        
-                        if(video->getCurrentFrame() < clip.getCropStart()) continue;
-                        
-                        if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
-                            fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
-                        }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
-                            fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
-                        }else if(currentFadeFrame >= clip.getTotalFrames()){
-                            fade = 0.0f;
-                        }
+//                        float fade = 1.0f;
+//                        int fadeInSeconds = 3;
+//                        int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
+//                        
+//                        if(video->getCurrentFrame() < clip.getCropStart()) continue;
+//                        
+//                        if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
+//                            fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
+//                        }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
+//                            fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
+//                        }else if(currentFadeFrame >= clip.getTotalFrames()){
+//                            fade = 0.0f;
+//                        }
                         
                         glPushMatrix();
                         
@@ -1679,13 +1684,14 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             shader.begin();
                             shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
                             shader.setUniform1i("conversionType", (false ? 709 : 601));
-                            shader.setUniform1f("fade", fade);
+                            shader.setUniform1f("fade", video->getFade());
                             renderer.draw(0, 0);
                             shader.end();
                             
                         }else{
                             
-                            ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
+                            ofSetColor(255, 255, 255, 255);
+//                            ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
                             video->draw(0, 0);
                             
                         }

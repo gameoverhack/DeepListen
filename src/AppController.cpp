@@ -209,8 +209,8 @@ void AppController::setup(){
     networkController = new NetworkController();
     networkController->setup();
     
-    ofHideCursor();
-    ofSetFullscreen(true);
+    //ofHideCursor();
+    //ofSetFullscreen(true);
     StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     debugViewStates.setState(kDEBUGVIEW_SHOWINFO, 0);
