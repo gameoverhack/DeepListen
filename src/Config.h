@@ -13,6 +13,7 @@
 #define MINI
 //#define RETINA
 //#define BLACKCAVIAR
+#define TEST_SOUND
 //#define NO_SOUND
 #define JPEG
 

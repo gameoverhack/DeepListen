@@ -9,6 +9,7 @@
 #include "SoundController.h"
 
 static bool isSetup = false;
+static int starts = 0;
 
 //--------------------------------------------------------------
 SoundController::SoundController(){
@@ -24,8 +25,9 @@ SoundController::~SoundController(){
 
 //--------------------------------------------------------------
 bool SoundController::setup(int inChannels, int outChannels){
-    
-    if(ofxJackClient::setup((string)"SoundController", true)){
+    instanceName = "SoundController" + ofToString(starts);
+    starts++;
+    if(ofxJackClient::setup(instanceName, true)){
         
         ofxLogVerbose() << "Starting ofxJackClient" << endl;
         
@@ -65,7 +67,7 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     for(int channel = 1; channel < inChannels + 1; channel++){
         ok = createPort("input" + ofToString(channel), JackPortIsInput);
         if(!ok) break;
-        ok = connect(getApplicationName() + ":out"+ofToString(channel), "SoundController:input" + ofToString(channel));
+        ok = connect(getApplicationName() + ":out"+ofToString(channel), instanceName+ ":input" + ofToString(channel));
         if(!ok) break;
     }
     
@@ -74,24 +76,15 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     for(int channel = 1; channel < outChannels + 1; channel++){
         ok = createPort("output" + ofToString(channel), JackPortIsOutput);
         if(!ok) break;
-#ifdef NO_SOUND
-        ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 1 : 2)));
-#else
-        ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
+#if defined(NO_SOUND)
+        ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 1 : 2)));
+#elif defined(TEST_SOUND)
+        ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 7 : 8)));
+#elif
+        ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString(channel));
 #endif
         if(!ok) break;
     }
-    
-//    for(int channel = 1; channel < outChannels + 1; channel++){
-//        ok = createPort("input" + ofToString(channel), JackPortIsInput);
-//        if(!ok) break;
-//        ok = createPort("output" + ofToString(channel), JackPortIsOutput);
-//        if(!ok) break;
-//        ok = connect(getApplicationName() + ":out"+ofToString(channel), "SoundController:input" + ofToString(channel));
-//        if(!ok) break;
-//        ok = connect("SoundController:output" + ofToString(channel), "system:playback_" + ofToString(channel));
-//        if(!ok) break;
-//    }
     
     if(ok){
         volumes.resize(inChannels);

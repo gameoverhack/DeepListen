@@ -44,6 +44,8 @@ public:
     
 protected:
 	
+    string instanceName;
+    
     vector< vector<float> > volumes;
     
     float masterVolume;

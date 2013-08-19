@@ -352,8 +352,21 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     
     switch (key) {
         case 'y':
+            timeline.clear();
+            ofSleepMillis(1000);
             soundController->stop();
+            ofSleepMillis(1000);
+            closeQuicktime();
+            ofSleepMillis(1000);
+//            system("pkill jackdmp");
+//            system("killall jackd");
+//            ofSleepMillis(2000);
+//            system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
+//            ofSleepMillis(2000);
+            initializeQuicktime();
+            ofSleepMillis(1000);
             soundController->setup(16, 8);
+            ofSleepMillis(1000);
             break;
         case ' ':
             playControllerStates.setState(kPLAYCONTROLLER_INIT);
