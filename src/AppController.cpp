@@ -380,6 +380,7 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     
     switch (key) {
         case 'y':
+            timeline.clear();
             system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
             ofSleepMillis(500);
             system("./../../../appswitch -f -a \"DeepScreenBlocker\"");

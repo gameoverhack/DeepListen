@@ -10,11 +10,11 @@
 #define _H_CONFIG
 
 //#define USE_FENSTER
-//#define MINI
-#define RETINA
+#define MINI
+//#define RETINA
 //#define BLACKCAVIAR
-//#define TEST_SOUND
-#define NO_SOUND
+#define TEST_SOUND
+//#define NO_SOUND
 #define JPEG
 
 #endif
