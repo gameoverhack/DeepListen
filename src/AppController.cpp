@@ -387,7 +387,7 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             system("./DeepListen &");
             system("./../../../appswitch -h -a \"Finder\"");
             system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
-            ofSleepMillis(4000);
+//            ofSleepMillis(4000);
             ofExit();
             break;
         case ' ':
