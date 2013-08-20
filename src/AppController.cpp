@@ -27,7 +27,7 @@ void AppController::setup(){
     
 #ifndef NO_SOUND
     system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
-    ofSleepMillis(10000);
+    ofSleepMillis(2000);
 #else
     system("~/../../usr/local/bin/jackd -R -d coreaudio -p 512 -r 48000 'JackRouter' -i 2 -o 2 &");
     ofSleepMillis(2000);
@@ -209,19 +209,32 @@ void AppController::setup(){
     networkController = new NetworkController();
     networkController->setup();
     
-    //ofHideCursor();
-    //ofSetFullscreen(true);
+
     StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     debugViewStates.setState(kDEBUGVIEW_SHOWINFO, 0);
     analyzeViewStates.setState(kANALYZEVIEW_SHOW, 0);
     
-    bShowCursor = true;
+    bShowCursor = false;
+
+    CGPoint p;
+    p.x = 1980 * 2; p.y = 1200;
+    CGPostMouseEvent( p, 1, 1, 1 );
+    CGPostMouseEvent( p, 1, 1, 0 );
     
-    system("./../../../data/Hide.sh \"TotalMix FX\"");
+    ofHideCursor();
+    ofSetFullscreen(true);
+    
+    system("./../../../appswitch -h -a \"Xcode\"");
+    system("./../../../appswitch -h -a \"Finder\"");
+    system("./../../../appswitch -h -a \"TotalMix FX\"");
+    system("./../../../appswitch -f -a \"DeepListen\"");
+    
+    //system("./../../../data/Hide.sh \"TotalMix FX\"");
     
 }
-
+static int appTimer = 0;
+static bool started = false;
 //--------------------------------------------------------------
 void AppController::update(){
     
@@ -233,6 +246,7 @@ void AppController::update(){
         
         case kAPPCONTROLLER_INIT:
         {
+            system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
             appControllerStates.setState(kAPPCONTROLLER_LOAD);
         }
             break;
@@ -245,6 +259,7 @@ void AppController::update(){
         {
             soundController->setup(16,8);
             appControllerStates.setState(kAPPCONTROLLER_PLAY);
+            appTimer = ofGetElapsedTimeMillis();
         }
             break;
         case kAPPCONTROLLER_ANALYZE:
@@ -254,6 +269,18 @@ void AppController::update(){
             break;
         case kAPPCONTROLLER_PLAY:
         {
+            if(!started){
+                
+                if(ofGetElapsedTimeMillis() - appTimer > 2000){
+                    started = true;
+                    system("./../../../appswitch -h -a \"Finder\"");
+                    system("./../../../appswitch -f -a \"DeepListen\"");
+                    system("./../../../appswitch -h -a \"DeepScreenBlocker\"");
+                    ofSleepMillis(500);
+                    system("pkill DeepScreenBlocker");
+                }
+                
+            }
             playController->update();
         }
             break;
@@ -330,7 +357,8 @@ void AppController::exit(){
     timeline.clear();
     
     appModel->save("config", ARCHIVE_BINARY);
-
+    
+    system("pkill DeepScreenBlocker");
     system("pkill jackdmp");
     system("pkill jackd");
 }
@@ -352,21 +380,14 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     
     switch (key) {
         case 'y':
-            timeline.clear();
-            ofSleepMillis(1000);
-            soundController->stop();
-            ofSleepMillis(1000);
-            closeQuicktime();
-            ofSleepMillis(1000);
-//            system("pkill jackdmp");
-//            system("killall jackd");
-//            ofSleepMillis(2000);
-//            system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
-//            ofSleepMillis(2000);
-            initializeQuicktime();
-            ofSleepMillis(1000);
-            soundController->setup(16, 8);
-            ofSleepMillis(1000);
+            system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
+            ofSleepMillis(500);
+            system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
+            system("./DeepListen &");
+            system("./../../../appswitch -h -a \"Finder\"");
+            system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
+            ofSleepMillis(4000);
+            ofExit();
             break;
         case ' ':
             playControllerStates.setState(kPLAYCONTROLLER_INIT);

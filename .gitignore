@@ -2,7 +2,8 @@
 .DS_Store
 
 #Applications
-*.app
+DeepListen.app
+DeepListenDebug.app
 *.exe
 
 # Compiled Object files
