@@ -48,6 +48,11 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     
     Serializer.loadClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
     timers = timeLineHistory.lastTimelineTimers;
+    
+//    int jumpStart = clipTimeline.getCurrentFrame();
+//    
+//    bool isAtEnd = (clipTimeline.getCurrentFrame() + minutesToFrames(2) > clipTimeline.getTotalFrames());
+//    
     clipTimeline.stop();
     clipTimeline.clear();
     ClipGroup& group = clipTimeline.getGroup();
@@ -67,7 +72,7 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     vector<Clip> clipsAtTime;
     clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime, timeLineHistory.lastTimelineTime, clipsAtTime);
     
-    if(clipsAtTime.size() == 0){
+//    if(clipsAtTime.size() == 0){
         ofxLogVerbose() << "FAST FORWARD TO FIRST FRAME OF NEXT CLIP" << endl;
         for(int i = 0; i < minutesToFrames(120); i++){
             vector<Clip> currentClips;
@@ -78,19 +83,20 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
             }
         }
 
-    }else{
-        ofxLogVerbose() << "REWIND TO FIRST BREAK BEFORE A PREVIOUS CLIP" << endl;
-        for(int i = 0; i < minutesToFrames(120); i++){
-            vector<Clip> currentClips;
-            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime - i, timeLineHistory.lastTimelineTime - i, currentClips);
-            if(currentClips.size() == 0){
-                jumpStart = timeLineHistory.lastTimelineTime - i - 1;
-                break;
-            }
-        }
-
-    }
-        
+//    }
+//    else if(clipsAtTime.size() > 0 && !isAtEnd){
+//        ofxLogVerbose() << "REWIND TO FIRST BREAK BEFORE A PREVIOUS CLIP" << endl;
+//        for(int i = 0; i < minutesToFrames(120); i++){
+//            vector<Clip> currentClips;
+//            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime - i, timeLineHistory.lastTimelineTime - i, currentClips);
+//            if(currentClips.size() == 0){
+//                jumpStart = timeLineHistory.lastTimelineTime - i - 1;
+//                break;
+//            }
+//        }
+//
+//    }
+    
     clipTimeline.play();
     clipTimeline.setFrame(jumpStart);
     return timeLineHistory;
