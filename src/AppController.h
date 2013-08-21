@@ -31,6 +31,7 @@ public:
     void draw();
     
     void exit();
+    void restart();
     
     void keyPressed(ofKeyEventArgs & e);
     void keyReleased(ofKeyEventArgs & e);

@@ -51,7 +51,12 @@ void PlayController::update(){
             clipTimeline.clear();
             clipTimeline.setMusicAssets(appModel->getMusicAssetLoader());
             resetClipGroups();
-            playControllerStates.setState(kPLAYCONTROLLER_MAKE);
+            TimeLineHistory& timneLineHistory = appModel->loadTimelineHistory();
+            if(clipTimeline.getCurrentFrame() + minutesToFrames(2) > clipTimeline.getTotalFrames()){
+                playControllerStates.setState(kPLAYCONTROLLER_MAKE);
+            }else{
+                playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+            }
         }
             break;
         case kPLAYCONTROLLER_MAKE:
@@ -65,7 +70,7 @@ void PlayController::update(){
             ofxLogVerbose() << timeline.getGroup() << endl;
             ofxLogVerbose() << "/\\---------------------/\\" << endl;
             
-            cout << "Total length: " << framesToMinutes(timeline.getTotalFrames()) << " num clips: " << timeline.getGroup().size() << endl;
+            ofxLogVerbose() << "Total length: " << framesToMinutes(timeline.getTotalFrames()) << " num clips: " << timeline.getGroup().size() << endl;
             
             ClipGroup & statistics = appModel->getClipGroupReference("statistics");
             statistics.push(timeline.getGroup());
@@ -150,6 +155,7 @@ void PlayController::makeClipGroup(){
     string category = "";
     string question = "";
     lastAudioFreeFrame = 0;
+    int lastResetFrame = 0;
     
 //    ClipTimeline & timeline = appModel->getClipTimeline();
 //    
@@ -190,7 +196,7 @@ void PlayController::makeClipGroup(){
             int titleInsertFrame;
             if(timeline.getGroup().size() > 0){
                 Clip lastClip = timeline.getLastClip();
-                titleInsertFrame = lastClip.getAudioEnd() - (12 * 25);
+                titleInsertFrame = lastClip.getAudioEnd() - secondsToFrames(12);
             }else{
                 titleInsertFrame = 0;
                 //title.setCrop(12 * 25, title.getTotalFrames());
@@ -198,7 +204,7 @@ void PlayController::makeClipGroup(){
             
             if(timeline.insertClipAt(title, titleInsertFrame)){
                 ofxLogVerbose() << "Inserted title: " << timeline.getLastClip() << endl;
-                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + (27 * 25);
+                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + secondsToFrames(27);
             }else{
                 ofxLogWarning() << "Rejected title: " << title << endl;
             }
@@ -218,6 +224,12 @@ void PlayController::makeClipGroup(){
             
             ClipGroup specialGroup = allSpecClips;
             ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 30);
+            
+            if(framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
+                ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
+                lastResetFrame = timeline.getLastClip().getVideoEnd();
+                lastAudioFreeFrame = lastResetFrame + secondsToFrames(30);
+            }
             
         }else{// do a category
             
@@ -318,7 +330,7 @@ void PlayController::makeClipGroup(){
             
             if(timeline.insertClipAt(title, titleInsertFrame)){
                 ofxLogVerbose() << "Inserted title: " << timeline.getLastClip() << endl;
-                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + (27 * 25);
+                lastAudioFreeFrame = timeline.getLastClip().getVideoStart() + secondsToFrames(27);
             }else{
                 ofxLogWarning() << "Rejected title: " << title << endl;
             }

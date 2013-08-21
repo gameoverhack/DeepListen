@@ -194,7 +194,8 @@ enum ClipSide{
     RIGHT
 };
 
-struct ClipPosition {
+class ClipPosition {
+public:
     ofRectangle position;
     int videostart;
     int videoend;
@@ -207,9 +208,28 @@ struct ClipPosition {
     int cropframes;
     bool isCropped;
     bool isStopping;
+    
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version){
+        ar & BOOST_SERIALIZATION_NVP(position);
+        ar & BOOST_SERIALIZATION_NVP(videostart);
+        ar & BOOST_SERIALIZATION_NVP(videoend);
+        ar & BOOST_SERIALIZATION_NVP(videoframes);
+        ar & BOOST_SERIALIZATION_NVP(audiostart);
+        ar & BOOST_SERIALIZATION_NVP(audioend);
+        ar & BOOST_SERIALIZATION_NVP(screen);
+        ar & BOOST_SERIALIZATION_NVP(cropstart);
+        ar & BOOST_SERIALIZATION_NVP(cropend);
+        ar & BOOST_SERIALIZATION_NVP(cropframes);
+        ar & BOOST_SERIALIZATION_NVP(isCropped);
+        ar & BOOST_SERIALIZATION_NVP(isStopping);
+    };
+    
 };
 
-struct ClipInfo{
+class ClipInfo{
+public:
     string category;
     string question;
     string type;
@@ -226,9 +246,72 @@ struct ClipInfo{
     string readablepersonal;
     string readablenumber;
     string readableperson;
+    
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version){
+        ar & BOOST_SERIALIZATION_NVP(category);
+        ar & BOOST_SERIALIZATION_NVP(question);
+        ar & BOOST_SERIALIZATION_NVP(type);
+        ar & BOOST_SERIALIZATION_NVP(time);
+        ar & BOOST_SERIALIZATION_NVP(framed);
+        ar & BOOST_SERIALIZATION_NVP(personal);
+        ar & BOOST_SERIALIZATION_NVP(number);
+        ar & BOOST_SERIALIZATION_NVP(person);
+        ar & BOOST_SERIALIZATION_NVP(readablecategory);
+        ar & BOOST_SERIALIZATION_NVP(readablequestion);
+        ar & BOOST_SERIALIZATION_NVP(readabletype);
+        ar & BOOST_SERIALIZATION_NVP(readabletime);
+        ar & BOOST_SERIALIZATION_NVP(readableframed);
+        ar & BOOST_SERIALIZATION_NVP(readablepersonal);
+        ar & BOOST_SERIALIZATION_NVP(readablenumber);
+        ar & BOOST_SERIALIZATION_NVP(readableperson);
+    };
 };
 
-class Clip {
+class ClipBase {
+    
+    friend class Clip;
+    friend class Clip2;
+    
+protected:
+    
+    // derived variables
+    ClipInfo clipInfo;
+    ClipPosition clipPosition;
+    
+    // serialized variables
+    string name; // actually the filename
+    
+    File videoFile;
+    File audioFile;
+    File textFile;
+    
+    bool analyzed;
+    bool deleted;
+    
+    string text;
+    ofRectangle rect;
+    ofRectangle scaledRect;
+    
+    int frames;
+    float audioinpct;
+    float audioutpct;
+    
+    float width;
+    float height;
+    
+    float scale;
+    float adjustHeight;
+    
+    string imagePath;
+    ofImage image;
+    ofPoint imagePosition;
+    float imageScale;
+    bool imageAdjust;
+};
+
+class Clip : public ClipBase{
     
 public:
     
@@ -240,6 +323,36 @@ public:
         clear();
         name = _name;
         init();
+    };
+    
+    Clip(ClipBase clip){
+        name = clip.name;
+        frames = clip.frames;
+        audioinpct = clip.audioinpct;
+        audioutpct = clip.audioutpct;
+        analyzed = clip.analyzed;
+        deleted = clip.deleted;
+        width = clip.width;
+        height = clip.height;
+        scale = clip.scale;
+        scaledRect = clip.scaledRect;
+        adjustHeight = clip.adjustHeight;
+        clipPosition = clip.clipPosition;
+        clipInfo = clip.clipInfo;
+        
+        videoFile = clip.videoFile;
+        audioFile = clip.audioFile;
+        textFile = clip.textFile;
+        
+        imagePath = clip.imagePath;
+        image = clip.image;
+        imagePosition = clip.imagePosition;
+        imageScale = clip.imageScale;
+        imageAdjust = clip.imageAdjust;
+        
+//        setScale(clip.scale);
+//        setPosition(clip.clipPosition.position.x, clip.clipPosition.position.y, clip.clipPosition.screen);
+        
     };
     
     ~Clip(){
@@ -665,39 +778,112 @@ public:
     
 protected:
     
-    // derived variables
-    ClipInfo clipInfo;
-    ClipPosition clipPosition;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version){
+        ar & BOOST_SERIALIZATION_NVP(name);
+        ar & BOOST_SERIALIZATION_NVP(videoFile);
+        ar & BOOST_SERIALIZATION_NVP(audioFile);
+        ar & BOOST_SERIALIZATION_NVP(textFile);
+        ar & BOOST_SERIALIZATION_NVP(analyzed);
+        ar & BOOST_SERIALIZATION_NVP(deleted);
+        ar & BOOST_SERIALIZATION_NVP(text);
+        ar & BOOST_SERIALIZATION_NVP(rect);
+        ar & BOOST_SERIALIZATION_NVP(frames);
+        ar & BOOST_SERIALIZATION_NVP(audioinpct);
+        ar & BOOST_SERIALIZATION_NVP(audioutpct);
+        ar & BOOST_SERIALIZATION_NVP(width);
+        ar & BOOST_SERIALIZATION_NVP(height);
+        ar & BOOST_SERIALIZATION_NVP(scale);
+        ar & BOOST_SERIALIZATION_NVP(adjustHeight);
+    };
     
-    // serialized variables
-    string name; // actually the filename
+private:
     
-    File videoFile;
-    File audioFile;
-    File textFile;
+};
+
+class Clip2 : public ClipBase {
     
-    bool analyzed;
-    bool deleted;
+public:
     
-    string text;
-    ofRectangle rect;
-    ofRectangle scaledRect;
+    Clip2(){
+    };
     
-    int frames;
-    float audioinpct;
-    float audioutpct;
+    Clip2(ClipBase clip){
+        name = clip.name;
+        frames = clip.frames;
+        audioinpct = clip.audioinpct;
+        audioutpct = clip.audioutpct;
+        analyzed = clip.analyzed;
+        deleted = clip.deleted;
+        width = clip.width;
+        height = clip.height;
+        scale = clip.scale;
+        scaledRect = clip.scaledRect;
+        adjustHeight = clip.adjustHeight;
+        clipPosition = clip.clipPosition;
+        clipInfo = clip.clipInfo;
+        
+        videoFile = clip.videoFile;
+        audioFile = clip.audioFile;
+        textFile = clip.textFile;
+        
+        imagePath = clip.imagePath;
+        image = clip.image;
+        imagePosition = clip.imagePosition;
+        imageScale = clip.imageScale;
+        imageAdjust = clip.imageAdjust;
+    };
     
-    float width;
-    float height;
+    ~Clip2(){
+        clear();
+    };
     
-    float scale;
-    float adjustHeight;
-    
-    string imagePath;
-    ofImage image;
-    ofPoint imagePosition;
-    float imageScale;
-    bool imageAdjust;
+    void clear(){
+        name = "";
+        frames = -1;
+        audioinpct = 0;
+        audioutpct = 0;
+        analyzed = deleted = false;
+        width = height = 0.0f;
+        scale = 1.0f;
+        adjustHeight = 0.0f;
+        
+        clipPosition.position = ofRectangle(-1, -1, -1, -1);
+        clipPosition.videostart = -1;
+        clipPosition.videoend = -1;
+        clipPosition.videoframes = -1;
+        clipPosition.audiostart = -1;
+        clipPosition.audioend = -1;
+        clipPosition.screen = -1;
+        clipPosition.cropstart = -1;
+        clipPosition.cropend = -1;
+        clipPosition.cropframes = -1;
+        clipPosition.isCropped = false;
+        clipPosition.isStopping = false;
+        
+        clipInfo.category = "";
+        clipInfo.question = "";
+        clipInfo.type = "";
+        clipInfo.time = "";
+        clipInfo.framed = "";
+        clipInfo.personal = "";
+        clipInfo.number = "";
+        clipInfo.person = "";
+        
+        clipInfo.readablecategory = "";
+        clipInfo.readablequestion = "";
+        clipInfo.readabletype = "";
+        clipInfo.readabletime = "";
+        clipInfo.readableframed = "";
+        clipInfo.readablepersonal = "";
+        
+        imagePath = "";
+        image.clear();
+        imagePosition.x = imagePosition.y = 0.0f;
+        imageScale = 1.0f;
+        imageAdjust = false;
+    }
     
     friend class boost::serialization::access;
     template<class Archive>
@@ -717,6 +903,12 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(height);
         ar & BOOST_SERIALIZATION_NVP(scale);
         ar & BOOST_SERIALIZATION_NVP(adjustHeight);
+        ar & BOOST_SERIALIZATION_NVP(clipPosition);
+        ar & BOOST_SERIALIZATION_NVP(clipInfo);
+        ar & BOOST_SERIALIZATION_NVP(videoFile);
+        ar & BOOST_SERIALIZATION_NVP(audioFile);
+        ar & BOOST_SERIALIZATION_NVP(textFile);
+        ar & BOOST_SERIALIZATION_NVP(scaledRect);
     };
     
 private:
@@ -852,6 +1044,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         map<string, int> types;
         
     protected:
+        
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & BOOST_SERIALIZATION_NVP(types);
+        };
         
     };
     
@@ -1100,9 +1298,16 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return clip;
         }
         
-        Clip pop(string & clipName){
-            Clip clip = Clip(clipName);
-            return pop(clip);
+        Clip pop(string clipName){
+            Clip clip = dummyClip;
+            for(int i = 0; i < group.size(); i++){
+                if(group[i].getName() == clipName){
+                    popCategoryTypes(group[i]);
+                    clip = group[i];
+                    group.erase(group.begin()+i, group.begin()+i+1);
+                }
+            }
+            return clip;
         }
         
         ClipGroup pop(vector<string> & clipnames){
@@ -1228,6 +1433,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         ClipType personTypes;
         ClipType nameTypes;
         
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version){
+            ar & BOOST_SERIALIZATION_NVP(group);
+            ar & BOOST_SERIALIZATION_NVP(categoryTypes);
+            ar & BOOST_SERIALIZATION_NVP(questionTypes);
+            ar & BOOST_SERIALIZATION_NVP(typeTypes);
+            ar & BOOST_SERIALIZATION_NVP(timeTypes);
+            ar & BOOST_SERIALIZATION_NVP(framedTypes);
+            ar & BOOST_SERIALIZATION_NVP(personalTypes);
+            ar & BOOST_SERIALIZATION_NVP(personTypes);
+            ar & BOOST_SERIALIZATION_NVP(nameTypes);
+        };
+        
     };
     
     inline ostream& operator<<(ostream& os, const ClipGroup &cg){
@@ -1297,6 +1516,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             
             ofxLogNotice() << "Setup timeline " << blackPath << endl;
             
+            blackFrames = 0;
+            blackOut = false;
+            
             pixelFormat = pixelformat;
             
             for(int i = 0; i < 4; i++){
@@ -1340,6 +1562,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                 getClipsFrom(currentFrame, currentFrame, currentClips);
                 
                 if(currentClips.size() > 0){
+                    
+                    blackFrames = 0;
+                    blackOut = false;
                     
                     for(int i = 0; i < currentClips.size(); i++){
                         
@@ -1413,7 +1638,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                     c.fade = 0.0f;
                                     audioClips[audioClipIndex + k].fades.push_back(c);
                                     
-                                    
                                 }
                                 
                             }else{
@@ -1448,6 +1672,13 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             
                         }
                     }
+                }else{
+                    blackFrames++;
+                    if(blackFrames > secondsToFrames(2)){
+                        ofxLogWarning() << "RESART" << endl;
+                        blackOut = true;
+                    }
+                    
                 }
                 
                 for(int i = 0; i < audioClips.size(); i++){
@@ -1465,7 +1696,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             int timeDiff = ofGetElapsedTimeMillis() - audioClip.fadeTime;
                             if(timeDiff <= f.time){
                                 float pct = (float)timeDiff/(float)f.time;
-                                //cout << musicVideo->getCurrentFrame() << " " << audioClip.audioTrack + 0 << " " << audioClip.audioTrack + 1 << " " << musicVideo->getVolume() << " " << pct << " " << timeDiff << " " << audioClip.fadeCurrent << endl;
                                 audioClip.fadeCurrent = audioClip.fadeLast + (audioClip.fadeTarget - audioClip.fadeLast) * pct;
                             }else{
                                 audioClip.fadeLast = audioClip.fadeCurrent = audioClip.fadeTarget;
@@ -1474,9 +1704,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             }
                             soundController->setAllChannelVolumes(audioClip.audioTrack + 0, audioClip.fadeCurrent);
                             soundController->setAllChannelVolumes(audioClip.audioTrack + 1, audioClip.fadeCurrent);
-                            //                                if(audioClip.fadeCurrent != audioClip.fadeTarget){
-                            //                                    musicVideo->setVolume(audioClip.fadeCurrent);
-                            //                                }
                         }
                         
                     }
@@ -1506,21 +1733,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     }
                     
                     if(video->isPlaying() && !syncAssigned){
-                        //                                if(i == 0){
-                        //                                    ofxLogVerbose() << "Black timestamp" << endl;
                         if(video->isFrameNew()) currentFrame++;
                         syncAssigned = true;
-                        //                                }else{
-                        //                                    if(video->getCurrentFrame() < clip.getCropStart() || video->getIsMovieDone()) continue;
-                        //                                    currentFrame = clip.getVideoStart() + video->getCurrentFrame() - clip.getCropStart();
-                        //                                    syncClipName = clip.getName();
-                        //                                    syncAssigned = true;
-                        //                                }
+                        syncClipName = clip.getName();
                     }
-                    
                 }
-                
-                
+
             }
         }
         
@@ -1557,9 +1775,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         }
         
         VideoClip& isClipAssigned(Clip & clip){
-            
             for(int i = 1; i < videoClips.size(); i++){
-                
                 if(videoClips[i].clip == clip &&
                    (videoClips[i].video->getMoviePath() == clip.getVideoPath() ||
                     videoClips[i].video->isLoading(clip.getVideoPath()))){
@@ -1580,10 +1796,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void setFrame(int frame){
             //bool cPaused = bPaused;
             //stop();
+            blackFrames = 0;
+            blackOut = 0;
             currentFrame = frame;
             for(int i = 1; i < videoClips.size(); i++){
                 VideoClip & videoClip = videoClips[i];
-                
                 Clip & clip = getRealClip(videoClip.clip);
                 ofxThreadedVideo * video = videoClip.video;
                 if(clip.getCropStart() + currentFrame - clip.getVideoStart() > 3){
@@ -1592,7 +1809,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                 }
             }
             for(int i = 0; i < audioClips.size(); i++){
-
                 AudioClip & audioClip = audioClips[i];
                 ofxThreadedVideo * musicVideo = audioClip.music;
                 if(musicVideo->isLoaded() && musicVideo->isPlaying()){
@@ -1609,11 +1825,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void stop(){
             
             for(int i = 1; i < videoClips.size(); i++){
-                
                 videoClips[i].video->stop();
+                videoClips[i].clip = dummyClip;
             }
-            for(int i = 0; i < group.size(); i++){
-                Clip & clip = group[i];
+            for(int i = 0; i < audioClips.size(); i++){
+                audioClips[i].music->stop();
             }
             setPaused(true);
         }
@@ -1624,6 +1840,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         }
         
         void setPaused(bool b){
+            blackFrames = 0;
+            blackOut = 0;
             bPaused = b;
             if(bPaused){
                 for(int i = 0; i < videoClips.size(); i++){
@@ -1656,25 +1874,10 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     
                     if(clip.getScreen() == screen){
                         
-//                        float fade = 1.0f;
-//                        int fadeInSeconds = 3;
-//                        int currentFadeFrame = MAX(currentFrame - clip.getVideoStart(), video->getCurrentFrame() - clip.getCropStart());
-//                        
-//                        if(video->getCurrentFrame() < clip.getCropStart()) continue;
-//                        
-//                        if(currentFadeFrame >= 0 && currentFadeFrame < fadeInSeconds * 25){
-//                            fade = (float)currentFadeFrame / (float)(fadeInSeconds * 25);
-//                        }else if(currentFadeFrame > clip.getTotalFrames() - fadeInSeconds * 25 && currentFadeFrame < clip.getTotalFrames()){
-//                            fade = (((float)clip.getTotalFrames() - currentFadeFrame) / (float)(fadeInSeconds * 25));
-//                        }else if(currentFadeFrame >= clip.getTotalFrames()){
-//                            fade = 0.0f;
-//                        }
-                        
                         glPushMatrix();
                         
                         glTranslatef(clip.getPosition().x - clip.getRect().x, clip.getPosition().y, 0.0f);
                         glScalef(clip.getScale(), clip.getScale(), 1.0f);
-                        
                         
                         if(video->getPixelFormat() == OF_PIXELS_2YUV){
                             
@@ -1691,7 +1894,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                         }else{
                             
                             ofSetColor(255, 255, 255, 255);
-//                            ofSetColor(255 * fade, 255 * fade, 255 * fade, 255 * fade);
                             video->draw(0, 0);
                             
                         }
@@ -2001,7 +2203,14 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return path;
         }
         
+        bool getRestart(){
+            return blackOut;
+        }
+        
     protected:
+        
+        int blackFrames;
+        bool blackOut;
         
         FileList musicAssets;
         deque<string> randomAbstract;

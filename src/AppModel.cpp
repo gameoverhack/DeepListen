@@ -21,13 +21,89 @@ AppModel::~AppModel() {
 }
 
 //--------------------------------------------------------------
-bool AppModel::save(string filename, ArchiveType archiveType){
+void AppModel::resetHistory(){
+    clipTimeline.setFrame(clipTimeline.getTotalFrames() - 1);
+    saveTimelineHistory();
+}
+
+//--------------------------------------------------------------
+void AppModel::saveTimelineHistory(){
+    ofxLogNotice() << "Saving Timeline History" << endl;
+    timeLineHistory.lastTimelineClips.clear();
+    ClipGroup& group = clipTimeline.getGroup();
+    for(int i = 0; i < group.size(); i++){
+        Clip2 clipCopy = Clip2(group[i]);
+        timeLineHistory.lastTimelineClips.push_back(clipCopy);
+        
+    }
+    timeLineHistory.lastTimelineTimers = timers;
+    timeLineHistory.lastTimelineTime = clipTimeline.getCurrentFrame();
+    Serializer.saveClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
+}
+
+//--------------------------------------------------------------
+TimeLineHistory& AppModel::loadTimelineHistory(){
+    
+    ofxLogNotice() << "Loading Timeline History" << endl;
+    
+    Serializer.loadClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
+    timers = timeLineHistory.lastTimelineTimers;
+    clipTimeline.stop();
+    clipTimeline.clear();
+    ClipGroup& group = clipTimeline.getGroup();
+    for(int i = 0; i < timeLineHistory.lastTimelineClips.size(); i++){
+        Clip clipCopy = Clip(timeLineHistory.lastTimelineClips[i]);
+        group.push(clipCopy);
+        clipTimeline.calculateFrames();
+    }
+    
+    ofxLogVerbose() << "\\/=====================\\/" << endl;
+    ofxLogVerbose() << clipTimeline.getGroup() << endl;
+    ofxLogVerbose() << "/\\=====================/\\" << endl;
+    
+    ofxLogVerbose() << "Total length (refill): " << framesToMinutes(clipTimeline.getTotalFrames()) << " num clips: " << clipTimeline.getGroup().size() << endl;
+    
+    int jumpStart = 0;
+    vector<Clip> clipsAtTime;
+    clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime, timeLineHistory.lastTimelineTime, clipsAtTime);
+    
+    if(clipsAtTime.size() == 0){
+        ofxLogVerbose() << "FAST FORWARD TO FIRST FRAME OF NEXT CLIP" << endl;
+        for(int i = 0; i < minutesToFrames(120); i++){
+            vector<Clip> currentClips;
+            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime + i, timeLineHistory.lastTimelineTime + i, currentClips);
+            if(currentClips.size() > 0){
+                jumpStart = timeLineHistory.lastTimelineTime + i - 2;
+                break;
+            }
+        }
+
+    }else{
+        ofxLogVerbose() << "REWIND TO FIRST BREAK BEFORE A PREVIOUS CLIP" << endl;
+        for(int i = 0; i < minutesToFrames(120); i++){
+            vector<Clip> currentClips;
+            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime - i, timeLineHistory.lastTimelineTime - i, currentClips);
+            if(currentClips.size() == 0){
+                jumpStart = timeLineHistory.lastTimelineTime - i - 1;
+                break;
+            }
+        }
+
+    }
+        
+    clipTimeline.play();
+    clipTimeline.setFrame(jumpStart);
+    return timeLineHistory;
+}
+
+//--------------------------------------------------------------
+void AppModel::save(string filename, ArchiveType archiveType){
     Serializer.saveClass(filename, (*this), archiveType);
     BaseModel::save(filename + "_props", archiveType);
 }
 
 //--------------------------------------------------------------
-bool AppModel::load(string filename, ArchiveType archiveType){
+void AppModel::load(string filename, ArchiveType archiveType){
     Serializer.loadClass(filename, (*this), archiveType);
     BaseModel::load(filename + "_props", archiveType);
 }
@@ -135,7 +211,7 @@ void AppModel::setTimer(string timerName, int timeMillis){
     }else{
         ofxLogVerbose() << "Reset timer: " << timerName << " at " << timeMillis << endl;
     }
-    timers[timerName] = timeMillis;
+    timers[timerName] = timeMillis + timeLineHistory.lastTimelineTime;
 }
 
 //--------------------------------------------------------------
@@ -161,6 +237,20 @@ int AppModel::getTimerDifference(string timerName, int timeMillis){
         return INFINITY;
     }
     return timeMillis - it->second;
+}
+
+//--------------------------------------------------------------
+map<string, int>& AppModel::getTimers(){
+    return timers;
+}
+
+//--------------------------------------------------------------
+void AppModel::setTimers(map<string, int>& _timers, int normalizeTime){
+//    map<string, int>::iterator it;
+//    for(it = _timers.begin(); it != _timers.end(); ++it){
+//        it->second = it->second - normalizeTime;
+//    }
+//    timers = _timers;
 }
 
 //--------------------------------------------------------------

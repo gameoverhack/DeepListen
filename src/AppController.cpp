@@ -219,13 +219,13 @@ void AppController::setup(){
 
     CGPoint p;
     p.x = 1980 * 2; p.y = 1200;
-    CGPostMouseEvent( p, 1, 1, 1 );
+    CGPostMouseEvent( p, 1, 1, 1 );   
     CGPostMouseEvent( p, 1, 1, 0 );
     
     ofHideCursor();
     ofSetFullscreen(true);
     
-    system("./../../../appswitch -h -a \"Xcode\"");
+//    system("./../../../appswitch -h -a \"Xcode\"");
     system("./../../../appswitch -h -a \"Finder\"");
     system("./../../../appswitch -h -a \"TotalMix FX\"");
     system("./../../../appswitch -f -a \"DeepListen\"");
@@ -239,6 +239,7 @@ static bool started = false;
 void AppController::update(){
     
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
+    ClipTimeline & timeline = appModel->getClipTimeline();
     
     networkController->update();
     
@@ -282,6 +283,10 @@ void AppController::update(){
                 
             }
             playController->update();
+            
+            if(timeline.getRestart()){
+                restart();
+            }
         }
             break;
     }
@@ -354,6 +359,11 @@ void AppController::draw(){
 void AppController::exit(){
     
     ClipTimeline & timeline = appModel->getClipTimeline();
+    
+    timeline.stop();
+    
+    appModel->saveTimelineHistory();
+    
     timeline.clear();
     
     appModel->save("config", ARCHIVE_BINARY);
@@ -361,6 +371,27 @@ void AppController::exit(){
     system("pkill DeepScreenBlocker");
     system("pkill jackdmp");
     system("pkill jackd");
+}
+
+//--------------------------------------------------------------
+void AppController::restart(){
+    
+    ClipTimeline & timeline = appModel->getClipTimeline();
+    
+    timeline.stop();
+    
+    appModel->saveTimelineHistory();
+    
+    timeline.clear();
+    
+    system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
+    ofSleepMillis(500);
+    system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
+    system("./DeepListen &");
+    system("./../../../appswitch -h -a \"Finder\"");
+    system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
+    ofExit();
+    
 }
 
 //--------------------------------------------------------------
@@ -380,18 +411,10 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     
     switch (key) {
         case 'y':
-            timeline.clear();
-            system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
-            ofSleepMillis(500);
-            system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
-            system("./DeepListen &");
-            system("./../../../appswitch -h -a \"Finder\"");
-            system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
-//            ofSleepMillis(4000);
-            ofExit();
+            restart();
             break;
         case ' ':
-            playControllerStates.setState(kPLAYCONTROLLER_INIT);
+            appModel->resetHistory();
             break;
         case 'z':
             playControllerStates.setState(kPLAYCONTROLLER_STOP);

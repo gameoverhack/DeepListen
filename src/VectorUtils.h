@@ -12,8 +12,20 @@
 #include <algorithm>
 #include <vector>
 
-inline int minutesToMillis(int minutes){
-    return minutes * 60 * 1000;
+inline int secondsToFrames(int seconds){
+    return seconds * 25;
+}
+
+inline int millisToFrames(int millis){
+    return ceil( (float)millis / 1000.0f ) * 25.0f;
+}
+
+inline int minutesToFrames(int minutes){
+    return minutes * 60.0f * 25.0f;
+}
+
+inline int minutesToMillis(float minutes){
+    return minutes * 60.0f * 1000.0f;
 }
 
 inline int framesToMillis(int frames){
@@ -21,7 +33,7 @@ inline int framesToMillis(int frames){
 }
 
 inline float framesToMinutes(int frames){
-    return (float)frames / 25.0 / 60.0f;
+    return (float)frames / 25.0f / 60.0f;
 }
 
 inline float millisToMinutes(int millis){

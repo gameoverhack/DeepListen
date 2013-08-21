@@ -93,6 +93,7 @@
 		77E337C1178ED0FE0047CE5B /* NetworkController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 77E337BF178ED0FE0047CE5B /* NetworkController.cpp */; };
 		77ECE4381711A4EA00EA0EAB /* yuyvtorgba.frag in Sources */ = {isa = PBXBuildFile; fileRef = 77ECE4361711A4EA00EA0EAB /* yuyvtorgba.frag */; };
 		77ECE4391711A4EA00EA0EAB /* yuyvtorgba.vert in Sources */ = {isa = PBXBuildFile; fileRef = 77ECE4371711A4EA00EA0EAB /* yuyvtorgba.vert */; };
+		77FD5D7817C38B5B00F1BB2F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77FD5D7717C38B5B00F1BB2F /* Foundation.framework */; };
 		7c531f297a6c5ee64ecee297ed4fbb6f /* hTabBoxItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4091b73657ae5b8d2bf19f7d4977c6a0 /* hTabBoxItem.cpp */; };
 		8057d022a144adadcfe86bd77608c460 /* hButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4972c0268d83e9add607ed33c0c2e5ac /* hButton.cpp */; };
 		8138a4e67f68976afaea225970f57a76 /* hEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = aa151f773eaf2a727e5b71eadd2dd7ce /* hEvents.cpp */; };
@@ -367,6 +368,7 @@
 		77E337C0178ED0FE0047CE5B /* NetworkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
 		77ECE4361711A4EA00EA0EAB /* yuyvtorgba.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = yuyvtorgba.frag; path = bin/data/yuyvtorgba.frag; sourceTree = SOURCE_ROOT; };
 		77ECE4371711A4EA00EA0EAB /* yuyvtorgba.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = yuyvtorgba.vert; path = bin/data/yuyvtorgba.vert; sourceTree = SOURCE_ROOT; };
+		77FD5D7717C38B5B00F1BB2F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = ../../../../../../../System/Library/Frameworks/Foundation.framework; sourceTree = "<group>"; };
 		7876592db6b0b796f0d7fc1fcab6ebe4 /* hCounterLabel.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = hCounterLabel.h; path = ../../../addons/ofxhGui/src/hCounterLabel.h; sourceTree = SOURCE_ROOT; };
 		78d67a00eb899fac0943059784f8212a /* ofxLabel.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxLabel.cpp; path = ../../../addons/ofxGui/src/ofxLabel.cpp; sourceTree = SOURCE_ROOT; };
 		7bd3b8a532d74cb26cf7b73b708db765 /* GHOST_WindowManager.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = GHOST_WindowManager.h; path = ../../../addons/ofxFenster/libs/ghost/include/GHOST_WindowManager.h; sourceTree = SOURCE_ROOT; };
@@ -544,6 +546,7 @@
 				7716FEE517068C4F00E217F4 /* libboost_wave-xgcc42-mt-1_46_1.a in Frameworks */,
 				7716FEE617068C4F00E217F4 /* libboost_wserialization-xgcc42-mt-1_46_1.a in Frameworks */,
 				771601121708008A00E217F4 /* libGhost32.a in Frameworks */,
+				77FD5D7817C38B5B00F1BB2F /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1243,6 +1246,7 @@
 				E45BE9730E8CC7DD009D7055 /* AudioToolbox.framework */,
 				E45BE9740E8CC7DD009D7055 /* Carbon.framework */,
 				E45BE9750E8CC7DD009D7055 /* CoreAudio.framework */,
+				77FD5D7717C38B5B00F1BB2F /* Foundation.framework */,
 				E45BE9760E8CC7DD009D7055 /* CoreFoundation.framework */,
 				E45BE9770E8CC7DD009D7055 /* CoreServices.framework */,
 				E45BE9790E8CC7DD009D7055 /* OpenGL.framework */,
