@@ -1675,7 +1675,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                 }else{
                     blackFrames++;
                     if(blackFrames > secondsToFrames(2)){
-                        ofxLogWarning() << "RESART" << endl;
+                        ofxLogWarning() << "RESTART" << endl;
                         blackOut = true;
                     }
                     
@@ -2170,6 +2170,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         }
         
         void setMusicAssets(FileList & fileList){
+            musicAssets.clear();
             musicAssets = fileList;
         }
         

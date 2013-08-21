@@ -225,12 +225,6 @@ void PlayController::makeClipGroup(){
             ClipGroup specialGroup = allSpecClips;
             ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 30);
             
-            if(framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
-                ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
-                lastResetFrame = timeline.getLastClip().getVideoEnd();
-                lastAudioFreeFrame = lastResetFrame + secondsToFrames(30);
-            }
-            
         }else{// do a category
             
             ofxLogNotice() << "CATEGORY CLIP INSERT" << endl;
@@ -322,7 +316,15 @@ void PlayController::makeClipGroup(){
             int titleInsertFrame;
             if(timeline.getGroup().size() > 0){
                 Clip lastClip = timeline.getLastClip();
-                titleInsertFrame = lastClip.getAudioEnd() - (12 * 25);
+                
+                if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
+                    ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
+                    lastResetFrame = timeline.getLastClip().getVideoEnd();
+                    titleInsertFrame = lastResetFrame + secondsToFrames(30);
+                }else{
+                    titleInsertFrame = lastClip.getAudioEnd() - secondsToFrames(12);
+                }
+                
             }else{
                 titleInsertFrame = 0;
                 //title.setCrop(12 * 25, title.getTotalFrames());

@@ -31,7 +31,12 @@ void AppModel::saveTimelineHistory(){
     ofxLogNotice() << "Saving Timeline History" << endl;
     timeLineHistory.lastTimelineClips.clear();
     ClipGroup& group = clipTimeline.getGroup();
+    if(group.size() == 0){
+        ofxLogWarning() << "Abort save! Double exit!" << endl;
+        return;
+    }
     for(int i = 0; i < group.size(); i++){
+        ofxLogVerbose() << "Saving clip: " << group[i] << endl;
         Clip2 clipCopy = Clip2(group[i]);
         timeLineHistory.lastTimelineClips.push_back(clipCopy);
         
@@ -39,6 +44,7 @@ void AppModel::saveTimelineHistory(){
     timeLineHistory.lastTimelineTimers = timers;
     timeLineHistory.lastTimelineTime = clipTimeline.getCurrentFrame();
     Serializer.saveClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
+
 }
 
 //--------------------------------------------------------------

@@ -384,6 +384,9 @@ void AppController::restart(){
     
     timeline.clear();
     
+//    StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
+//    playControllerStates.setState(kPLAYCONTROLLER_INIT);
+    
     system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
     ofSleepMillis(500);
     system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
