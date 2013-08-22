@@ -320,7 +320,7 @@ void PlayController::makeClipGroup(){
                 if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
                     ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
                     lastResetFrame = timeline.getLastClip().getVideoEnd();
-                    titleInsertFrame = lastResetFrame + secondsToFrames(30);
+                    titleInsertFrame = lastResetFrame + minutesToFrames(5);
                 }else{
                     titleInsertFrame = lastClip.getAudioEnd() - secondsToFrames(12);
                 }
