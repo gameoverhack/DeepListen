@@ -47,23 +47,27 @@ void PlayController::update(){
     switch (playControllerStates.getState()) {
         case kPLAYCONTROLLER_INIT:
         {
-            ClipTimeline & clipTimeline = appModel->getClipTimeline();
-            clipTimeline.clear();
-            clipTimeline.setMusicAssets(appModel->getMusicAssetLoader());
-            resetClipGroups();
-            TimeLineHistory& timneLineHistory = appModel->loadTimelineHistory();
-            if(clipTimeline.getCurrentFrame() + minutesToFrames(2) > clipTimeline.getTotalFrames()){
+            
+            ofxLogNotice() << "PLAYCONTROLLER INIT" << endl;
+            
+            if(timeline.getCurrentFrame() > timeline.getTotalFrames()){
                 playControllerStates.setState(kPLAYCONTROLLER_MAKE);
             }else{
+                TimeLineHistory& timneLineHistory = appModel->loadTimelineHistory();
                 playControllerStates.setState(kPLAYCONTROLLER_PLAY);
             }
+            
         }
             break;
         case kPLAYCONTROLLER_MAKE:
         {
-            // generate clip group
+            
+            ofxLogNotice() << "PLAYCONTROLLER MAKE" << endl;
             
             timeline.clear();
+            timeline.setMusicAssets(appModel->getMusicAssetLoader());
+            resetClipGroups();
+            
             makeClipGroup();
 
             ofxLogVerbose() << "\\/---------------------\\/" << endl;
@@ -75,14 +79,17 @@ void PlayController::update(){
             ClipGroup & statistics = appModel->getClipGroupReference("statistics");
             statistics.push(timeline.getGroup());
             
-            //playControllerStates.setState(kPLAYCONTROLLER_INIT);
-            
             timeline.play();
-
+            
+            playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+            
         }
             break;
         case kPLAYCONTROLLER_PLAY:
         {
+            
+            ofxLogNotice() << "PLAYCONTROLLER PLAY" << endl;
+            
             StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
 
             timeline.update();
@@ -117,7 +124,7 @@ void PlayController::update(){
                 appModel->setProperty("TimeFrames", timeline.getTotalFrames());
             }
 
-            if(timeline.getCurrentFrame() >= timeline.getTotalFrames()){
+            if(timeline.getCurrentFrame() > timeline.getTotalFrames()){
                 playControllerStates.setState(kPLAYCONTROLLER_INIT);
             }
             
@@ -139,10 +146,6 @@ void PlayController::makeClipGroup(){
     
     StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
     
-    ofSeedRandom();
-    
-    appModel->resetTimers();
-    
     ClipGroup & allClips = appModel->getClipGroupReference("allClips");
     ClipGroup & allListenClips = appModel->getClipGroupReference("allListenClips");
     ClipGroup & allStatClips = appModel->getClipGroupReference("allStatClips");
@@ -156,6 +159,7 @@ void PlayController::makeClipGroup(){
     string question = "";
     lastAudioFreeFrame = 0;
     int lastResetFrame = 0;
+    vector<int> blackspace;
     
 //    ClipTimeline & timeline = appModel->getClipTimeline();
 //    
@@ -241,7 +245,11 @@ void PlayController::makeClipGroup(){
 
             if (remainingNumCategories < 4){ // 5 is all categories
                 // reset the clip groups by changing state
-                playControllerStates.setState(kPLAYCONTROLLER_PLAY);
+                blackspace.push_back(timeline.getTotalFrames());
+                appModel->setProperty("BlackSpace", blackspace);
+                ostringstream os;
+                os << blackspace;
+                ofxLogNotice() << "ALLBLACKSPACE: " << os.str() << endl;
                 return;// newClipGroup;
             }
             
@@ -320,6 +328,7 @@ void PlayController::makeClipGroup(){
                 if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
                     ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
                     lastResetFrame = timeline.getLastClip().getVideoEnd();
+                    blackspace.push_back(lastResetFrame);
                     titleInsertFrame = lastResetFrame + minutesToFrames(5);
                 }else{
                     titleInsertFrame = lastClip.getAudioEnd() - secondsToFrames(12);
@@ -516,6 +525,9 @@ ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips
 
 //--------------------------------------------------------------
 void PlayController::resetClipGroups(){
+    
+    ofSeedRandom();
+    appModel->resetTimers();
     
     // check if we've already made the clip groups
     if(!appModel->getClipGroupExists("originalClips")){ // assume that if we have this one we have all the clipGroups!

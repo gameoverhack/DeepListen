@@ -26,14 +26,12 @@ public:
     ~TimeLineHistory(){};
     
     vector<Clip2>       lastTimelineClips;
-    map<string, int>    lastTimelineTimers;
     int                 lastTimelineTime;
     
     friend class boost::serialization::access;
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version){
 		ar & BOOST_SERIALIZATION_NVP(lastTimelineClips);
-        ar & BOOST_SERIALIZATION_NVP(lastTimelineTimers);
         ar & BOOST_SERIALIZATION_NVP(lastTimelineTime);
 	};
     
@@ -67,7 +65,6 @@ public:
     bool getTimer(string timerName, int timeMillis, int timeOutMillis);
     int getTimerDifference(string timerName, int timeMillis);
     map<string, int>& getTimers();
-    void setTimers(map<string, int>& _timers, int normalizeTime = 0);
     void resetTimers();
     
     // analysis functions

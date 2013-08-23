@@ -1674,7 +1674,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     }
                 }else{
                     blackFrames++;
-                    if(blackFrames > secondsToFrames(2)){
+                    if(blackFrames > secondsToFrames(2) && currentFrame < totalFrames){
                         ofxLogWarning() << "RESTART" << endl;
                         blackOut = true;
                     }
@@ -1970,9 +1970,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         };
         
         void clear(){
+            stop();
             group.clear();
             calculateFrames();
-            stop();
             currentFrame = 0;
         };
         

@@ -222,8 +222,8 @@ void AppController::setup(){
     CGPostMouseEvent( p, 1, 1, 1 );   
     CGPostMouseEvent( p, 1, 1, 0 );
     
-    ofHideCursor();
-    ofSetFullscreen(true);
+//    ofHideCursor();
+//    ofSetFullscreen(true);
     
 //    system("./../../../appswitch -h -a \"Xcode\"");
     system("./../../../appswitch -h -a \"Finder\"");
@@ -415,6 +415,19 @@ void AppController::keyPressed(ofKeyEventArgs & e){
     switch (key) {
         case 'y':
             restart();
+            break;
+        case 'x':
+        {
+            vector<int> blackspace = appModel->getProperty< vector<int> >("BlackSpace");
+            for(int i = 0; i < blackspace.size(); i++){
+                if(blackspace[i] > timeline.getCurrentFrame() && timeline.getCurrentFrame() < blackspace[i] - 500){
+                    timeline.stop();
+                    timeline.setFrame(blackspace[i] - 500);
+                    timeline.setPaused(false);
+                    break;
+                }
+            }
+        }
             break;
         case ' ':
             appModel->resetHistory();

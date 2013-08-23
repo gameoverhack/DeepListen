@@ -23,7 +23,7 @@ AppModel::~AppModel() {
 //--------------------------------------------------------------
 void AppModel::resetHistory(){
     clipTimeline.setFrame(clipTimeline.getTotalFrames() - 1);
-    saveTimelineHistory();
+    //saveTimelineHistory();
 }
 
 //--------------------------------------------------------------
@@ -41,7 +41,6 @@ void AppModel::saveTimelineHistory(){
         timeLineHistory.lastTimelineClips.push_back(clipCopy);
         
     }
-    timeLineHistory.lastTimelineTimers = timers;
     timeLineHistory.lastTimelineTime = clipTimeline.getCurrentFrame();
     Serializer.saveClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
 
@@ -53,13 +52,7 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     ofxLogNotice() << "Loading Timeline History" << endl;
     
     Serializer.loadClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
-    timers = timeLineHistory.lastTimelineTimers;
-    
-//    int jumpStart = clipTimeline.getCurrentFrame();
-//    
-//    bool isAtEnd = (clipTimeline.getCurrentFrame() + minutesToFrames(2) > clipTimeline.getTotalFrames());
-//    
-    clipTimeline.stop();
+
     clipTimeline.clear();
     ClipGroup& group = clipTimeline.getGroup();
     for(int i = 0; i < timeLineHistory.lastTimelineClips.size(); i++){
@@ -74,37 +67,24 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     
     ofxLogVerbose() << "Total length (refill): " << framesToMinutes(clipTimeline.getTotalFrames()) << " num clips: " << clipTimeline.getGroup().size() << endl;
     
+    clipTimeline.setMusicAssets(getMusicAssetLoader());
+    
     int jumpStart = 0;
     vector<Clip> clipsAtTime;
     clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime, timeLineHistory.lastTimelineTime, clipsAtTime);
-    
-//    if(clipsAtTime.size() == 0){
-        ofxLogVerbose() << "FAST FORWARD TO FIRST FRAME OF NEXT CLIP" << endl;
-        for(int i = 0; i < minutesToFrames(120); i++){
-            vector<Clip> currentClips;
-            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime + i, timeLineHistory.lastTimelineTime + i, currentClips);
-            if(currentClips.size() > 0){
-                jumpStart = timeLineHistory.lastTimelineTime + i - 2;
-                break;
-            }
-        }
 
-//    }
-//    else if(clipsAtTime.size() > 0 && !isAtEnd){
-//        ofxLogVerbose() << "REWIND TO FIRST BREAK BEFORE A PREVIOUS CLIP" << endl;
-//        for(int i = 0; i < minutesToFrames(120); i++){
-//            vector<Clip> currentClips;
-//            clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime - i, timeLineHistory.lastTimelineTime - i, currentClips);
-//            if(currentClips.size() == 0){
-//                jumpStart = timeLineHistory.lastTimelineTime - i - 1;
-//                break;
-//            }
-//        }
-//
-//    }
-    
-    clipTimeline.play();
+    ofxLogVerbose() << "FAST FORWARD TO FIRST FRAME OF NEXT CLIP" << endl;
+    for(int i = 0; i < minutesToFrames(120); i++){
+        vector<Clip> currentClips;
+        clipTimeline.getClipsFrom(timeLineHistory.lastTimelineTime + i, timeLineHistory.lastTimelineTime + i, currentClips);
+        if(currentClips.size() > 0){
+            jumpStart = timeLineHistory.lastTimelineTime + i - 2;
+            break;
+        }
+    }
+
     clipTimeline.setFrame(jumpStart);
+    clipTimeline.setPaused(false);
     return timeLineHistory;
 }
 
@@ -223,7 +203,7 @@ void AppModel::setTimer(string timerName, int timeMillis){
     }else{
         ofxLogVerbose() << "Reset timer: " << timerName << " at " << timeMillis << endl;
     }
-    timers[timerName] = timeMillis + timeLineHistory.lastTimelineTime;
+    timers[timerName] = timeMillis;
 }
 
 //--------------------------------------------------------------
@@ -254,15 +234,6 @@ int AppModel::getTimerDifference(string timerName, int timeMillis){
 //--------------------------------------------------------------
 map<string, int>& AppModel::getTimers(){
     return timers;
-}
-
-//--------------------------------------------------------------
-void AppModel::setTimers(map<string, int>& _timers, int normalizeTime){
-//    map<string, int>::iterator it;
-//    for(it = _timers.begin(); it != _timers.end(); ++it){
-//        it->second = it->second - normalizeTime;
-//    }
-//    timers = _timers;
 }
 
 //--------------------------------------------------------------
