@@ -1870,7 +1870,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     continue;
                 }
                 
-                if(video->isPlaying()){
+                if(video->isPlaying() && video->isTextureReady()){
                     
                     if(clip.getScreen() == screen){
                         

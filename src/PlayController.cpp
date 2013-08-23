@@ -88,7 +88,7 @@ void PlayController::update(){
         case kPLAYCONTROLLER_PLAY:
         {
             
-            ofxLogNotice() << "PLAYCONTROLLER PLAY" << endl;
+            //ofxLogNotice() << "PLAYCONTROLLER PLAY" << endl;
             
             StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
 

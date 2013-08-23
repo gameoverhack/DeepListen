@@ -8,6 +8,9 @@
 
 #include "AppController.h"
 
+static int appTimer = 0;
+static bool started = false;
+
 //--------------------------------------------------------------
 AppController::AppController(){
     ofxLogVerbose() << "Creating AppController" << endl;
@@ -222,19 +225,15 @@ void AppController::setup(){
     CGPostMouseEvent( p, 1, 1, 1 );   
     CGPostMouseEvent( p, 1, 1, 0 );
     
-//    ofHideCursor();
-//    ofSetFullscreen(true);
+    ofHideCursor();
+    ofSetFullscreen(true);
     
-//    system("./../../../appswitch -h -a \"Xcode\"");
     system("./../../../appswitch -h -a \"Finder\"");
     system("./../../../appswitch -h -a \"TotalMix FX\"");
     system("./../../../appswitch -f -a \"DeepListen\"");
     
-    //system("./../../../data/Hide.sh \"TotalMix FX\"");
-    
 }
-static int appTimer = 0;
-static bool started = false;
+
 //--------------------------------------------------------------
 void AppController::update(){
     
@@ -299,7 +298,8 @@ void AppController::draw(){
     StateGroup & analyzeViewStates = appModel->getStateGroup("AnalyzeViewStates");
     StateGroup & debugViewStates = appModel->getStateGroup("DebugViewStates");
     StateGroup & appControllerStates = appModel->getStateGroup("AppControllerStates");
-
+    StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
+    
     ofSetColor(0, 0, 0);
     ofFill();
     ofRect(0, 0, ofGetWidth(), ofGetHeight());
@@ -329,9 +329,8 @@ void AppController::draw(){
             break;
         case kAPPCONTROLLER_PLAY:
         {
-
             ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-
+            
             appViews[0]->draw(w0x,
                               w0y,
                               1920.0f * (ofGetWidth()/2.0f) / 1920.0f,
@@ -341,7 +340,7 @@ void AppController::draw(){
                               w1y,
                               1440.0f * (ofGetWidth()/2.0f) / 1920.0f,
                               (1440.0f * (ofGetWidth()/2.0f) / 1920.0f) / 4.0 * 3.0);
-
+            
         }
             break;
     }
@@ -349,6 +348,7 @@ void AppController::draw(){
     if(debugViewStates.getState(kDEBUGVIEW_SHOWINFO)) debugView->draw();
 
     if(analyzeViewStates.getState(kANALYZEVIEW_SHOW)) analyzeView->draw();
+    
     ofDisableBlendMode();
     
     glFlush();
@@ -379,13 +379,8 @@ void AppController::restart(){
     ClipTimeline & timeline = appModel->getClipTimeline();
     
     timeline.stop();
-    
     appModel->saveTimelineHistory();
-    
     timeline.clear();
-    
-//    StateGroup & playControllerStates = appModel->getStateGroup("PlayControllerStates");
-//    playControllerStates.setState(kPLAYCONTROLLER_INIT);
     
     system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
     ofSleepMillis(500);

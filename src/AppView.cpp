@@ -28,18 +28,11 @@ void AppView::update(){
     
     begin();
     {
-//        glPushMatrix();
-//        ostringstream os;
-//        os << ofGetFrameRate() << endl << endl;
-//        ofDrawBitmapString(os.str(), 20, 20);
-//        glPopMatrix();
         ofSetBackgroundColor(0, 0, 0, 0);
         ofEnableBlendMode(OF_BLENDMODE_SCREEN);
         if(playControllerStates.getState(kPLAYCONTROLLER_PLAY)){
             ofSetColor(255, 255, 255);
             clipTimeline.draw(instanceID);
-//            ofNoFill();
-//            ofLine(0, ofGetHeight()-200, 1920, ofGetHeight()-200);
         }
         ofDisableBlendMode();
     }
