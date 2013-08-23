@@ -80,7 +80,7 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
         ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 1 : 2)));
 #elif defined(TEST_SOUND)
         ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString((channel%2 == 1 ? 7 : 8)));
-#elif
+#else
         ok = connect(instanceName + ":output" + ofToString(channel), "system:playback_" + ofToString(channel));
 #endif
         if(!ok) break;
