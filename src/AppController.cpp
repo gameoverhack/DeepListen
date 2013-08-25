@@ -253,6 +253,7 @@ void AppController::update(){
         case kAPPCONTROLLER_LOAD:
         {
             loadController->update();
+            playController->resetClipGroups();
         }
             break;
         case kAPPCONTROLLER_SOUND:

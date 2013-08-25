@@ -35,7 +35,7 @@ void PlayController::setup(){
     playControllerStates.setState(kPLAYCONTROLLER_INIT);
     
 }
-multimap<int, int> stats;
+
 //--------------------------------------------------------------
 void PlayController::update(){
     
@@ -160,7 +160,7 @@ void PlayController::makeClipGroup(){
     lastAudioFreeFrame = 0;
     int lastResetFrame = 0;
     vector<int> blackspace;
-    
+    vector<string> specials;
 //    ClipTimeline & timeline = appModel->getClipTimeline();
 //    
 //    for (int i = 0; i < 10000; i++){
@@ -223,11 +223,15 @@ void PlayController::makeClipGroup(){
             ClipGroup theseStatementPeople = getGroupSelectionFrom(statementGroup, numberOfStatements, 5);
             
         }else if(specialCount == 7){
+            
             ofxLogNotice() << "SPECIAL CLIP INSERT" << endl;
+            
             specialCount = 0;
             
             ClipGroup specialGroup = allSpecClips;
-            ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 30);
+            ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 5);
+            
+            specials.push_back(specialPerson[0].getName());
             
         }else{// do a category
             
@@ -241,15 +245,19 @@ void PlayController::makeClipGroup(){
             allCategoryTypes.popall("INTR");
             allCategoryTypes.popall(category);
             
+            allCategoryTypes.shuffle();
+            
             int remainingNumCategories = allCategoryTypes.size();
 
             if (remainingNumCategories < 4){ // 5 is all categories
                 // reset the clip groups by changing state
                 blackspace.push_back(timeline.getTotalFrames());
                 appModel->setProperty("BlackSpace", blackspace);
-                ostringstream os;
+                ostringstream os, bs;
                 os << blackspace;
                 ofxLogNotice() << "ALLBLACKSPACE: " << os.str() << endl;
+                bs << specials;
+                ofxLogNotice() << "ALLSPECIALS: " << bs.str() << endl;
                 return;// newClipGroup;
             }
             
@@ -291,8 +299,11 @@ void PlayController::makeClipGroup(){
             }
             
             ClipGroup categoryGroup = allClips.getContains(CATEGORY, category);
+            categoryGroup.shuffle();
+            
             ClipType questionTypes = categoryGroup.getClipTypes(QUESTION);
-
+            questionTypes.shuffle();
+            
             attempts = 0;
             bool questionOk = false;
             while(!questionOk && attempts < maxAttempts){
@@ -325,7 +336,7 @@ void PlayController::makeClipGroup(){
             if(timeline.getGroup().size() > 0){
                 Clip lastClip = timeline.getLastClip();
                 
-                if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 120){
+                if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 90){
                     ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
                     lastResetFrame = timeline.getLastClip().getVideoEnd();
                     blackspace.push_back(lastResetFrame);
@@ -348,10 +359,14 @@ void PlayController::makeClipGroup(){
             
             // insert statements
             ClipGroup statementGroup = allStatClips.getStatements(category);
+            statementGroup.shuffle();
+            
             ClipGroup theseStatementPeople = getGroupSelectionFrom(statementGroup, numberOfStatements, 5);
+            theseStatementPeople.shuffle();
             
             // insert responses
             ClipGroup questionGroup = categoryGroup.getContains(QUESTION, question);
+            questionGroup.shuffle();
             
             for(int j = 0; j < theseStatementPeople.size(); j++){
                 questionGroup = questionGroup.getExcludes(PERSON, theseStatementPeople[j].getClipInfo().person);
@@ -460,6 +475,8 @@ ClipGroup PlayController::getGroupSelectionFrom(ClipGroup group, int maxNumClips
     ClipTimeline & timeline = appModel->getClipTimeline();
     ClipGroup thisSelection;
     int startAudioFreeFrame = lastAudioFreeFrame;
+    
+    group.shuffle();
     
     for(int j = 0; j < MIN(group.size(), maxNumClips); j++){ // make sure we don't exceed statementGroup size!
         

@@ -973,6 +973,10 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return value;
         }
         
+        void shuffle(){
+            //random_shuffle(types.begin(), types.end());
+        }
+        
         string getrandom(){
             string s = "";
             int r = ofRandom(types.size());
@@ -1584,6 +1588,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             video->setAudioDevice("JackRouter");
                             video->play();
                             
+                            video->setFade(0.0f);
+                            video->setFade(0, 0, 0.0f);
+                            video->setFade(0, 3000, 1.0f);
+                            video->setFade(-1, 3000, 0.0f);
+                            
                             clip.setClipStopping(false);
                             
                             if(videoClip.clip.getIsClipTitle()){
@@ -1643,11 +1652,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             }else{
                                 
                                 ofxLogVerbose() << "...loaded normal clip: " << clip << endl;
-                                
-                                video->setFade(0.0f);
-                                video->setFade(0, 0, 0.0f);
-                                video->setFade(0, 3000, 1.0f);
-                                video->setFade(-1, 3000, 0.0f);
                                 
                                 ofxLogVerbose() << "Assign (video) audio to: " << videoClip.audioTrack << endl;
                                 video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
@@ -1755,7 +1759,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             
             for(int i = 1; i < videoClips.size(); i++){
                 
-                if((!videoClips[i].video->isLoading() && !videoClips[i].video->isPlaying())){// ||
+                if(!videoClips[i].video->isLoading() &&
+                   !videoClips[i].video->isPlaying() &&
+                   !videoClips[i].video->isLoading(clip.getVideoPath())){// ||
                     freeIndex = i;
                     break;
                 }
