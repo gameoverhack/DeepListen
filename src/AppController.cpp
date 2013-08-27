@@ -136,6 +136,9 @@ void AppController::setup(){
     appModel->setProperty("OutputWidth_1", 1440.0f);
     appModel->setProperty("OutputHeight_1", 1080.0f);
     
+//    appModel->setProperty("VolumePeople", 1.0f);
+//    appModel->setProperty("VolumeMusic", 1.0f);
+    
 #if defined(MINI) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
     appModel->setProperty("PixelFormat", (string)"JPEG");
@@ -456,6 +459,42 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 'a':
             analyzeViewStates.toggleState(kANALYZEVIEW_SHOW);
+            break;
+        case '9':
+        {
+            float v = appModel->getProperty<float>("VolumePeople");
+            v -= 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumePeople(v);
+            appModel->setProperty("VolumePeople", v);
+        }
+            break;
+        case '0':
+        {
+            float v = appModel->getProperty<float>("VolumePeople");
+            v += 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumePeople(v);
+            appModel->setProperty("VolumePeople", v);
+        }
+            break;
+        case '-':
+        {
+            float v = appModel->getProperty<float>("VolumeMusic");
+            v -= 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumeMusic(v);
+            appModel->setProperty("VolumeMusic", v);
+        }
+            break;
+        case '=':
+        {
+            float v = appModel->getProperty<float>("VolumeMusic");
+            v += 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumeMusic(v);
+            appModel->setProperty("VolumeMusic", v);
+        }
             break;
         case '1':
             appViewStates.toggleState(kAPPVIEW_SHOWWARP_0);
