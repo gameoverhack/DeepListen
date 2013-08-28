@@ -66,6 +66,8 @@ void PlayController::update(){
             
             timeline.clear();
             timeline.setMusicAssets(appModel->getMusicAssetLoader());
+            timeline.setVolumeMusic(appModel->getProperty<float>("VolumeMusic"));
+            timeline.setVolumePeople(appModel->getProperty<float>("VolumePeople"));
             resetClipGroups();
             
             makeClipGroup();

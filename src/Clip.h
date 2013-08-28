@@ -1612,7 +1612,6 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                     audioClips[audioClipIndex + k].music->setLoopState(OF_LOOP_NONE);
                                     audioClips[audioClipIndex + k].music->setAudioDevice("JackRouter");
                                     audioClips[audioClipIndex + k].music->setPosition(0.3f);
-                                    audioClips[audioClipIndex + k].music->setVolume(0.7);
                                     audioClips[audioClipIndex + k].music->play();
                                     
                                     audioClips[audioClipIndex + k].startFrame = currentFrame;
@@ -1666,12 +1665,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 ofPoint pan = soundController->getPan(clipCenter, screenWidth, numSpeakers);
                                 
                                 for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
-                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, pan[channel - channelStart]);
+                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, pan[channel - channelStart] * volumePeople);
                                 }
                                 
-                                for(int channel = 5; channel < 8; channel++){
-                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f);
-                                }
+//                                for(int channel = 5; channel < 8; channel++){
+//                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f * volumePeople);
+//                                }
                             }
                             
                         }
@@ -1706,8 +1705,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 audioClip.fades.pop_front();
                                 audioClip.fadeTime = ofGetElapsedTimeMillis();
                             }
-                            soundController->setAllChannelVolumes(audioClip.audioTrack + 0, audioClip.fadeCurrent);
-                            soundController->setAllChannelVolumes(audioClip.audioTrack + 1, audioClip.fadeCurrent);
+                            
+                            for(int channel = 0; channel < 5; channel++){
+                                soundController->setChannelVolume(audioClip.audioTrack + 0, channel, audioClip.fadeCurrent * volumeMusic * 0.5);
+                                soundController->setChannelVolume(audioClip.audioTrack + 1, channel, audioClip.fadeCurrent * volumeMusic * 0.5);
+                            }
+                            
+                            for(int channel = 5; channel < 8; channel++){
+                                soundController->setChannelVolume(audioClip.audioTrack + 0, channel, audioClip.fadeCurrent * volumeMusic);
+                                soundController->setChannelVolume(audioClip.audioTrack + 1, channel, audioClip.fadeCurrent * volumeMusic);
+                            }
+                            
+//                            soundController->setAllChannelVolumes(audioClip.audioTrack + 0, audioClip.fadeCurrent * volumeMusic);
+//                            soundController->setAllChannelVolumes(audioClip.audioTrack + 1, audioClip.fadeCurrent * volumeMusic);
+                        
                         }
                         
                     }
@@ -2214,7 +2225,17 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return blackOut;
         }
         
+        void setVolumePeople(float v){
+            volumePeople = v;
+        }
+        
+        void setVolumeMusic(float v){
+            volumeMusic = v;
+        }
+        
     protected:
+        
+        float volumePeople, volumeMusic;
         
         int blackFrames;
         bool blackOut;

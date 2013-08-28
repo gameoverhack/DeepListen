@@ -68,6 +68,8 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     ofxLogVerbose() << "Total length (refill): " << framesToMinutes(clipTimeline.getTotalFrames()) << " num clips: " << clipTimeline.getGroup().size() << endl;
     
     clipTimeline.setMusicAssets(getMusicAssetLoader());
+    clipTimeline.setVolumeMusic(getProperty<float>("VolumeMusic"));
+    clipTimeline.setVolumePeople(getProperty<float>("VolumePeople"));
     
     int jumpStart = 0;
     vector<Clip> clipsAtTime;
