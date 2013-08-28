@@ -1667,16 +1667,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 for(int channel = channelStart; channel < channelStart + numSpeakers; channel++){
                                     soundController->setChannelVolume(videoClip.audioTrack, channel + 0, pan[channel - channelStart] * volumePeople);
                                 }
-                                
-<<<<<<< HEAD
+
 //                                for(int channel = 5; channel < 8; channel++){
 //                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f * volumePeople);
 //                                }
-=======
-                                for(int channel = 5; channel < 8; channel++){
-                                    soundController->setChannelVolume(videoClip.audioTrack, channel + 0, 0.2f * volumePeople);
-                                }
->>>>>>> 0a8cd5ed3a6857ba5c42c8d009c95c941658bf8d
+                                
                             }
                             
                         }
