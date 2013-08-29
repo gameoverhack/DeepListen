@@ -48,7 +48,15 @@ void LoadController::update(){
     textFiles.allowExt(".txt");
     musicFiles.allowExt(".mov");
     
+#ifdef RMBP_PEGASUS_SSD
+    for(int i = 0; i < 4; i++){
+        videoFiles.addDir(appModel->getProperty<string>("VideoPath") + ofToString(i) + "/ANIME60", false);
+    }
+    videoFiles.list();
+#else
     videoFiles.listDir(appModel->getProperty<string>("VideoPath"), false);
+#endif
+    
     audioFiles.listDir(appModel->getProperty<string>("AudioPath"), false);
     textFiles.listDir(appModel->getProperty<string>("TextPath"), true);
     musicFiles.listDir(appModel->getProperty<string>("MusicPath"), true);

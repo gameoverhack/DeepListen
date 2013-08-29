@@ -96,8 +96,10 @@ void AppController::setup(){
     
     string rootPath = "";
     
-#if defined(MINI)
+#if defined(RMBP_INTERNAL_SSD)
     rootPath = "/Users/deeplistening/Desktop/DeepData/";
+#elif defined(RMBP_PEGASUS_SSD)
+    rootPath = "/Volumes/Deep00/";
 #elif defined(RETINA)
     rootPath = "/Users/gameover/Desktop/DeepDataTest/";
 #elif defined(BLACKCAVIAR)
@@ -113,7 +115,13 @@ void AppController::setup(){
 #ifdef JPEG
     appModel->setProperty("VideoPath", (string)rootPath + "JPEG60/");
 #else
+    
+#ifdef RMBP_PEGASUS_SSD
+    appModel->setProperty("VideoPath", "/Volumes/Deep0");
+#else
     appModel->setProperty("VideoPath", (string)rootPath + "ANIME60/");
+#endif
+    
 #endif
     
     appModel->setProperty("OverrideVideoPath", true);
@@ -139,7 +147,7 @@ void AppController::setup(){
 //    appModel->setProperty("VolumePeople", 1.0f);
 //    appModel->setProperty("VolumeMusic", 1.0f);
     
-#if defined(MINI) || defined(RETINA) || defined(BLACKCAVIAR)
+#if defined(RMBP_INTERNAL_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #else
