@@ -117,7 +117,7 @@ void AppController::setup(){
 #else
     
 #ifdef RMBP_PEGASUS_SSD
-    appModel->setProperty("VideoPath", "/Volumes/Deep0");
+    appModel->setProperty("VideoPath", (string)"/Volumes/Deep0");
 #else
     appModel->setProperty("VideoPath", (string)rootPath + "ANIME60/");
 #endif
@@ -147,7 +147,7 @@ void AppController::setup(){
 //    appModel->setProperty("VolumePeople", 1.0f);
 //    appModel->setProperty("VolumeMusic", 1.0f);
     
-#if defined(RMBP_INTERNAL_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
+#if defined(RMBP_INTERNAL_SSD) || defined(RMBP_PEGASUS_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #else
