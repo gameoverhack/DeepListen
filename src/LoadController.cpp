@@ -59,7 +59,9 @@ void LoadController::update(){
     
     audioFiles.listDir(appModel->getProperty<string>("AudioPath"), false);
     textFiles.listDir(appModel->getProperty<string>("TextPath"), true);
-    musicFiles.listDir(appModel->getProperty<string>("MusicPath"), true);
+    musicFiles.addDir(appModel->getProperty<string>("MusicPath") + "ABSTRACT/", false);
+    musicFiles.addDir(appModel->getProperty<string>("MusicPath") + "ATMOSPHERE/", false);
+    musicFiles.list();
     
     set<string> excludeSet;
     ofFile excludeList = ofFile(ofToDataPath("ExcludeList.txt"));
