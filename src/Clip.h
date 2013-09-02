@@ -1566,7 +1566,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                 
                 std::pair <std::multimap<int, Clip>::iterator, std::multimap<int, Clip>::iterator> range;
                 range = starts.equal_range(currentFrame);
-                cout << currentFrame << " " << (starts.find(currentFrame) != starts.end()) << endl;
+                
                 for (std::multimap<int, Clip>::iterator it = range.first; it != range.second; ++it){
                     currentClips.push_back(it->second);
                 }
