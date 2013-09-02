@@ -147,6 +147,7 @@ void AppController::setup(){
 //    appModel->setProperty("VolumePeople", 1.0f);
 //    appModel->setProperty("VolumeMusic", 1.0f);
 //    appModel->setProperty("VolumeMaster", 1.0f);
+    appModel->setProperty("VolumeMax", 1.0f);
     
 #if defined(RMBP_INTERNAL_SSD) || defined(RMBP_PEGASUS_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
@@ -444,19 +445,6 @@ void AppController::keyPressed(ofKeyEventArgs & e){
         case 'z':
             playControllerStates.setState(kPLAYCONTROLLER_STOP);
             break;
-        case 'm':
-        {
-            // m key is now a toggle mute
-            float masterVolume = appModel->getProperty<float>("VolumeMaster");
-            if(masterVolume > 0){
-                masterVolume = 0.0f;
-            }else{
-                masterVolume = 1.0f;
-            }
-            appModel->setProperty("VolumeMaster", masterVolume);
-            soundController->setMasterVolume(masterVolume);
-        }
-            break;
         case 'v':
             appModel->setProperty("VerticalSync", !appModel->getProperty<bool>("VerticalSync"));
             ofSetVerticalSync(appModel->getProperty<bool>("VerticalSync"));
@@ -476,6 +464,24 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case 'a':
             analyzeViewStates.toggleState(kANALYZEVIEW_SHOW);
+            break;
+        case '7':
+        {
+            float v = appModel->getProperty<float>("VolumeMusic");
+            v -= 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumeMusic(v);
+            appModel->setProperty("VolumeMusic", v);
+        }
+            break;
+        case '8':
+        {
+            float v = appModel->getProperty<float>("VolumeMusic");
+            v += 0.05;
+            v = CLAMP(v, 0.0f, 1.0f);
+            timeline.setVolumeMusic(v);
+            appModel->setProperty("VolumeMusic", v);
+        }
             break;
         case '9':
         {
@@ -497,20 +503,34 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             break;
         case '-':
         {
-            float v = appModel->getProperty<float>("VolumeMusic");
+            float v = appModel->getProperty<float>("VolumeMaster");
             v -= 0.05;
             v = CLAMP(v, 0.0f, 1.0f);
-            timeline.setVolumeMusic(v);
-            appModel->setProperty("VolumeMusic", v);
+            soundController->setMasterVolume(v);
+            appModel->setProperty("VolumeMaster", v);
         }
             break;
         case '=':
         {
-            float v = appModel->getProperty<float>("VolumeMusic");
+            float v = appModel->getProperty<float>("VolumeMaster");
             v += 0.05;
             v = CLAMP(v, 0.0f, 1.0f);
-            timeline.setVolumeMusic(v);
-            appModel->setProperty("VolumeMusic", v);
+            soundController->setMasterVolume(v);
+            appModel->setProperty("VolumeMaster", v);
+        }
+            break;
+        case 'm':
+        {
+            // m key is now a toggle mute
+            float masterVolume = appModel->getProperty<float>("VolumeMaster");
+            if(masterVolume > 0){
+                appModel->setProperty("VolumeMax", masterVolume);
+                masterVolume = 0.0f;
+            }else{
+                masterVolume = appModel->getProperty<float>("VolumeMax");
+            }
+            appModel->setProperty("VolumeMaster", masterVolume);
+            soundController->setMasterVolume(masterVolume);
         }
             break;
         case '1':
