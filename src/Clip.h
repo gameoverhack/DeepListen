@@ -1520,8 +1520,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             
             ofxLogNotice() << "Setup timeline " << blackPath << endl;
             
-            blackFrames = 0;
-            blackOut = false;
+//            blackFrames = 0;
+//            blackOut = false;
             
             pixelFormat = pixelformat;
             
@@ -1563,12 +1563,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             if(!bPaused){
                 
                 currentClips.clear();
-                getClipsFrom(currentFrame, currentFrame, currentClips);
+                
+                std::pair <std::multimap<int, Clip>::iterator, std::multimap<int, Clip>::iterator> range;
+                range = starts.equal_range(currentFrame);
+                cout << currentFrame << " " << (starts.find(currentFrame) != starts.end()) << endl;
+                for (std::multimap<int, Clip>::iterator it = range.first; it != range.second; ++it){
+                    currentClips.push_back(it->second);
+                }
+                
+                //getClipsFrom(currentFrame, currentFrame, currentClips);
                 
                 if(currentClips.size() > 0){
                     
-                    blackFrames = 0;
-                    blackOut = false;
+//                    blackFrames = 0;
+//                    blackOut = false;
                     
                     for(int i = 0; i < currentClips.size(); i++){
                         
@@ -1676,14 +1684,15 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             
                         }
                     }
-                }else{
-                    blackFrames++;
-                    if(blackFrames > secondsToFrames(2) && currentFrame < totalFrames){
-                        ofxLogWarning() << "RESTART" << endl;
-                        blackOut = true;
-                    }
-                    
                 }
+//                else{
+//                    blackFrames++;
+//                    if(blackFrames > secondsToFrames(2) && currentFrame < totalFrames){
+//                        ofxLogWarning() << "RESTART" << endl;
+//                        //blackOut = true;
+//                    }
+//                    
+//                }
                 
                 for(int i = 0; i < audioClips.size(); i++){
                     
@@ -1814,8 +1823,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void setFrame(int frame){
             //bool cPaused = bPaused;
             //stop();
-            blackFrames = 0;
-            blackOut = 0;
+//            blackFrames = 0;
+//            blackOut = 0;
             currentFrame = frame;
             for(int i = 1; i < videoClips.size(); i++){
                 VideoClip & videoClip = videoClips[i];
@@ -1858,8 +1867,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         }
         
         void setPaused(bool b){
-            blackFrames = 0;
-            blackOut = 0;
+//            blackFrames = 0;
+//            blackOut = 0;
             bPaused = b;
             if(bPaused){
                 for(int i = 0; i < videoClips.size(); i++){
@@ -1990,6 +1999,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void clear(){
             stop();
             group.clear();
+            starts.clear();
+            restarts.clear();
             calculateFrames();
             currentFrame = 0;
         };
@@ -2160,6 +2171,22 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             }
         };
         
+        void calculateStartFrames(){
+            totalFrames = 0;
+            starts.clear();
+            int endFrame = 0;
+            int startFrame = 0;
+            for(int i = 0; i < group.size(); i++){
+                if(i > 0){
+                    if(group[i].getVideoStart() - group[i-1].getVideoEnd() > minutesToFrames(4)){
+                        setRestart(group[i-1].getVideoEnd());
+                    }
+                }
+                totalFrames = MAX(totalFrames, group[i].getVideoEnd());
+                starts.insert(pair<int, Clip>(group[i].getVideoStart(), group[i]));
+            }
+        }
+        
         vector<VideoClip>& getVideoClips(){
             return videoClips;
         }
@@ -2222,8 +2249,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return path;
         }
         
+        void setRestart(int frame){
+            restarts.insert(frame);
+        }
+        
         bool getRestart(){
-            return blackOut;
+            return (restarts.find(currentFrame) != restarts.end());
         }
         
         void setVolumePeople(float v){
@@ -2238,8 +2269,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         
         float volumePeople, volumeMusic;
         
-        int blackFrames;
-        bool blackOut;
+//        int blackFrames;
+//        bool blackOut;
         
         FileList musicAssets;
         deque<string> randomAbstract;
@@ -2259,6 +2290,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         ofPixelFormat pixelFormat;
         vector<VideoClip> videoClips;
         vector<AudioClip> audioClips;
+        
+        multimap<int, Clip> starts;
+        set<int> restarts;
         
         vector<Clip> currentClips;
         

@@ -61,6 +61,8 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
         clipTimeline.calculateFrames();
     }
     
+    clipTimeline.calculateStartFrames();
+    
     ofxLogVerbose() << "\\/=====================\\/" << endl;
     ofxLogVerbose() << clipTimeline.getGroup() << endl;
     ofxLogVerbose() << "/\\=====================/\\" << endl;

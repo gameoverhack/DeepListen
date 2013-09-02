@@ -72,6 +72,8 @@ void PlayController::update(){
             
             makeClipGroup();
 
+            timeline.calculateStartFrames();
+            
             ofxLogVerbose() << "\\/---------------------\\/" << endl;
             ofxLogVerbose() << timeline.getGroup() << endl;
             ofxLogVerbose() << "/\\---------------------/\\" << endl;
@@ -341,6 +343,7 @@ void PlayController::makeClipGroup(){
                 if(lastClip.getClipInfo().category == "SPEC" && framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) > 90){
                     ofxLogNotice() << "INSERT BLACKSPACE RESTART at " << timeline.getLastClip().getVideoEnd() << " after " << framesToMinutes(timeline.getLastClip().getVideoEnd() - lastResetFrame) << endl;
                     lastResetFrame = timeline.getLastClip().getVideoEnd();
+                    //timeline.setRestart(lastResetFrame + 1);
                     blackspace.push_back(lastResetFrame);
                     titleInsertFrame = lastResetFrame + minutesToFrames(5);
                 }else{
