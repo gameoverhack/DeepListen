@@ -11,11 +11,11 @@
 
 //#define USE_FENSTER
 //#define RMBP_INTERNAL_SSD
-//#define RMBP_PEGASUS_SSD
-#define RETINA
+#define RMBP_PEGASUS_SSD
+//#define RETINA
 //#define BLACKCAVIAR
 //#define TEST_SOUND
-#define NO_SOUND
-#define JPEG
+//#define NO_SOUND
+//#define JPEG
 
 #endif
