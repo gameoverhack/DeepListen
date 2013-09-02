@@ -60,6 +60,7 @@ void NetworkController::update(){
                 ofxLogVerbose() << "volume:" << command[1] << endl;
                 float volume = CLAMP(ofToFloat(command[1]), 0.0f, 100.0f);
                 soundController->setMasterVolume(volume/100.0f);
+                appModel->setProperty("VolumeMaster", volume/100.0f);
                 send(i, command[0] + ":" + command[1]);
             }
             

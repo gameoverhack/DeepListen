@@ -146,6 +146,7 @@ void AppController::setup(){
     
 //    appModel->setProperty("VolumePeople", 1.0f);
 //    appModel->setProperty("VolumeMusic", 1.0f);
+//    appModel->setProperty("VolumeMaster", 1.0f);
     
 #if defined(RMBP_INTERNAL_SSD) || defined(RMBP_PEGASUS_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
 #ifdef JPEG
@@ -270,6 +271,7 @@ void AppController::update(){
         case kAPPCONTROLLER_SOUND:
         {
             soundController->setup(16,8);
+            soundController->setMasterVolume(appModel->getProperty<float>("VolumeMaster"));
             appControllerStates.setState(kAPPCONTROLLER_PLAY);
             appTimer = ofGetElapsedTimeMillis();
         }
@@ -443,10 +445,17 @@ void AppController::keyPressed(ofKeyEventArgs & e){
             playControllerStates.setState(kPLAYCONTROLLER_STOP);
             break;
         case 'm':
-            soundController->setMasterVolume(0.0f);
-            break;
-        case 'n':
-            soundController->setMasterVolume(1.0f);
+        {
+            // m key is now a toggle mute
+            float masterVolume = appModel->getProperty<float>("VolumeMaster");
+            if(masterVolume > 0){
+                masterVolume = 0.0f;
+            }else{
+                masterVolume = 1.0f;
+            }
+            appModel->setProperty("VolumeMaster", masterVolume);
+            soundController->setMasterVolume(masterVolume);
+        }
             break;
         case 'v':
             appModel->setProperty("VerticalSync", !appModel->getProperty<bool>("VerticalSync"));
