@@ -235,7 +235,7 @@ void PlayController::makeClipGroup(){
             ClipGroup specialGroup = allSpecClips;
             ClipGroup specialPerson = getGroupSelectionFrom(specialGroup, 1, 5);
             
-            specials.push_back(specialPerson[0].getName());
+            if(specialPerson.size() > 0) specials.push_back(specialPerson[0].getName());
             
         }else{// do a category
             
