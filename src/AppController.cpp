@@ -260,6 +260,7 @@ void AppController::update(){
         case kAPPCONTROLLER_INIT:
         {
             system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
+            ofSleepMillis(8000);
             appControllerStates.setState(kAPPCONTROLLER_LOAD);
         }
             break;
