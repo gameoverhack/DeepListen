@@ -260,7 +260,16 @@ void AppController::update(){
         case kAPPCONTROLLER_INIT:
         {
             system("./../../../appswitch -f -a \"DeepScreenBlocker\"");
-            ofSleepMillis(8000);
+            
+            FILE *lsofFile_p = NULL;
+            lsofFile_p = popen("ps $PPID -o comm=", "r");
+            char buffer[1024]; char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
+            pclose(lsofFile_p);
+            ofxLogVerbose() << line_p << endl;
+            ofxLogVerbose() << appModel->getApplicationPath() << endl;
+            if(string(line_p) == appModel->getApplicationPath() + "\n") ofSleepMillis(8000);
+            delete line_p;
+            
             appControllerStates.setState(kAPPCONTROLLER_LOAD);
         }
             break;
