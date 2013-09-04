@@ -1725,8 +1725,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     }
                     
                     if(musicVideo->getIsMovieDone()){
-                        ofxLogVerbose() << "Stopping Music " << endl;
-                        musicVideo->stop();
+                        ofxLogVerbose() << "Stopping Music " << musicVideo->getMovieName() << endl;
+                        if(musicVideo->isPlaying()) musicVideo->stop();
                     }
                     
                 }
@@ -1744,7 +1744,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     
                     if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
                         ofxLogVerbose() << "Stopping Video " << clip << endl;
-                        video->stop();
+                        if(video->isPlaying()) video->stop();
                         videoClip.clip.setClipStopping(true);
                     }
                     
@@ -1843,11 +1843,11 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void stop(){
             
             for(int i = 1; i < videoClips.size(); i++){
-                videoClips[i].video->stop();
+                if(videoClips[i].video->isPlaying()) videoClips[i].video->stop();
                 videoClips[i].clip = dummyClip;
             }
             for(int i = 0; i < audioClips.size(); i++){
-                audioClips[i].music->stop();
+                if(audioClips[i].music->isPlaying()) audioClips[i].music->stop();
             }
             setPaused(true);
         }
