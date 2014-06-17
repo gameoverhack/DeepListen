@@ -65,6 +65,7 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     bool ok = false;
     
     for(int channel = 1; channel < inChannels + 1; channel++){
+        cout << "Create input: " << channel << " of " << inChannels << endl;
         ok = createPort("input" + ofToString(channel), JackPortIsInput);
         if(!ok) break;
         ok = connect(getApplicationName() + ":out"+ofToString(channel), instanceName+ ":input" + ofToString(channel));
@@ -74,6 +75,7 @@ bool SoundController::setNumChannels(int inChannels, int outChannels){
     if(!ok) return false;
     
     for(int channel = 1; channel < outChannels + 1; channel++){
+        cout << "Create output: " << channel << " of " << outChannels << endl;
         ok = createPort("output" + ofToString(channel), JackPortIsOutput);
         if(!ok) break;
 #if defined(NO_SOUND)

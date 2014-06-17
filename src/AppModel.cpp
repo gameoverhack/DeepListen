@@ -42,7 +42,7 @@ void AppModel::saveTimelineHistory(){
         
     }
     timeLineHistory.lastTimelineTime = clipTimeline.getCurrentFrame();
-    Serializer.saveClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
+    Serializer->saveClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
 
 }
 
@@ -51,7 +51,7 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
     
     ofxLogNotice() << "Loading Timeline History" << endl;
     
-    Serializer.loadClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
+    Serializer->loadClass("timeLineHistory", timeLineHistory, ARCHIVE_BINARY);
 
     clipTimeline.clear();
     ClipGroup& group = clipTimeline.getGroup();
@@ -60,6 +60,8 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
         group.push(clipCopy);
         clipTimeline.calculateFrames();
     }
+    
+    clipTimeline.calculateStartFrames();
     
     ofxLogVerbose() << "\\/=====================\\/" << endl;
     ofxLogVerbose() << clipTimeline.getGroup() << endl;
@@ -92,13 +94,13 @@ TimeLineHistory& AppModel::loadTimelineHistory(){
 
 //--------------------------------------------------------------
 void AppModel::save(string filename, ArchiveType archiveType){
-    Serializer.saveClass(filename, (*this), archiveType);
+    Serializer->saveClass(filename, (*this), archiveType);
     BaseModel::save(filename + "_props", archiveType);
 }
 
 //--------------------------------------------------------------
 void AppModel::load(string filename, ArchiveType archiveType){
-    Serializer.loadClass(filename, (*this), archiveType);
+    Serializer->loadClass(filename, (*this), archiveType);
     BaseModel::load(filename + "_props", archiveType);
 }
 

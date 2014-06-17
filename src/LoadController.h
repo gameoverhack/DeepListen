@@ -19,17 +19,17 @@ public:
     
     void save(){
 #ifdef JPEG
-        Serializer.saveClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
+        Serializer->saveClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
 #else
-        Serializer.saveClass("clips_only", (*this), ARCHIVE_BINARY);
+        Serializer->saveClass("clips_only", (*this), ARCHIVE_BINARY);
 #endif
     };
     
     void load(){
 #ifdef JPEG
-        Serializer.loadClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
+        Serializer->loadClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
 #else
-        Serializer.loadClass("clips_only_jpeg", (*this), ARCHIVE_BINARY);
+        Serializer->loadClass("clips_only", (*this), ARCHIVE_BINARY);
 #endif
     };
     

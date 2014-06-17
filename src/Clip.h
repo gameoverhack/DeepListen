@@ -1467,6 +1467,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
     
     struct VideoClip {
         ofxThreadedVideo* video;
+        ofFbo renderer;
         Clip clip;
         int audioTrack;
     };
@@ -1520,8 +1521,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             
             ofxLogNotice() << "Setup timeline " << blackPath << endl;
             
-            blackFrames = 0;
-            blackOut = false;
+//            blackFrames = 0;
+//            blackOut = false;
             
             pixelFormat = pixelformat;
             
@@ -1553,7 +1554,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             
             if(pixelFormat == OF_PIXELS_2YUV){
                 shader.load(ofToDataPath("yuyvtorgba"));
-                renderer.allocate(1920, 1080);
+                //renderer.allocate(1920, 1080);
             }
             
         }
@@ -1563,12 +1564,20 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             if(!bPaused){
                 
                 currentClips.clear();
-                getClipsFrom(currentFrame, currentFrame, currentClips);
+                
+                std::pair <std::multimap<int, Clip>::iterator, std::multimap<int, Clip>::iterator> range;
+                range = starts.equal_range(currentFrame);
+                
+                for (std::multimap<int, Clip>::iterator it = range.first; it != range.second; ++it){
+                    currentClips.push_back(it->second);
+                }
+                
+                //getClipsFrom(currentFrame, currentFrame, currentClips);
                 
                 if(currentClips.size() > 0){
                     
-                    blackFrames = 0;
-                    blackOut = false;
+//                    blackFrames = 0;
+//                    blackOut = false;
                     
                     for(int i = 0; i < currentClips.size(); i++){
                         
@@ -1652,6 +1661,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                                 
                                 ofxLogVerbose() << "...loaded normal clip: " << clip << endl;
                                 
+//                                videoClip.renderer.allocate(clip.getWidth(), clip.getHeight());
+                                
                                 ofxLogVerbose() << "Assign (video) audio to: " << videoClip.audioTrack << endl;
                                 video->setAudioTrackToChannel(1, kAudioChannelLabel_Mono, soundController->getChannelLabel(videoClip.audioTrack));
                                 
@@ -1676,14 +1687,15 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                             
                         }
                     }
-                }else{
-                    blackFrames++;
-                    if(blackFrames > secondsToFrames(2) && currentFrame < totalFrames){
-                        ofxLogWarning() << "RESTART" << endl;
-                        blackOut = true;
-                    }
-                    
                 }
+//                else{
+//                    blackFrames++;
+//                    if(blackFrames > secondsToFrames(2) && currentFrame < totalFrames){
+//                        ofxLogWarning() << "RESTART" << endl;
+//                        //blackOut = true;
+//                    }
+//                    
+//                }
                 
                 for(int i = 0; i < audioClips.size(); i++){
                     
@@ -1725,8 +1737,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     }
                     
                     if(musicVideo->getIsMovieDone()){
-                        ofxLogVerbose() << "Stopping Music " << musicVideo->getMovieName() << endl;
-                        if(musicVideo->isPlaying()) musicVideo->stop();
+                        ofxLogVerbose() << "Stopping Music " << endl;
+                        musicVideo->stop();
                     }
                     
                 }
@@ -1744,7 +1756,7 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                     
                     if((video->getIsMovieDone() || (clip.getIsCropped() && currentFrame >= clip.getVideoEnd())) && !clip.getClipStopping()){
                         ofxLogVerbose() << "Stopping Video " << clip << endl;
-                        if(video->isPlaying()) video->stop();
+                        video->stop();
                         videoClip.clip.setClipStopping(true);
                     }
                     
@@ -1814,8 +1826,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void setFrame(int frame){
             //bool cPaused = bPaused;
             //stop();
-            blackFrames = 0;
-            blackOut = 0;
+//            blackFrames = 0;
+//            blackOut = 0;
             currentFrame = frame;
             for(int i = 1; i < videoClips.size(); i++){
                 VideoClip & videoClip = videoClips[i];
@@ -1840,14 +1852,31 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             //setPaused(cPaused);
         }
         
+        void deleteTimeline(){
+            ofxLogNotice() << "Deleting timeline!" << endl;
+            for(int i = 1; i < videoClips.size(); i++){
+                delete videoClips[i].video;
+            }
+            for(int i = 0; i < audioClips.size(); i++){
+                delete audioClips[i].music;
+            }
+        }
+        
         void stop(){
             
             for(int i = 1; i < videoClips.size(); i++){
-                if(videoClips[i].video->isPlaying()) videoClips[i].video->stop();
-                videoClips[i].clip = dummyClip;
+                if(videoClips[i].video->isPlaying()){
+                    videoClips[i].video->stop();
+                    videoClips[i].video->finish();
+                    videoClips[i].clip = dummyClip;
+                }
             }
             for(int i = 0; i < audioClips.size(); i++){
-                if(audioClips[i].music->isPlaying()) audioClips[i].music->stop();
+                if(audioClips[i].music->isPlaying()){
+                    audioClips[i].music->stop();
+                    audioClips[i].music->finish();
+                }
+                
             }
             setPaused(true);
         }
@@ -1858,16 +1887,16 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         }
         
         void setPaused(bool b){
-            blackFrames = 0;
-            blackOut = 0;
+//            blackFrames = 0;
+//            blackOut = 0;
             bPaused = b;
             if(bPaused){
                 for(int i = 0; i < videoClips.size(); i++){
-                    videoClips[i].video->setPaused(true);
+                    if(!videoClips[i].video->isPaused()) videoClips[i].video->setPaused(true);
                 }
             }else{
                 for(int i = 0; i < videoClips.size(); i++){
-                    videoClips[i].video->setPaused(false);
+                    if(videoClips[i].video->isPaused()) videoClips[i].video->setPaused(false);
                 }
             }
         }
@@ -1899,14 +1928,19 @@ inline ostream& operator<<(ostream& os, const Clip &c){
                         
                         if(video->getPixelFormat() == OF_PIXELS_2YUV){
                             
-                            renderer.begin();
+                            if(videoClips[i].renderer.getWidth() != video->getWidth() - 1 || videoClips[i].renderer.getHeight() != video->getHeight() - 1){
+                                cout << "Allocating: " << video->getWidth() << " x " << video->getHeight() << endl;
+                                videoClips[i].renderer.allocate(video->getWidth() - 1, video->getHeight() - 1);
+                            }
+                            
+                            videoClips[i].renderer.begin();
                             ofClear(0.0f, 0.0f, 0.0f, 1.0f);
-                            renderer.end();
+                            videoClips[i].renderer.end();
                             shader.begin();
                             shader.setUniformTexture("yuvTex", video->getTextureReference(), 1);
                             shader.setUniform1i("conversionType", (false ? 709 : 601));
                             shader.setUniform1f("fade", video->getFade());
-                            renderer.draw(0, 0);
+                            videoClips[i].renderer.draw(0, 0);
                             shader.end();
                             
                         }else{
@@ -1990,6 +2024,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         void clear(){
             stop();
             group.clear();
+            starts.clear();
+            restarts.clear();
             calculateFrames();
             currentFrame = 0;
         };
@@ -2160,6 +2196,22 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             }
         };
         
+        void calculateStartFrames(){
+            totalFrames = 0;
+            starts.clear();
+            int endFrame = 0;
+            int startFrame = 0;
+            for(int i = 0; i < group.size(); i++){
+                if(i > 0){
+                    if(group[i].getVideoStart() - group[i-1].getVideoEnd() > minutesToFrames(4)){
+                        setRestart(group[i-1].getVideoEnd());
+                    }
+                }
+                totalFrames = MAX(totalFrames, group[i].getVideoEnd());
+                starts.insert(pair<int, Clip>(group[i].getVideoStart(), group[i]));
+            }
+        }
+        
         vector<VideoClip>& getVideoClips(){
             return videoClips;
         }
@@ -2222,8 +2274,12 @@ inline ostream& operator<<(ostream& os, const Clip &c){
             return path;
         }
         
+        void setRestart(int frame){
+            restarts.insert(frame);
+        }
+        
         bool getRestart(){
-            return blackOut;
+            return (restarts.find(currentFrame) != restarts.end());
         }
         
         void setVolumePeople(float v){
@@ -2238,8 +2294,8 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         
         float volumePeople, volumeMusic;
         
-        int blackFrames;
-        bool blackOut;
+//        int blackFrames;
+//        bool blackOut;
         
         FileList musicAssets;
         deque<string> randomAbstract;
@@ -2259,6 +2315,9 @@ inline ostream& operator<<(ostream& os, const Clip &c){
         ofPixelFormat pixelFormat;
         vector<VideoClip> videoClips;
         vector<AudioClip> audioClips;
+        
+        multimap<int, Clip> starts;
+        set<int> restarts;
         
         vector<Clip> currentClips;
         

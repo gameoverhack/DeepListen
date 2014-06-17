@@ -50,7 +50,11 @@ void LoadController::update(){
     
 #ifdef RMBP_PEGASUS_SSD
     for(int i = 0; i < 4; i++){
+#ifdef PRORES
+        videoFiles.addDir(appModel->getProperty<string>("VideoPath") + ofToString(i) + "/PRORES70", false);
+#else
         videoFiles.addDir(appModel->getProperty<string>("VideoPath") + ofToString(i) + "/ANIME60", false);
+#endif
     }
     videoFiles.list();
 #else
@@ -127,7 +131,7 @@ void LoadController::update(){
                 clip.setDeleted(false);
                 appModel->setClip(clip);
             }
-            
+
             if(audioFiles.getFileExists(name) && textFiles.getFileExists(name)){
                 
                 ofxLogNotice() << "ADDING clip: " << name << endl;
@@ -191,6 +195,9 @@ void LoadController::update(){
            !audioFiles.getFileExists(clip.getName()) || 
            !textFiles.getFileExists(clip.getName())){
             
+            
+            cout <<videoFiles.getFileExists(clip.getName()) << " " << audioFiles.getFileExists(clip.getName()) << " " <<textFiles.getFileExists(clip.getName()) << endl;
+            
             // if any one of these files does not exist then
             // mark the clip as deleted in case we're just
             // temporarily removing the file
@@ -236,6 +243,7 @@ void LoadController::update(){
     if(!appModel->getProperty<bool>("ImportClipRects")){
         clips.clips = appModel->getClips();
         clips.save();
+        appModel->save("config", ARCHIVE_BINARY);
     }
     
     if(appModel->getNumClipsForAnalysis() > 0){

@@ -90,14 +90,14 @@ inline ostream& operator<<(ostream& os, File &f){
             extensions.push_back(extension);
         }
         
-        void addDir(string path, bool recursive){
+        inline void addDir(string path, bool recursive){
             Directory directory;
             directory.path = path;
             directory.recursive = recursive;
             directories.push_back(directory);
         }
         
-        void listDir(string path, bool recursive){
+        inline void listDir(string path, bool recursive){
             addDir(path, recursive);
             list();
         }

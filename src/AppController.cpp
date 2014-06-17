@@ -27,12 +27,13 @@ void AppController::setup(){
     // set log levels
     ofxLogSetLogLevel(LOG_VERBOSE);
     ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel("ofThread", OF_LOG_NOTICE);
     
 #ifndef NO_SOUND
-    system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
-    ofSleepMillis(2000);
+    //system("~/../../usr/local/bin/jackd -R -d coreaudio -d 'de_IMM_driver_USBAudioEngine:1658A66' -p 512 -r 48000 'JackRouter' -i 8 -o 8 &");
+    //ofSleepMillis(2000);
 #else
-    system("~/../../usr/local/bin/jackd -R -d coreaudio -p 512 -r 48000 'JackRouter' -i 2 -o 2 &");
+    system("~/../../usr/local/bin/jackd -R -d coreaudio -P false 512 -r 48000 'JackRouter' -o 2 &");
     ofSleepMillis(2000);
 #endif
     
@@ -77,7 +78,7 @@ void AppController::setup(){
 //    appModel->setProperty("VerticalSync", false);
     ofSetVerticalSync(appModel->getProperty<bool>("VerticalSync"));
     
-//    appModel->setProperty("LogToFile", false);
+//    appModel->setProperty("LogToFile", true);
     ofxLogSetLogToFile(appModel->getProperty<bool>("LogToFile"), ofToDataPath("log_" + ofGetTimestampString() + ".txt"));
     
     appModel->setProperty("mouseX", 0);
@@ -101,7 +102,7 @@ void AppController::setup(){
 #elif defined(RMBP_PEGASUS_SSD)
     rootPath = "/Volumes/Deep00/";
 #elif defined(RETINA)
-    rootPath = "/Users/gameover/Desktop/DeepDataTest/";
+    rootPath = "/Users/gameoverlf/Desktop/DeepDataTest/";
 #elif defined(BLACKCAVIAR)
     rootPath = "/Volumes/Love/DeepData/";
 #else
@@ -150,7 +151,7 @@ void AppController::setup(){
     appModel->setProperty("VolumeMax", 1.0f);
     
 #if defined(RMBP_INTERNAL_SSD) || defined(RMBP_PEGASUS_SSD) || defined(RETINA) || defined(BLACKCAVIAR)
-#ifdef JPEG
+#if defined (JPEG) || defined (PRORES)
     appModel->setProperty("PixelFormat", (string)"JPEG");
 #else
     appModel->setProperty("PixelFormat", (string)"BGRA");
@@ -238,8 +239,8 @@ void AppController::setup(){
     CGPostMouseEvent( p, 1, 1, 1 );   
     CGPostMouseEvent( p, 1, 1, 0 );
     
-    ofHideCursor();
-    ofSetFullscreen(true);
+    //ofHideCursor();
+    //ofSetFullscreen(true);
     
     system("./../../../appswitch -h -a \"Finder\"");
     system("./../../../appswitch -h -a \"TotalMix FX\"");
@@ -267,7 +268,11 @@ void AppController::update(){
             pclose(lsofFile_p);
             ofxLogVerbose() << line_p << endl;
             ofxLogVerbose() << appModel->getApplicationPath() << endl;
-            if(string(line_p) == appModel->getApplicationPath() + "\n") ofSleepMillis(8000);
+            if(string(line_p) == appModel->getApplicationPath() + "\n"){
+                ofSleepMillis(8000);
+            }else{
+                //ofSleepMillis(2000);
+            }
             delete line_p;
             
             appControllerStates.setState(kAPPCONTROLLER_LOAD);
@@ -281,7 +286,7 @@ void AppController::update(){
             break;
         case kAPPCONTROLLER_SOUND:
         {
-            soundController->setup(16,8);
+            soundController->setup(16, 8);
             soundController->setMasterVolume(appModel->getProperty<float>("VolumeMaster"));
             appControllerStates.setState(kAPPCONTROLLER_PLAY);
             appTimer = ofGetElapsedTimeMillis();
@@ -393,6 +398,23 @@ void AppController::exit(){
     
     appModel->save("config", ARCHIVE_BINARY);
     
+    //ofSleepMillis(1000);
+    
+    timeline.deleteTimeline();
+    
+    soundController->stop();
+    
+    delete loadController;
+    delete analyzeController;
+    delete playController;
+    delete soundController;
+    delete appViews[0];
+    delete appViews[1];
+    delete debugView;
+    delete analyzeView;
+    delete networkController;
+    delete Serializer;
+    
     system("pkill DeepScreenBlocker");
     system("pkill jackdmp");
     system("pkill jackd");
@@ -406,6 +428,8 @@ void AppController::restart(){
     timeline.stop();
     appModel->saveTimelineHistory();
     timeline.clear();
+    
+    soundController->stop();
     
     system("./../../../DeepScreenBlocker.app/Contents/MacOS/DeepScreenBlocker &");
     ofSleepMillis(500);
